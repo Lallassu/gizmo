@@ -1,0 +1,63 @@
+Interfaces
+-----------
+EntityIf
+    - Hit(x,y, byObject) bool
+    - Explode()
+    - GetPosition() pixel.Vec
+    - SetPosition(x,y)
+    - GetMass()
+    - Intersects(GenericIf) bool
+    - IsParticle() bool
+    - GetType()
+    - Pickup()
+    - Drop()
+    - Throw()
+
+Classes
+-----------
+- Base
+    - *World
+    - *ParticleEngine
+    - *win
+    - *camera
+- Camera
+    - SetPosition()
+    - Follow(genericIf)
+    - Zoom control
+    - Lerp
+- Controller
+    - Handle inputs or generate inputs
+    - Player
+    - AI
+- Entity
+    - Moveable entity with animation or other.
+    - Can be character or other
+    - Implements phys
+- ParticleEngine
+    - Pool
+    - CreateFire(size, position)
+    - CreateSmoke(size, position)
+- Particle
+    - Types
+    - *Phys
+    - Incl. Ammo
+    - Fire
+    - Smoke
+    - Blood
+    - Size
+- World
+    - Quadtree
+        - objects are GenericIf
+- Chunk
+    - GenericIf
+- Utils
+    - floodfill
+    - Load sprites
+    - Load Textures
+- Weapons
+    - Type
+- constants
+    - Constants etc.
+- Log
+
+
