@@ -3,17 +3,26 @@ package main
 type mapType int
 
 const (
-	map_easy mapType = iota
-	map_normal
-	map_hard
-	map_hell
-	map_wtf
+	mapEasy mapType = iota
+	mapNormal
+	mapHard
+	mapHell
+	mapWtf
 )
 
 type weaponType int
 
 const (
-	weapon_ak47 weaponType = iota
-	weapon_rocket
-	weapon_grenade
+	weaponAk47 weaponType = iota
+	weaponRocket
+	weaponGrenade
+)
+
+type particleType int
+
+const (
+	particleRegular particleType = iota
+	particleBlood
+	particleFire
+	particleSmoke
 )
