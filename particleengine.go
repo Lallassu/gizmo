@@ -4,3 +4,6 @@
 // Particles of different kinds.
 //=============================================================
 package main
+
+type particleEngine struct {
+}

@@ -8,46 +8,69 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
-	"github.com/faiface/pixel/pixelgl"
+	_ "github.com/faiface/pixel/pixelgl"
 )
 
 //=============================================================
 // Chunk Structure
 //=============================================================
-type Chunk struct {
+type chunk struct {
 	dirty  bool
-	pixels []*uint32
-	x      float64
-	y      float64
-	width  float64
-	height float64
 	model  *imdraw.IMDraw
+	bounds Bounds
+}
+
+//=============================================================
+// Support the Entity interface
+//=============================================================
+func (c *chunk) hit(x, y float64) bool {
+	return false
+}
+
+func (c *chunk) explode() {
+}
+
+func (c *chunk) getMass() float64 {
+	return 1.0
+}
+
+func (c *chunk) getType() entityType {
+	return entityChunk
 }
 
 //=============================================================
 // Create a new chunk
 //=============================================================
-func (c *Chunk) create() {
-	c.draw_model = imdraw.New(nil)
+func (c *chunk) create(x, y float64) {
+	c.model = imdraw.New(nil)
 	c.dirty = true
+	c.bounds = Bounds{
+		X:      x,
+		Y:      y,
+		Width:  wPixelsPerChunk,
+		Height: wPixelsPerChunk,
+		entity: Entity(c),
+	}
 }
 
 //=============================================================
 // Draw the chunk
 //=============================================================
-func (c *Chunk) draw(win *pixelgl.Window) {
-	c.model.Draw(win)
+func (c *chunk) draw(dt float64) {
+	if c.dirty {
+		c.build()
+	}
+	c.model.Draw(global.gWin)
 }
 
 //=============================================================
 // Rebuild/Build the chunk.
 //=============================================================
-func (c *Chunk) build() {
+func (c *chunk) build() {
 	model := imdraw.New(nil)
-
-	for x := 0; x < wPixelsPerChunk; x++ {
-		for y := 0; y < wPixelsPerChunk; y++ {
-			p := *c.Pixels[wPixelsPerChunk*x+y]
+	for x := c.bounds.X; x < c.bounds.X+c.bounds.Width; x++ {
+		for y := c.bounds.Y; y < c.bounds.Y+c.bounds.Height; y++ {
+			p := global.gWorld.pixels[int(float64(global.gWorld.width)*x+y)]
 			if p == 0 {
 				continue
 			}
@@ -59,8 +82,8 @@ func (c *Chunk) build() {
 			).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
 
 			model.Push(
-				pixel.V(float64(c.Posx+x*wPixelSize), float64(c.Posy+y*wPixelSize)),
-				pixel.V(float64(c.Posx+x*wPixelSize+wPixelSize), float64(c.Posy+y*wPixelSize+wPixelSize)),
+				pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
+				pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
 			)
 			model.Rectangle(0)
 		}

@@ -5,17 +5,14 @@
 //=============================================================
 package main
 
-import ()
+import (
+	_ "github.com/faiface/pixel"
+)
 
-type EntityIf interface {
+type Entity interface {
 	hit(x, y float64) bool
 	explode()
-	getPosition() pixel.Vec
-	setPosition(x, y float64)
 	getMass() float64
-	intersects(EntityIf) bool
 	getType() entityType
-	// Pickup() bool
-	// Drop() bool
-	// Throw() bool
+	draw(dt float64)
 }

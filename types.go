@@ -26,3 +26,12 @@ const (
 	particleFire
 	particleSmoke
 )
+
+type entityType int
+
+const (
+	entityPlayer entityType = iota
+	entityEnemy
+	entityObject
+	entityChunk
+)
