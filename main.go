@@ -71,10 +71,10 @@ func gameLoop() {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 
-		if global.gWin.Pressed(pixelgl.KeyDown) {
+		if global.gWin.Pressed(pixelgl.KeyS) {
 			global.gCamera.zoom -= 0.1
 		}
-		if global.gWin.Pressed(pixelgl.KeyUp) {
+		if global.gWin.Pressed(pixelgl.KeyW) {
 			global.gCamera.zoom += 0.1
 		}
 		if global.gWin.Pressed(pixelgl.KeyLeft) {
@@ -82,6 +82,15 @@ func gameLoop() {
 		}
 		if global.gWin.Pressed(pixelgl.KeyRight) {
 			global.gCamera.pos.X += 5.1
+		}
+		if global.gWin.Pressed(pixelgl.KeyUp) {
+			global.gCamera.pos.Y += 5.1
+		}
+		if global.gWin.Pressed(pixelgl.KeyDown) {
+			global.gCamera.pos.Y -= 5.1
+		}
+		if global.gWin.Pressed(pixelgl.KeyM) {
+			PrintMemoryUsage()
 		}
 		if global.gWin.Pressed(pixelgl.KeyQ) {
 			break

@@ -30,9 +30,9 @@ type world struct {
 func (w *world) Init() {
 	w.qt = &Quadtree{
 		Bounds:     Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)},
-		MaxObjects: 5,
-		MaxLevels:  5,
-		Level:      10,
+		MaxObjects: 4,
+		MaxLevels:  4,
+		Level:      4,
 	}
 }
 
@@ -62,10 +62,13 @@ func (w *world) NewMap(maptype mapType) {
 	Debug("Generating world", w.width, w.height)
 	g := generator{}
 	pixels := g.NewWorld(w.width, w.height)
+
+	// Ad dall pixels as red before coloring
 	for i := 0; i < len(pixels); i += 2 {
-		w.addPixel(int(pixels[i]), int(pixels[i+1]), uint32(0xFF0000FF))
+		w.AddPixel(int(pixels[i]), int(pixels[i+1]), uint32(0xFF0000FF))
 	}
 
+	// Paint the map with colors
 	w.paintMap()
 
 	// Initialize pixel pointers in the chunks
@@ -106,7 +109,7 @@ func (w *world) Draw(dt float64) {
 	}
 }
 
-func (w *world) addPixel(x, y int, color uint32) {
+func (w *world) AddPixel(x, y int, color uint32) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		w.pixels[w.width*x+y] = color
@@ -114,7 +117,7 @@ func (w *world) addPixel(x, y int, color uint32) {
 	}
 }
 
-func (w *world) removePixel(x, y int) {
+func (w *world) RemovePixel(x, y int) {
 
 }
 
@@ -127,7 +130,7 @@ func (w *world) removePixel(x, y int) {
 //=============================================================
 // Flood fill in map
 //=============================================================
-func (w *world) FloodFill(x, y float64) {
+func (w *world) floodFill(x, y float64) {
 
 }
 

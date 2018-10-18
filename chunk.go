@@ -8,7 +8,7 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
-	_ "github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/pixelgl"
 )
 
 //=============================================================
@@ -16,7 +16,7 @@ import (
 //=============================================================
 type chunk struct {
 	dirty  bool
-	model  *imdraw.IMDraw
+	canvas *pixelgl.Canvas
 	bounds Bounds
 }
 
@@ -42,7 +42,7 @@ func (c *chunk) getType() entityType {
 // Create a new chunk
 //=============================================================
 func (c *chunk) create(x, y float64) {
-	c.model = imdraw.New(nil)
+	c.canvas = pixelgl.NewCanvas(pixel.R(0, 0, wPixelsPerChunk, wPixelsPerChunk))
 	c.dirty = true
 	c.bounds = Bounds{
 		X:      x,
@@ -60,7 +60,7 @@ func (c *chunk) draw(dt float64) {
 	if c.dirty {
 		c.build()
 	}
-	c.model.Draw(global.gWin)
+	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X, c.bounds.Y)))
 }
 
 //=============================================================
@@ -68,9 +68,9 @@ func (c *chunk) draw(dt float64) {
 //=============================================================
 func (c *chunk) build() {
 	model := imdraw.New(nil)
-	for x := c.bounds.X; x < c.bounds.X+c.bounds.Width; x++ {
-		for y := c.bounds.Y; y < c.bounds.Y+c.bounds.Height; y++ {
-			p := global.gWorld.pixels[int(float64(global.gWorld.width)*x+y)]
+	for x := 0.0; x < c.bounds.Width; x++ {
+		for y := 0.0; y < c.bounds.Height; y++ {
+			p := global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))]
 			if p == 0 {
 				continue
 			}
@@ -88,6 +88,6 @@ func (c *chunk) build() {
 			model.Rectangle(0)
 		}
 	}
-	c.model = model
+	model.Draw(c.canvas)
 	c.dirty = false
 }

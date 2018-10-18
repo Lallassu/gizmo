@@ -2,7 +2,8 @@ General
 --------
 - World should have static border around the whole map.
   Like a container.
-- Chunk gets pixels from world.pixels and draws an model
+- Only lookup entities to draw if camera hasn't moved more than
+  a certain threshold
 
 Interfaces
 -----------
