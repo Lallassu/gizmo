@@ -10,6 +10,10 @@
 //=============================================================
 package main
 
+import (
+	"github.com/faiface/pixel"
+)
+
 //=============================================================
 // World Structure
 //=============================================================
@@ -27,15 +31,22 @@ type world struct {
 // World Public Functions
 //=============================================================
 //=============================================================
+
+//=============================================================
+// Initialize world first time.
+//=============================================================
 func (w *world) Init() {
 	w.qt = &Quadtree{
 		Bounds:     Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)},
 		MaxObjects: 4,
-		MaxLevels:  4,
-		Level:      4,
+		MaxLevels:  8,
+		Level:      0,
 	}
 }
 
+//=============================================================
+// New Map
+//=============================================================
 func (w *world) NewMap(maptype mapType) {
 	// Generate map based on maptype
 	w.currentMap = maptype
@@ -80,28 +91,47 @@ func (w *world) NewMap(maptype mapType) {
 		}
 	}
 
+	// Build all chunks first time.
+	for _, v := range w.qt.RetrieveIntersections(Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
+		v.entity.draw(0)
+	}
 	Debug("Tree Size:", w.qt.Total)
 	Debug("World generation complete.")
 }
 
+//=============================================================
+// Add object to world (QT)
+//=============================================================
 func (w *world) AddObject(x, y float64, obj Entity) {
 
 }
 
+//=============================================================
+// Remove object from world (QT)
+//=============================================================
 func (w *world) RemoveObject(obj Entity) {
 
 }
 
+//=============================================================
+// Check if pixel exists
+//=============================================================
 func (w *world) PixelExists(x, y float64) bool {
 
 	return true
 }
 
+//=============================================================
+// Get color of the specified pixel
 // Return -1 if not exist
+//=============================================================
 func (w *world) PixelColor(x, y float64) int32 {
 	return 1
 }
 
+//=============================================================
+// Draw
+//=============================================================
 func (w *world) Draw(dt float64) {
 	// Draw those around camera position only.
 	for _, v := range w.qt.RetrieveIntersections(Bounds{X: global.gCamera.pos.X, Y: global.gCamera.pos.Y, Width: wViewMax, Height: wViewMax}) {
@@ -109,6 +139,9 @@ func (w *world) Draw(dt float64) {
 	}
 }
 
+//=============================================================
+// Add pixel with color (replace if already exists)
+//=============================================================
 func (w *world) AddPixel(x, y int, color uint32) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
@@ -117,8 +150,90 @@ func (w *world) AddPixel(x, y int, color uint32) {
 	}
 }
 
+//=============================================================
+// Remove a pixel from the world map
+//=============================================================
 func (w *world) RemovePixel(x, y int) {
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF == wStaticColor8 ||
+			w.pixels[pos]&0xFF == wBackground8 || w.pixels[pos]&0xFF == wShadow8 {
+			return
+		}
 
+		// Remove shadow
+		for i := 0; i < 25; i++ {
+			pos2 := (x+i)*w.width + y - i
+			if pos2 < w.width*w.height && pos2 >= 0 {
+				if w.pixels[pos2]&0xFF == wShadow8 {
+					//w.RemoveShadow(x+i, y-i)
+				}
+			}
+		}
+
+		// Add shadow to visible pixel
+		for i := 0; i < 5; i++ {
+			pos2 := (x+i)*w.width + y - i
+			if pos2 < w.width*w.height && pos2 >= 0 {
+				if w.pixels[pos2]&0xFF == wBackground8 {
+					//w.AddShadow(x+i, y-i)
+				}
+			}
+		}
+
+		// Particle
+		// if w.Exists(float64(x), float64(y)) {
+		// 	p := Particle{
+		// 		X:     float64(x),
+		// 		Y:     float64(y),
+		// 		Size:  1,
+		// 		Color: w.pixels[pos],
+		// 	}
+		// 	w.pts.NewParticle(p)
+		// }
+
+		// Set bg pixel.
+		if w.pixels[pos] != 0 {
+			v := w.coloring.getBackground()
+			v &= wBackground32
+			w.pixels[pos] = v
+		}
+		w.markChunkDirty(x, y)
+	}
+}
+
+//=============================================================
+// Explode in world
+// Also hits objects in the world.
+//=============================================================
+func (w *world) Explode(x, y int, power int) {
+	pow := power * power
+	ff := make([]pixel.Vec, 10)
+	for rx := x - power; rx <= x+power; rx++ {
+		vx := (rx - x) * (rx - x)
+		for ry := y - power; ry <= y+power; ry++ {
+			if ry < 0 {
+				continue
+			}
+			val := (ry-y)*(ry-y) + vx
+			if val <= pow {
+				w.RemovePixel(rx, ry)
+				//w.ObjectHit(float64(rx), float64(ry))
+			} else {
+				ff = append(ff, pixel.Vec{X: float64(rx), Y: float64(ry)})
+			}
+		}
+	}
+
+	// Floodfill
+	// pixels := make([]Vec, 0)
+	// for i := 0; i < len(ff); i++ {
+	// 	pixels = append(pixels, w.FloodFill(ff[i].X, ff[i].Y)...)
+	// }
+
+	// for i := 0; i < len(pixels); i++ {
+	// 	w.UnMarkPixelVisited(pixels[i].X, pixels[i].Y)
+	// }}
 }
 
 //=============================================================
@@ -130,7 +245,14 @@ func (w *world) RemovePixel(x, y int) {
 //=============================================================
 // Flood fill in map
 //=============================================================
-func (w *world) floodFill(x, y float64) {
+func (w *world) floodFill(x, y int) {
+
+}
+
+//=============================================================
+// Mark chunk as dirty to rebuild it
+//=============================================================
+func (w *world) markChunkDirty(x, y int) {
 
 }
 
@@ -284,12 +406,13 @@ func (w *world) paintMap() {
 				before := w.pixels[(x-1)*w.width+y] & 0xFF
 				point := w.pixels[x*w.width+y] & 0xFF
 				after := w.pixels[(x+1)*w.width+y] & 0xFF
-				above := w.pixels[(x)*w.width+y+1] & 0xFF
+				above := w.pixels[x*w.width+y+1] & 0xFF
 				long := uint32(0)
 				if x+23 < w.width {
 					long = w.pixels[(x+23)*w.width+y] & 0xFF
 				}
 				if above == wBackground8 && point == 0xFF && before == 0xFF && after == wBackground8 && long == 0xFF {
+					Debug("COLOR LADDER")
 					for i := 0; i < 18; i++ {
 						if i == 5 || i == 17 {
 							for n := 0; n < 500000; n++ {

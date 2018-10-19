@@ -19,7 +19,7 @@ func GenerateMapColor(maptype mapType) *mapColor {
 	m := &mapColor{
 		background: 0xAAF55FFF,
 		foreground: 0xFFAADAFF,
-		ladders:    0x00FFAAFF,
+		ladders:    0x444444FF,
 		borders:    0xFF0000FF,
 	}
 	return m

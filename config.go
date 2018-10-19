@@ -19,7 +19,7 @@ const (
 	wPixelsPerChunk     = 64
 	wPixelSize          = 1
 	wBorderSize         = 5
-	wStaticBorderSize   = 20
+	wStaticBorderSize   = 0
 	wStaticColor32      = 0xFFFFFFFE
 	wStaticColor8       = 0xFE
 	wFloodFill8         = 0xFC
