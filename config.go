@@ -18,7 +18,7 @@ const (
 const (
 	wPixelsPerChunk     = 64
 	wPixelSize          = 1
-	wBorderSize         = 5
+	wBorderSize         = 10
 	wStaticBorderSize   = 0
 	wStaticColor32      = 0xFFFFFFFE
 	wStaticColor8       = 0xFE
@@ -48,6 +48,7 @@ type Global struct {
 	gParticles    *particleEngine
 	gClearColor   pixel.RGBA
 	gWin          *pixelgl.Window
+	gController   *controller
 }
 
 var global = &Global{
@@ -57,6 +58,7 @@ var global = &Global{
 	gUndecorated:  false,
 	gWorld:        &world{},
 	gCamera:       &camera{},
+	gController:   &controller{},
 	gParticles:    &particleEngine{},
 	gClearColor:   pixel.RGBA{0.4, 0.4, 0.4, 1.0},
 	gWin:          &pixelgl.Window{},

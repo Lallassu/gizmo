@@ -206,7 +206,9 @@ func (w *world) RemovePixel(x, y int) {
 // Explode in world
 // Also hits objects in the world.
 //=============================================================
-func (w *world) Explode(x, y int, power int) {
+func (w *world) Explode(x_, y_ float64, power int) {
+	x := int(x_)
+	y := int(y_)
 	pow := power * power
 	ff := make([]pixel.Vec, 10)
 	for rx := x - power; rx <= x+power; rx++ {
@@ -253,7 +255,12 @@ func (w *world) floodFill(x, y int) {
 // Mark chunk as dirty to rebuild it
 //=============================================================
 func (w *world) markChunkDirty(x, y int) {
-
+	// Get all chunks in this area.
+	for _, v := range w.qt.RetrieveIntersections(Bounds{X: float64(x), Y: float64(y), Width: 3, Height: 3}) {
+		if v.entity.getType() == entityChunk {
+			v.entity.(*chunk).dirty = true
+		}
+	}
 }
 
 //=============================================================
@@ -412,7 +419,6 @@ func (w *world) paintMap() {
 					long = w.pixels[(x+23)*w.width+y] & 0xFF
 				}
 				if above == wBackground8 && point == 0xFF && before == 0xFF && after == wBackground8 && long == 0xFF {
-					Debug("COLOR LADDER")
 					for i := 0; i < 18; i++ {
 						if i == 5 || i == 17 {
 							for n := 0; n < 500000; n++ {

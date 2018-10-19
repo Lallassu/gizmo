@@ -88,6 +88,7 @@ func (c *chunk) build() {
 			model.Rectangle(0)
 		}
 	}
+	c.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 	model.Draw(c.canvas)
 	c.dirty = false
 }

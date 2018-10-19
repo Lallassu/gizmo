@@ -17,6 +17,7 @@ type camera struct {
 	scale     pixel.Vec
 	follow    *Entity
 	wScalePos pixel.Vec
+	cam       pixel.Matrix
 }
 
 func (c *camera) create() {
@@ -40,8 +41,8 @@ func (c *camera) update(dt float64) {
 	}
 	pos = c.pos // TBD
 	camPos := pixel.Lerp(c.pos, pos, 1-math.Pow(1.0/128, dt))
-	cam := pixel.IM.Moved(camPos.Scaled(-1))
-	cam = cam.Moved(c.wScalePos)
-	cam = cam.Scaled(c.wScalePos, c.zoom)
-	global.gWin.SetMatrix(cam)
+	c.cam = pixel.IM.Moved(camPos.Scaled(-1))
+	//c.cam = c.cam.Moved(c.wScalePos)
+	c.cam = c.cam.Scaled(c.wScalePos, c.zoom)
+	global.gWin.SetMatrix(c.cam)
 }

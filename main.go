@@ -49,11 +49,12 @@ func run() {
 func setup() {
 	// Camera setup
 	global.gCamera.create()
-	// Init map
+	global.gController.create()
 	global.gWorld.Init()
 	global.gWorld.NewMap(mapEasy)
-	global.gCamera.setPosition(-200, -200)
+	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 2
+	global.gWin.SetSmooth(false)
 
 }
 
@@ -66,37 +67,13 @@ func gameLoop() {
 	//fps := time.Tick(time.Second / 60)
 	//second := time.Tick(time.Second)
 
-	//cs := pixel.Vec{0, 0}
-	for !global.gWin.Closed() {
+	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 
-		if global.gWin.Pressed(pixelgl.KeyS) {
-			global.gCamera.zoom -= 0.1
-		}
-		if global.gWin.Pressed(pixelgl.KeyW) {
-			global.gCamera.zoom += 0.1
-		}
-		if global.gWin.Pressed(pixelgl.KeyLeft) {
-			global.gCamera.pos.X -= 5.1
-		}
-		if global.gWin.Pressed(pixelgl.KeyRight) {
-			global.gCamera.pos.X += 5.1
-		}
-		if global.gWin.Pressed(pixelgl.KeyUp) {
-			global.gCamera.pos.Y += 5.1
-		}
-		if global.gWin.Pressed(pixelgl.KeyDown) {
-			global.gCamera.pos.Y -= 5.1
-		}
-		if global.gWin.Pressed(pixelgl.KeyM) {
-			PrintMemoryUsage()
-		}
-		if global.gWin.Pressed(pixelgl.KeyQ) {
-			break
-		}
-
 		global.gWin.Clear(global.gClearColor)
+
+		global.gController.update(dt)
 
 		global.gCamera.update(dt)
 
