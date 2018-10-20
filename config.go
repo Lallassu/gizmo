@@ -16,6 +16,7 @@ const (
 
 // World constants
 const (
+	wLadderShadowSize   = 5
 	wPixelsPerChunk     = 64
 	wPixelSize          = 1
 	wBorderSize         = 10

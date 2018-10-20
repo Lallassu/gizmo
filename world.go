@@ -162,24 +162,26 @@ func (w *world) RemovePixel(x, y int) {
 		}
 
 		// Remove shadow
-		for i := 0; i < 25; i++ {
+		for i := 0; i < 5; i++ {
 			pos2 := (x+i)*w.width + y - i
 			if pos2 < w.width*w.height && pos2 >= 0 {
 				if w.pixels[pos2]&0xFF == wShadow8 {
-					//w.RemoveShadow(x+i, y-i)
+					w.removeShadow(x+i, y-i)
 				}
 			}
 		}
 
 		// Add shadow to visible pixel
-		for i := 0; i < 5; i++ {
-			pos2 := (x+i)*w.width + y - i
-			if pos2 < w.width*w.height && pos2 >= 0 {
-				if w.pixels[pos2]&0xFF == wBackground8 {
-					//w.AddShadow(x+i, y-i)
-				}
-			}
-		}
+		//if w.pixels[(x-1)*w.width+y+1]&0xFF == 0xFF {
+		//	for i := 1; i < 5; i++ {
+		//		pos2 := (x-i)*w.width + y
+		//		if pos2 < w.width*w.height && pos2 >= 0 {
+		//			if w.pixels[pos2]&0xFF == wBackground8 {
+		//				w.addShadow(x+i, y-i)
+		//			}
+		//		}
+		//	}
+		//}
 
 		// Particle
 		// if w.Exists(float64(x), float64(y)) {
@@ -210,7 +212,7 @@ func (w *world) Explode(x_, y_ float64, power int) {
 	x := int(x_)
 	y := int(y_)
 	pow := power * power
-	ff := make([]pixel.Vec, 10)
+	ff := make([]pixel.Vec, 50)
 	for rx := x - power; rx <= x+power; rx++ {
 		vx := (rx - x) * (rx - x)
 		for ry := y - power; ry <= y+power; ry++ {
@@ -218,11 +220,30 @@ func (w *world) Explode(x_, y_ float64, power int) {
 				continue
 			}
 			val := (ry-y)*(ry-y) + vx
-			if val <= pow {
+			if val < pow {
 				w.RemovePixel(rx, ry)
 				//w.ObjectHit(float64(rx), float64(ry))
 			} else {
 				ff = append(ff, pixel.Vec{X: float64(rx), Y: float64(ry)})
+			}
+		}
+	}
+
+	// Add shadows
+	for n := 0; n < len(ff); n++ {
+		ffx := int(ff[n].X)
+		ffy := int(ff[n].Y)
+		pp := ffx*w.width + ffy
+		if pp >= 0 && pp < w.width*w.height {
+			if w.pixels[pp]&0xFF == 0xFF {
+				for i := 0; i < 5; i++ {
+					pos2 := (ffx+i)*w.width + ffy - i
+					if pos2 < w.width*w.height && pos2 >= 0 {
+						if w.pixels[pos2]&0xFF == wBackground8 {
+							w.addShadow(ffx+i, ffy-i)
+						}
+					}
+				}
 			}
 		}
 	}
@@ -249,6 +270,38 @@ func (w *world) Explode(x_, y_ float64, power int) {
 //=============================================================
 func (w *world) floodFill(x, y int) {
 
+}
+
+//=============================================================
+// Remove shadows from map on given position
+//=============================================================
+func (w *world) removeShadow(x, y int) {
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF == wShadow8 {
+			r := uint32(float64((w.pixels[pos]>>24)&0xFF) * 1.5)
+			g := uint32(float64((w.pixels[pos]>>16)&0xFF) * 1.5)
+			b := uint32(float64((w.pixels[pos]>>8)&0xFF) * 1.5)
+			w.pixels[pos] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wBackground8
+			w.markChunkDirty(x, y)
+		}
+	}
+}
+
+//=============================================================
+// Add shadows to map on given position
+//=============================================================
+func (w *world) addShadow(x, y int) {
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF != wShadow8 {
+			r := uint32(float64((w.pixels[pos]>>24)&0xFF) / 1.5)
+			g := uint32(float64((w.pixels[pos]>>16)&0xFF) / 1.5)
+			b := uint32(float64((w.pixels[pos]>>8)&0xFF) / 1.5)
+			w.pixels[pos] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wShadow8
+			w.markChunkDirty(x, y)
+		}
+	}
 }
 
 //=============================================================
@@ -391,15 +444,12 @@ func (w *world) paintMap() {
 			g := p >> 16 & 0xFF
 			b := p >> 8 & 0xFF
 			if r == 0xFF && g == 0x00 && b == 0x00 {
-				// Keep alpha (shadows)
 				v := w.coloring.getBackground()
 				// add some alpha to background
 				v &= wBackground32
 				w.pixels[x*w.width+y] = v
 			} else if r == 0x00 && g == 0x00 && b == 0x00 {
-				//v := uint32(0x2c5557FF)
 				v := w.coloring.getBackground()
-				// add some alpha to background
 				w.pixels[x*w.width+y] = v
 			}
 		}
