@@ -24,6 +24,7 @@ type world struct {
 	qt         *Quadtree
 	pixels     []uint32
 	currentMap mapType
+	gravity    float64
 }
 
 //=============================================================
@@ -42,6 +43,7 @@ func (w *world) Init() {
 		MaxLevels:  8,
 		Level:      0,
 	}
+	w.gravity = wGravity
 }
 
 //=============================================================
@@ -114,10 +116,40 @@ func (w *world) RemoveObject(obj Entity) {
 }
 
 //=============================================================
+// Check if pixel is regular
+//=============================================================
+func (w *world) IsRegular(x_, y_ float64) bool {
+	x := int(x_)
+	y := int(y_)
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF == 0xFF {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
+// Check if it's a wall
+//=============================================================
+func (w *world) IsWall(x_, y_ float64) bool {
+	x := int(x_)
+	y := int(y_)
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos] != 0 && w.pixels[pos]&0xFF != wBackground8 && w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != wLadder8 {
+			return true
+		}
+	}
+	return false
+
+}
+
+//=============================================================
 // Check if pixel exists
 //=============================================================
 func (w *world) PixelExists(x, y float64) bool {
-
 	return true
 }
 

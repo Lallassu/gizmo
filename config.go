@@ -16,7 +16,6 @@ const (
 
 // World constants
 const (
-	wLadderShadowSize   = 5
 	wPixelsPerChunk     = 64
 	wPixelSize          = 1
 	wBorderSize         = 10
@@ -34,6 +33,10 @@ const (
 	wShadow8            = 0xBF
 	wShadow32           = 0xFFFFFFBF
 	wViewMax            = 400
+
+	wParticleDefaultLife = 5
+	wGravity             = -9.82
+	wParticlesMax        = 1000
 )
 
 //=============================================================
