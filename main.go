@@ -7,7 +7,6 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	_ "math"
 	"time"
 )
 
@@ -50,6 +49,7 @@ func setup() {
 	// Camera setup
 	global.gCamera.create()
 	global.gController.create()
+	global.gParticleEngine.create()
 	global.gWorld.Init()
 	global.gWorld.NewMap(mapEasy)
 	global.gCamera.setPosition(0, 0)
@@ -74,9 +74,8 @@ func gameLoop() {
 		global.gWin.Clear(global.gClearColor)
 
 		global.gController.update(dt)
-
 		global.gCamera.update(dt)
-
+		global.gParticleEngine.update(dt)
 		global.gWorld.Draw(dt)
 
 		global.gWin.Update()

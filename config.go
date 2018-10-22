@@ -43,27 +43,27 @@ const (
 // Global variables
 //=============================================================
 type Global struct {
-	gWindowHeight int
-	gWindowWidth  int
-	gVsync        bool
-	gUndecorated  bool
-	gWorld        *world
-	gCamera       *camera
-	gParticles    *particleEngine
-	gClearColor   pixel.RGBA
-	gWin          *pixelgl.Window
-	gController   *controller
+	gWindowHeight   int
+	gWindowWidth    int
+	gVsync          bool
+	gUndecorated    bool
+	gWorld          *world
+	gCamera         *camera
+	gParticleEngine *particleEngine
+	gClearColor     pixel.RGBA
+	gWin            *pixelgl.Window
+	gController     *controller
 }
 
 var global = &Global{
-	gWindowHeight: 768,
-	gWindowWidth:  1024,
-	gVsync:        true,
-	gUndecorated:  false,
-	gWorld:        &world{},
-	gCamera:       &camera{},
-	gController:   &controller{},
-	gParticles:    &particleEngine{},
-	gClearColor:   pixel.RGBA{0.4, 0.4, 0.4, 1.0},
-	gWin:          &pixelgl.Window{},
+	gWindowHeight:   768,
+	gWindowWidth:    1024,
+	gVsync:          true,
+	gUndecorated:    false,
+	gWorld:          &world{},
+	gCamera:         &camera{},
+	gController:     &controller{},
+	gParticleEngine: &particleEngine{},
+	gClearColor:     pixel.RGBA{0.4, 0.4, 0.4, 1.0},
+	gWin:            &pixelgl.Window{},
 }

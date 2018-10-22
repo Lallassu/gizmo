@@ -12,6 +12,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	"math/rand"
 )
 
 //=============================================================
@@ -97,6 +98,7 @@ func (w *world) NewMap(maptype mapType) {
 	for _, v := range w.qt.RetrieveIntersections(Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
 		v.entity.draw(0)
 	}
+
 	Debug("Tree Size:", w.qt.Total)
 	Debug("World generation complete.")
 }
@@ -216,15 +218,15 @@ func (w *world) RemovePixel(x, y int) {
 		//}
 
 		// Particle
-		// if w.Exists(float64(x), float64(y)) {
-		// 	p := Particle{
-		// 		X:     float64(x),
-		// 		Y:     float64(y),
-		// 		Size:  1,
-		// 		Color: w.pixels[pos],
-		// 	}
-		// 	w.pts.NewParticle(p)
-		// }
+		if w.IsRegular(float64(x), float64(y)) {
+			global.gParticleEngine.newParticle(
+				particle{
+					x:     float64(x + rand.Intn(10)),
+					y:     float64(y),
+					size:  1,
+					color: w.pixels[pos],
+				})
+		}
 
 		// Set bg pixel.
 		if w.pixels[pos] != 0 {

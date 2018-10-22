@@ -68,6 +68,6 @@ func (c *controller) update(dt float64) {
 	// Handle mouse
 	if global.gWin.Pressed(pixelgl.MouseButtonLeft) {
 		mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
-		global.gWorld.Explode(mouse.X+30, mouse.Y+30, 10)
+		global.gWorld.Explode(mouse.X, mouse.Y, 10)
 	}
 }

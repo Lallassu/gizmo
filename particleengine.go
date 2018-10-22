@@ -6,54 +6,76 @@
 package main
 
 import (
-	"github.com/golang-collections/collections/stack"
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
+	"github.com/faiface/pixel/pixelgl"
+	"math/rand"
 )
 
 type particleEngine struct {
-	canvas   *pixelgl.Canvas
-	active   *stack.Stack
-	inactive *stack.Stack
+	canvas    *pixelgl.Canvas
+	particles []particle
+	idx       int
 }
 
 //=============================================================
 // Draw the canvas
 //=============================================================
-func (p *particleEngine) create() {
-	p.canvas = pixelgl.NewCanvas(pixel.R(0, 0, global.gWindowHeight, global.gWindowWidth))
-	p.active = stack.New()
-	p.inactive = stack.New()
+func (pe *particleEngine) create() {
+	pe.particles = make([]particle, wParticlesMax)
+	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWindowHeight), float64(global.gWindowWidth)))
 
+	// Use a channel for particles.
 	for i := 0; i < wParticlesMax; i++ {
-		p.inactive.push(particle{active: false})
+		p := particle{active: false}
+		pe.particles = append(pe.particles, p)
 	}
-
+	pe.idx = 0
 }
 
 //=============================================================
 // Get new particle
 //=============================================================
-func (p *particleEngine) newParticle() {
-
+func (pe *particleEngine) newParticle(p particle) {
+	pe.idx++
+	if pe.idx >= len(pe.particles) {
+		pe.idx = 0
+	}
+	newp := pe.particles[pe.idx : pe.idx+1][0]
+	// Make a shallow copy, no pointers in particle so we're fine.
+	newp = p
+	newp.active = true
+	newp.life = wParticleDefaultLife
+	newp.restitution = -0.3
+	newp.fx = float64(5 - rand.Intn(10))
+	newp.fy = float64(5 - rand.Intn(10))
+	newp.bounces = 0
+	newp.px = p.x
+	newp.py = p.y
+	newp.size = 1
+	newp.mass = 2 * rand.Float64()
+	pe.particles[pe.idx : pe.idx+1][0] = newp
 }
 
 //=============================================================
 // Draw the canvas
 //=============================================================
-func (p *particleEngine) draw(dt float64) {
-	for _, p := range p.particles {
+func (pe *particleEngine) update(dt float64) {
+	for _, p := range pe.particles {
 		if p.active {
-			p.update(dt)
+			//	p.update(dt)
 		}
 	}
-	p.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(0, 0)))
+	pe.build()
+	pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWindowHeight/2), float64(global.gWindowWidth/2))))
 }
 
 //=============================================================
 // Build particle canvas
 //=============================================================
-func (c *particleEngine) build() {
+func (pe *particleEngine) build() {
 	model := imdraw.New(nil)
-	for _, p := range p.particles {
+	for _, p := range pe.particles {
 		if p.active {
 			model.Color = pixel.RGB(
 				float64(p.color>>24&0xFF)/255.0,
@@ -68,6 +90,6 @@ func (c *particleEngine) build() {
 			model.Rectangle(0)
 		}
 	}
-	p.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	model.Draw(p.canvas)
+	pe.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	model.Draw(pe.canvas)
 }

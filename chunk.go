@@ -60,7 +60,7 @@ func (c *chunk) draw(dt float64) {
 	if c.dirty {
 		c.build()
 	}
-	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X, c.bounds.Y)))
+	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+c.bounds.Width/2, c.bounds.Y+c.bounds.Height/2)))
 }
 
 //=============================================================
