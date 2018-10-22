@@ -7,6 +7,7 @@ package main
 
 import (
 	"math"
+	_ "math/rand"
 )
 
 type particle struct {
@@ -25,8 +26,6 @@ type particle struct {
 	restitution float64
 	air_area    float64
 	bounces     int
-	px          float64
-	py          float64
 	vx          float64
 	vy          float64
 }
@@ -35,9 +34,12 @@ type particle struct {
 // Update particle
 //=============================================================
 func (p *particle) update(dt float64) {
-	if p.life <= 0 || !p.active {
+	if p.life <= 0 {
+		p.active = false
 		return
 	}
+	// p.x += rand.Float64()
+	// p.y += rand.Float64()
 	p.life -= dt
 	ax := p.fx * dt * p.vx * p.mass
 	ay := p.fy * dt * p.vy * p.mass
@@ -47,7 +49,7 @@ func (p *particle) update(dt float64) {
 	// Lerp pixels (to get almost pixel perfect collisions)
 	lx := 1.0
 	ly := 1.0
-	loops := 5
+	loops := 2
 	if math.Abs(ax) > 1 || math.Abs(ay) > 1 {
 		if math.Abs(ax) > math.Abs(ay) {
 			if ax < 0 {
@@ -100,7 +102,7 @@ func (p *particle) update(dt float64) {
 	}
 
 	if p.y < 0 || !global.gWorld.IsRegular(p.x, p.y) {
-		p.stop()
+		//p.stop()
 	}
 }
 

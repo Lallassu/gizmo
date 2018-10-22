@@ -12,7 +12,6 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"math/rand"
 )
 
 //=============================================================
@@ -221,7 +220,7 @@ func (w *world) RemovePixel(x, y int) {
 		if w.IsRegular(float64(x), float64(y)) {
 			global.gParticleEngine.newParticle(
 				particle{
-					x:     float64(x + rand.Intn(10)),
+					x:     float64(x),
 					y:     float64(y),
 					size:  1,
 					color: w.pixels[pos],

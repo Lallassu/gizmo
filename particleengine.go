@@ -47,11 +47,13 @@ func (pe *particleEngine) newParticle(p particle) {
 	newp.active = true
 	newp.life = wParticleDefaultLife
 	newp.restitution = -0.3
-	newp.fx = float64(5 - rand.Intn(10))
-	newp.fy = float64(5 - rand.Intn(10))
+	newp.fx = 10
+	newp.fy = 10
+	newp.vx = float64(5 - rand.Intn(10))
+	newp.vy = float64(5 - rand.Intn(10))
 	newp.bounces = 0
-	newp.px = p.x
-	newp.py = p.y
+	newp.x = p.x
+	newp.y = p.y
 	newp.size = 1
 	newp.mass = 2 * rand.Float64()
 	pe.particles[pe.idx : pe.idx+1][0] = newp
@@ -61,9 +63,9 @@ func (pe *particleEngine) newParticle(p particle) {
 // Draw the canvas
 //=============================================================
 func (pe *particleEngine) update(dt float64) {
-	for _, p := range pe.particles {
-		if p.active {
-			//	p.update(dt)
+	for i, _ := range pe.particles {
+		if pe.particles[i].active {
+			pe.particles[i].update(dt)
 		}
 	}
 	pe.build()

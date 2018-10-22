@@ -36,7 +36,7 @@ const (
 
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
-	wParticlesMax        = 1000
+	wParticlesMax        = 2000
 )
 
 //=============================================================
