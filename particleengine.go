@@ -24,20 +24,22 @@ type particleEngine struct {
 func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	// Create fire part
 	for i := 0; i < size; i++ {
-		r := 0xF5
-		g := 50 + rand.Intn(180)
+		r := 0xF9
+		g := 50 + rand.Intn(140)
 		b := 16
 		a := 20 + rand.Intn(220)
 		pe.newParticle(particle{
 			color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
 			size:        rand.Float64() * 2,
-			x:           x + float64((size/2)-rand.Intn(size)),
-			y:           y + float64((size/2)-rand.Intn(size)),
-			vx:          0,
-			vy:          rand.Float64() * 10,
+			x:           x, // + float64((size/2)-rand.Intn(size)),
+			y:           y, // + float64((size/2)-rand.Intn(size)),
+			vx:          float64(5 - rand.Intn(10)),
+			vy:          float64(5 - rand.Intn(10)),
 			fx:          10,
 			fy:          10,
 			life:        rand.Float64(),
+			mass:        1,
+			pType:       particleFire,
 			restitution: 0,
 		})
 
@@ -49,14 +51,15 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 		pe.newParticle(particle{
 			color:       uint32((c & 0xFF << 24) | (c & 0xFF << 16) | (c & 0xFF << 8) | (a & 0xFF)),
 			size:        rand.Float64() * 2,
-			x:           x + float64(size/2-rand.Intn(size)),
-			y:           y + float64(size/2-rand.Intn(size)),
+			x:           x + float64(size/2-rand.Intn(size)) + rand.Float64()*2,
+			y:           y + float64(size/2-rand.Intn(size)) + rand.Float64()*2,
 			vx:          0,
 			vy:          rand.Float64() * 10,
 			fy:          -rand.Float64() * 10,
 			fx:          0,
-			life:        rand.Float64() * 1.5,
+			life:        rand.Float64() * 2.5,
 			mass:        -0.1,
+			pType:       particleSmoke,
 			restitution: 0,
 		})
 	}
@@ -123,6 +126,20 @@ func (pe *particleEngine) build() {
 				pixel.V(float64(p.x), float64(p.y)),
 				pixel.V(float64(p.x+p.size), float64(p.y+p.size)),
 			)
+			model.Rectangle(0)
+
+			// Shadow test
+			if !global.gWorld.IsRegular(p.x+1, p.y-1) {
+				model.Color = pixel.RGB(
+					0.4,
+					0.4,
+					0.4).Mul(pixel.Alpha(0.5))
+
+				model.Push(
+					pixel.V(float64(p.x+1), float64(p.y-1)),
+					pixel.V(float64(p.x+1+p.size), float64(p.y-1+p.size)),
+				)
+			}
 			model.Rectangle(0)
 		}
 	}

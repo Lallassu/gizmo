@@ -43,47 +43,52 @@ func (p *particle) update(dt float64) {
 	// Take the largest
 	// divide the other with it.
 	// Lerp pixels (to get almost pixel perfect collisions)
-	lx := 1.0
-	ly := 1.0
-	loops := 1
-	if math.Abs(ax) > 1 || math.Abs(ay) > 1 {
-		if math.Abs(ax) > math.Abs(ay) {
-			if ax < 0 {
-				lx *= -1
+	if p.pType != particleSmoke {
+		lx := 1.0
+		ly := 1.0
+		loops := 1
+		if math.Abs(ax) > 1 || math.Abs(ay) > 1 {
+			if math.Abs(ax) > math.Abs(ay) {
+				if ax < 0 {
+					lx *= -1
+				}
+				ly = ay / math.Abs(ax)
+				loops = int(math.Abs(ax))
+			} else {
+				if ay < 0 {
+					ly *= -1
+				}
+				lx = ax / math.Abs(ay)
+				loops = int(math.Abs(ay))
 			}
-			ly = ay / math.Abs(ax)
-			loops = int(math.Abs(ax))
 		} else {
-			if ay < 0 {
-				ly *= -1
+			lx = ax
+			ly = ay
+		}
+
+		for n := 0; n < loops; n++ {
+			if global.gWorld.IsWall(p.x+lx, p.y+ly) { // || global.gWorld.IsObject(p.x+lx, p.y+ly) {
+				p.bounces++
+				if p.vy < 0 {
+					p.vy *= p.restitution
+				} else {
+					if p.vx > 0 {
+						p.vx *= -p.restitution
+						p.vy *= -p.restitution
+					} else if p.vx < 0 {
+						p.vx *= -p.restitution
+						p.vy *= -p.restitution
+					}
+				}
+				break
+			} else {
+				p.x += lx
+				p.y += ly
 			}
-			lx = ax / math.Abs(ay)
-			loops = int(math.Abs(ay))
 		}
 	} else {
-		lx = ax
-		ly = ay
-	}
-
-	for n := 0; n < loops; n++ {
-		if global.gWorld.IsWall(p.x+lx, p.y+ly) { // || global.gWorld.IsObject(p.x+lx, p.y+ly) {
-			p.bounces++
-			if p.vy < 0 {
-				p.vy *= p.restitution
-			} else {
-				if p.vx > 0 {
-					p.vx *= -p.restitution
-					p.vy *= -p.restitution
-				} else if p.vx < 0 {
-					p.vx *= -p.restitution
-					p.vy *= -p.restitution
-				}
-			}
-			break
-		} else {
-			p.x += lx
-			p.y += ly
-		}
+		p.x += ax
+		p.y += ay
 	}
 
 	p.vy -= dt * p.fy
@@ -97,9 +102,9 @@ func (p *particle) update(dt float64) {
 		p.fy -= dt * global.gWorld.gravity * p.mass
 	}
 
-	if p.y < 0 || !global.gWorld.IsRegular(p.x, p.y) {
-		//p.stop()
-	}
+	//if p.y < 0 || !global.gWorld.IsRegular(p.x, p.y) {
+	//	//p.stop()
+	//}
 }
 
 //=============================================================

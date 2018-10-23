@@ -231,6 +231,7 @@ func (w *world) RemovePixel(x, y int) {
 					vx:          float64(5 - rand.Intn(10)),
 					vy:          float64(5 - rand.Intn(10)),
 					mass:        1,
+					pType:       particleRegular,
 					color:       w.pixels[pos],
 				})
 		}

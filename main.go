@@ -75,8 +75,8 @@ func gameLoop() {
 
 		global.gController.update(dt)
 		global.gCamera.update(dt)
-		global.gParticleEngine.update(dt)
 		global.gWorld.Draw(dt)
+		global.gParticleEngine.update(dt)
 
 		global.gWin.Update()
 	}
