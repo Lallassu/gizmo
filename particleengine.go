@@ -19,6 +19,49 @@ type particleEngine struct {
 }
 
 //=============================================================
+// Explosion effect
+//=============================================================
+func (pe *particleEngine) effectExplosion(x, y float64, size int) {
+	// Create fire part
+	for i := 0; i < size; i++ {
+		r := 0xF5
+		g := 50 + rand.Intn(180)
+		b := 16
+		a := 20 + rand.Intn(220)
+		pe.newParticle(particle{
+			color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
+			size:        rand.Float64() * 2,
+			x:           x + float64(size/2-rand.Intn(size)),
+			y:           y + float64(size/2-rand.Intn(size)),
+			vx:          0,
+			vy:          rand.Float64() * 10,
+			fx:          10,
+			fy:          10,
+			life:        rand.Float64() * 5,
+			restitution: 0,
+		})
+	}
+	// Create smoke
+	for i := 0; i < size*2; i++ {
+		c := 50 + rand.Intn(205)
+		a := 20 + rand.Intn(220)
+		pe.newParticle(particle{
+			color:       uint32((c & 0xFF << 24) | (c & 0xFF << 16) | (c & 0xFF << 8) | (a & 0xFF)),
+			size:        rand.Float64() * 2,
+			x:           x + float64(size/2-rand.Intn(size)),
+			y:           y + float64(size/2-rand.Intn(size)),
+			vx:          0,
+			vy:          rand.Float64() * 10,
+			fy:          -rand.Float64() * 10,
+			fx:          0,
+			life:        rand.Float64() * 1.5,
+			mass:        -0.1,
+			restitution: 0,
+		})
+	}
+}
+
+//=============================================================
 // Draw the canvas
 //=============================================================
 func (pe *particleEngine) create() {
@@ -45,17 +88,17 @@ func (pe *particleEngine) newParticle(p particle) {
 	// Make a shallow copy, no pointers in particle so we're fine.
 	newp = p
 	newp.active = true
-	newp.life = wParticleDefaultLife
-	newp.restitution = -0.3
-	newp.fx = 10
-	newp.fy = 10
-	newp.vx = float64(5 - rand.Intn(10))
-	newp.vy = float64(5 - rand.Intn(10))
 	newp.bounces = 0
-	newp.x = p.x
-	newp.y = p.y
-	newp.size = 1
-	newp.mass = 2 * rand.Float64()
+	//newp.life = wParticleDefaultLife
+	//newp.restitution = -0.3
+	//newp.fx = 10
+	//newp.fy = 10
+	//newp.vx = float64(5 - rand.Intn(10))
+	//newp.vy = float64(5 - rand.Intn(10))
+	//newp.x = p.x
+	//newp.y = p.y
+	//newp.size = 1
+	//newp.mass = 2 * rand.Float64()
 	pe.particles[pe.idx : pe.idx+1][0] = newp
 }
 

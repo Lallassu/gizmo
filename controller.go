@@ -69,5 +69,6 @@ func (c *controller) update(dt float64) {
 	if global.gWin.Pressed(pixelgl.MouseButtonLeft) {
 		mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 		global.gWorld.Explode(mouse.X, mouse.Y, 10)
+		global.gParticleEngine.effectExplosion(mouse.X, mouse.Y, 10)
 	}
 }

@@ -7,7 +7,6 @@ package main
 
 import (
 	"math"
-	_ "math/rand"
 )
 
 type particle struct {
@@ -24,7 +23,6 @@ type particle struct {
 	fy     float64
 
 	restitution float64
-	air_area    float64
 	bounces     int
 	vx          float64
 	vy          float64
@@ -38,8 +36,6 @@ func (p *particle) update(dt float64) {
 		p.active = false
 		return
 	}
-	// p.x += rand.Float64()
-	// p.y += rand.Float64()
 	p.life -= dt
 	ax := p.fx * dt * p.vx * p.mass
 	ay := p.fy * dt * p.vy * p.mass
@@ -49,7 +45,7 @@ func (p *particle) update(dt float64) {
 	// Lerp pixels (to get almost pixel perfect collisions)
 	lx := 1.0
 	ly := 1.0
-	loops := 2
+	loops := 1
 	if math.Abs(ax) > 1 || math.Abs(ay) > 1 {
 		if math.Abs(ax) > math.Abs(ay) {
 			if ax < 0 {
@@ -76,10 +72,10 @@ func (p *particle) update(dt float64) {
 				p.vy *= p.restitution
 			} else {
 				if p.vx > 0 {
-					p.vx *= -0.8
+					p.vx *= -p.restitution
 					p.vy *= -p.restitution
 				} else if p.vx < 0 {
-					p.vx *= -0.8
+					p.vx *= -p.restitution
 					p.vy *= -p.restitution
 				}
 			}
