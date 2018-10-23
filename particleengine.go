@@ -31,15 +31,16 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 		pe.newParticle(particle{
 			color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
 			size:        rand.Float64() * 2,
-			x:           x + float64(size/2-rand.Intn(size)),
-			y:           y + float64(size/2-rand.Intn(size)),
+			x:           x + float64((size/2)-rand.Intn(size)),
+			y:           y + float64((size/2)-rand.Intn(size)),
 			vx:          0,
 			vy:          rand.Float64() * 10,
 			fx:          10,
 			fy:          10,
-			life:        rand.Float64() * 5,
+			life:        rand.Float64(),
 			restitution: 0,
 		})
+
 	}
 	// Create smoke
 	for i := 0; i < size*2; i++ {
@@ -89,16 +90,6 @@ func (pe *particleEngine) newParticle(p particle) {
 	newp = p
 	newp.active = true
 	newp.bounces = 0
-	//newp.life = wParticleDefaultLife
-	//newp.restitution = -0.3
-	//newp.fx = 10
-	//newp.fy = 10
-	//newp.vx = float64(5 - rand.Intn(10))
-	//newp.vy = float64(5 - rand.Intn(10))
-	//newp.x = p.x
-	//newp.y = p.y
-	//newp.size = 1
-	//newp.mass = 2 * rand.Float64()
 	pe.particles[pe.idx : pe.idx+1][0] = newp
 }
 
@@ -129,8 +120,8 @@ func (pe *particleEngine) build() {
 			).Mul(pixel.Alpha(float64(p.color&0xFF) / 255.0))
 
 			model.Push(
-				pixel.V(float64(p.x*p.size), float64(p.y*p.size)),
-				pixel.V(float64(p.x*p.size+p.size), float64(p.y*p.size+p.size)),
+				pixel.V(float64(p.x), float64(p.y)),
+				pixel.V(float64(p.x+p.size), float64(p.y+p.size)),
 			)
 			model.Rectangle(0)
 		}
