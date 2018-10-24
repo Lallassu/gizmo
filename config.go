@@ -16,6 +16,7 @@ const (
 
 // World constants
 const (
+	wShadowLength       = 5
 	wPixelsPerChunk     = 64
 	wPixelSize          = 1
 	wBorderSize         = 10

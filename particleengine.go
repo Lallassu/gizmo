@@ -129,7 +129,7 @@ func (pe *particleEngine) build() {
 			model.Rectangle(0)
 
 			// Shadow test
-			if !global.gWorld.IsRegular(p.x+1, p.y-1) {
+			if !global.gWorld.IsRegular(p.x+1, p.y-1) && !global.gWorld.IsShadow(p.x+1, p.y-1) {
 				model.Color = pixel.RGB(
 					0.4,
 					0.4,

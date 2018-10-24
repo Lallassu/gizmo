@@ -77,7 +77,7 @@ func (w *world) NewMap(maptype mapType) {
 	g := generator{}
 	pixels := g.NewWorld(w.width, w.height)
 
-	// Ad dall pixels as red before coloring
+	// Add all pixels as red before coloring
 	for i := 0; i < len(pixels); i += 2 {
 		w.AddPixel(int(pixels[i]), int(pixels[i+1]), uint32(0xFF0000FF))
 	}
@@ -115,6 +115,21 @@ func (w *world) AddObject(x, y float64, obj Entity) {
 //=============================================================
 func (w *world) RemoveObject(obj Entity) {
 
+}
+
+//=============================================================
+// Check if pixel is a shadow
+//=============================================================
+func (w *world) IsShadow(x_, y_ float64) bool {
+	x := int(x_)
+	y := int(y_)
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF == wShadow8 {
+			return true
+		}
+	}
+	return false
 }
 
 //=============================================================
@@ -180,7 +195,7 @@ func (w *world) AddPixel(x, y int, color uint32) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		w.pixels[w.width*x+y] = color
-		//	         w.MarkChunkDirty(x, y)
+		w.markChunkDirty(x, y)
 	}
 }
 
@@ -336,7 +351,7 @@ func (w *world) removeShadow(x, y int) {
 func (w *world) addShadow(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
-		if w.pixels[pos]&0xFF != wShadow8 {
+		if w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != 0xFF {
 			r := uint32(float64((w.pixels[pos]>>24)&0xFF) / 1.5)
 			g := uint32(float64((w.pixels[pos]>>16)&0xFF) / 1.5)
 			b := uint32(float64((w.pixels[pos]>>8)&0xFF) / 1.5)
@@ -551,7 +566,7 @@ func (w *world) paintMap() {
 					below := w.pixels[x*w.width+y-1]
 					right := w.pixels[(x+1)*w.width+y]
 					if (below&0xFF == wShadow8 || below&0xFF == wBackground8) && point&0xFF == 0xFF {
-						for i := 1; i < 5; i++ {
+						for i := 1; i < wShadowLength; i++ {
 							p := w.pixels[(x+i)*w.width+y-i]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
 								r := uint32(float64((p >> 24 & 0xFF)) / 1.5)
@@ -562,7 +577,7 @@ func (w *world) paintMap() {
 						}
 					}
 					if (right&0xFF == wShadow8 || right&0xFF == wBackground8) && point&0xFF == 0xFF {
-						for i := 0; i < 5; i++ {
+						for i := 0; i < wShadowLength; i++ {
 							p := w.pixels[(x+i)*w.width+y-i]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
 								r := uint32(float64((p >> 24 & 0xFF)) / 1.5)

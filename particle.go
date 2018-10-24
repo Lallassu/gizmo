@@ -26,6 +26,9 @@ type particle struct {
 	bounces     int
 	vx          float64
 	vy          float64
+	prevX       float64
+	prevY       float64
+	mdt         float64
 }
 
 //=============================================================
@@ -39,6 +42,9 @@ func (p *particle) update(dt float64) {
 	p.life -= dt
 	ax := p.fx * dt * p.vx * p.mass
 	ay := p.fy * dt * p.vy * p.mass
+
+	p.prevX = p.x
+	p.prevY = p.y
 
 	// Take the largest
 	// divide the other with it.
@@ -102,9 +108,19 @@ func (p *particle) update(dt float64) {
 		p.fy -= dt * global.gWorld.gravity * p.mass
 	}
 
-	//if p.y < 0 || !global.gWorld.IsRegular(p.x, p.y) {
-	//	//p.stop()
-	//}
+	if p.prevX-p.x == 0 && p.prevY-p.y == 0 {
+		p.mdt += dt
+	} else {
+		p.mdt = 0
+	}
+
+	if (p.life <= 0 || p.mdt > 2) && global.gWorld.IsRegular(p.x, p.y-1) && p.pType == particleRegular {
+		global.gWorld.AddPixel(int(p.x), int(p.y), p.color)
+
+		for i := 0.0; i < wShadowLength; i++ {
+			global.gWorld.addShadow(int(p.x+i), int(p.y-i))
+		}
+	}
 }
 
 //=============================================================
