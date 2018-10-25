@@ -220,18 +220,6 @@ func (w *world) RemovePixel(x, y int) {
 			}
 		}
 
-		// Add shadow to visible pixel
-		//if w.pixels[(x-1)*w.width+y+1]&0xFF == 0xFF {
-		//	for i := 1; i < 5; i++ {
-		//		pos2 := (x-i)*w.width + y
-		//		if pos2 < w.width*w.height && pos2 >= 0 {
-		//			if w.pixels[pos2]&0xFF == wBackground8 {
-		//				w.addShadow(x+i, y-i)
-		//			}
-		//		}
-		//	}
-		//}
-
 		// Particle
 		if w.IsRegular(float64(x), float64(y)) {
 			global.gParticleEngine.newParticle(
@@ -239,7 +227,7 @@ func (w *world) RemovePixel(x, y int) {
 					x:           float64(x),
 					y:           float64(y),
 					size:        1,
-					restitution: -0.3,
+					restitution: -0.1 - rand.Float64()/4,
 					life:        wParticleDefaultLife,
 					fx:          10,
 					fy:          10,
@@ -248,6 +236,7 @@ func (w *world) RemovePixel(x, y int) {
 					mass:        1,
 					pType:       particleRegular,
 					color:       w.pixels[pos],
+					static:      true,
 				})
 		}
 
@@ -405,6 +394,7 @@ func (w *world) paintMap() {
 					}
 				}
 			}
+
 			// Top/Bottom
 			if y+1 < w.height {
 				p2 := w.pixels[x*w.width+y+1]
@@ -522,6 +512,7 @@ func (w *world) paintMap() {
 				after := w.pixels[(x+1)*w.width+y] & 0xFF
 				above := w.pixels[x*w.width+y+1] & 0xFF
 				long := uint32(0)
+
 				if x+23 < w.width {
 					long = w.pixels[(x+23)*w.width+y] & 0xFF
 				}
@@ -596,6 +587,51 @@ func (w *world) paintMap() {
 					}
 				}
 			}
+
 		}
 	}
+
+	// Create objects/materials AFTER ladders otherwise we must take objects into account
+	// when generating ladders. Overhead with multiple loops, but easier.
+	pcgGen := &pcg{}
+	// Generate texture
+	for x := 0; x < w.width; x++ {
+		for y := 0; y < w.height; y++ {
+			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
+				//before := w.pixels[(x-1)*w.width+y] & 0xFF
+				point := w.pixels[x*w.width+y] & 0xFF
+				//after := w.pixels[(x+1)*w.width+y] & 0xFF
+				above := w.pixels[x*w.width+y+1] & 0xFF
+				below := w.pixels[x*w.width+y-1] & 0xFF
+
+				if point == 0xFF && above == wBackground8 {
+					// Create floor
+					pcgGen.MetalFloor(x, y)
+				}
+				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
+					// Create floor
+					pcgGen.MetalRoof(x, y)
+				}
+			}
+		}
+	}
+
+	for x := 0; x < w.width; x++ {
+		for y := 0; y < w.height; y++ {
+			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
+				//before := w.pixels[(x-1)*w.width+y] & 0xFF
+				point := w.pixels[x*w.width+y] & 0xFF
+				//after := w.pixels[(x+1)*w.width+y] & 0xFF
+				above := w.pixels[x*w.width+y+1] & 0xFF
+
+				// Add flowers
+				if point == 0xFF && above == wBackground8 {
+					if rand.Float64() < 0.1 {
+						pcgGen.Flower(x, y+1)
+					}
+				}
+			}
+		}
+	}
+
 }

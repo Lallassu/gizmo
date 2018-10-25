@@ -17,12 +17,16 @@ func GenerateMapColor(maptype mapType) *mapColor {
 	// types of coloring schemes depending
 	// on map type.
 	m := &mapColor{
-		background: 0xAAF55FFF,
-		foreground: 0xFFAADAFF,
+		background: 0x10100eFF,
+		foreground: 0x3d6253FF,
 		ladders:    0x444444FF,
 		borders:    0xFF0000FF,
 	}
 	return m
+}
+
+func (m *mapColor) getFlower() uint32 {
+	return m.background
 }
 
 func (m *mapColor) getBackground() uint32 {

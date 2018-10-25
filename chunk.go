@@ -18,6 +18,7 @@ type chunk struct {
 	dirty  bool
 	canvas *pixelgl.Canvas
 	bounds Bounds
+	bdt    float64 // build dt
 }
 
 //=============================================================
@@ -57,7 +58,9 @@ func (c *chunk) create(x, y float64) {
 // Draw the chunk
 //=============================================================
 func (c *chunk) draw(dt float64) {
-	if c.dirty {
+	c.bdt += dt
+	if c.dirty && c.bdt > 0.2 {
+		c.bdt = 0
 		c.build()
 	}
 	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+c.bounds.Width/2, c.bounds.Y+c.bounds.Height/2)))

@@ -114,12 +114,8 @@ func (p *particle) update(dt float64) {
 		p.mdt = 0
 	}
 
-	if (p.life <= 0 || p.mdt > 2) && global.gWorld.IsRegular(p.x, p.y-1) && p.pType == particleRegular {
-		global.gWorld.AddPixel(int(p.x), int(p.y), p.color)
-
-		for i := 0.0; i < wShadowLength; i++ {
-			global.gWorld.addShadow(int(p.x+i), int(p.y-i))
-		}
+	if p.life <= 0 || p.mdt > 1 {
+		p.stop()
 	}
 }
 
@@ -129,6 +125,13 @@ func (p *particle) update(dt float64) {
 func (p *particle) stop() {
 	p.life = 0
 	if p.static {
-		global.gWorld.AddPixel(int(p.x), int(p.y), p.color)
+		if global.gWorld.IsRegular(p.x, p.y-1) {
+			global.gWorld.AddPixel(int(p.x), int(p.y), p.color)
+			global.gWorld.addShadow(int(p.x+1), int(p.y-1))
+			// We could add shadow for full length, but more expensive and looks strange when adding it.
+			// for i := 0.0; i < wShadowLength; i++ {
+			// 	global.gWorld.addShadow(int(p.x+i), int(p.y-i))
+			// }
+		}
 	}
 }
