@@ -486,9 +486,14 @@ func (w *world) paintMap() {
 				above := w.pixels[x*w.width+y+1] & 0xFF
 				below := w.pixels[x*w.width+y-1] & 0xFF
 
+				// Roof
 				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
 					pcgGen.MetalFlat(x, y, false)
 				}
+				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
+					pcgGen.MetalWallBgPlates(x, y)
+				}
+				// Walls
 				if point == 0xFF && (after == wBackground8 || after == wShadow8) {
 					pcgGen.MetalWall(x, y, false)
 				}
@@ -499,6 +504,7 @@ func (w *world) paintMap() {
 				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
 					pcgGen.MetalFlat(x, y, true)
 				}
+				// Colored floor
 				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
 					pcgGen.MetalFloor(x, y)
 				}

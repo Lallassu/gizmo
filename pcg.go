@@ -12,6 +12,8 @@ import (
 type pcg struct {
 	floorHeight int
 	incr        float64
+	floorCnt    int
+	bgPlateCnt  int
 }
 
 func (p *pcg) Flower(x, y int) {
@@ -290,28 +292,28 @@ func (p *pcg) MetalFloor(x, y int) {
 	r := 0
 	g := 0
 	b := 0
-	rnd := rand.Float64()
+	p.floorCnt += 1
 	for i := 0; i < 4; i++ {
 		switch i {
 		case 0:
-			if rnd < 0.01 {
-				r = 0x00
+			if p.floorCnt == 50 {
+				r = 0x59
 				g = 0x7e
-				b = 0x58
+				b = 0x6f
 			} else {
-				r = 0x00
-				g = 0xbe
-				b = 0x98
+				r = 0x7d
+				g = 0xa6
+				b = 0x91
 			}
 		case 1, 2:
-			if rnd < 0.01 {
+			if p.floorCnt == 50 {
 				r = 0x16
 				g = 0x27
 				b = 0x23
 			} else {
-				r = 0x00
-				g = 0x90
-				b = 0x75
+				r = 0x59
+				g = 0x7e
+				b = 0x6f
 			}
 		case 3:
 			r = 0x16
@@ -325,12 +327,51 @@ func (p *pcg) MetalFloor(x, y int) {
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 		)
 	}
+	if p.floorCnt == 50 {
+		p.floorCnt = 0
+	}
+}
+
+func (p *pcg) MetalWallBgPlates(x, y int) {
+	p.bgPlateCnt++
+
+	if p.bgPlateCnt < 100 {
+		return
+	}
+	p.bgPlateCnt = 0
+
+	offset := 8
+	r := 0x3e
+	g := 0x58
+	b := 0x5c
+	a := wBackground8
+
+	global.gWorld.AddPixel(
+		x-2,
+		y-offset,
+		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a&0xFF),
+	)
+	global.gWorld.AddPixel(
+		x+2,
+		y-offset,
+		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a/2&0xFF),
+	)
+
+	for i := 0; i < 30; i++ {
+		for j := 0; j < 30; j++ {
+			a += 1
+			global.gWorld.AddPixel(
+				x+j,
+				y-offset-i,
+				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a&0xFF),
+			)
+		}
+	}
 }
 
 func (p *pcg) GrassFloor(x, y int) {
 	// Grass floor
 	p.floorHeight = 5 + rand.Intn(4)
-
 	r := 0x33
 	g := 0xFF
 	b := 0x33
