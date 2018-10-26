@@ -19,7 +19,7 @@ const (
 	wShadowLength       = 5
 	wPixelsPerChunk     = 64
 	wPixelSize          = 1
-	wBorderSize         = 10
+	wBorderSize         = 4
 	wStaticBorderSize   = 0
 	wStaticColor32      = 0xFFFFFFFE
 	wStaticColor8       = 0xFE

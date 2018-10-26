@@ -366,123 +366,124 @@ func (w *world) markChunkDirty(x, y int) {
 // paint generated map
 //=============================================================
 func (w *world) paintMap() {
-	color := w.coloring.getBackground()
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			p := w.pixels[x*w.width+y]
-			// Sides
-			if x+1 < w.width {
-				p2 := w.pixels[(x+1)*w.width+y]
-				if p == 0 && p2 != 0 {
-					for i := 0; i < wBorderSize; i++ {
-						if i < wStaticBorderSize {
-							w.pixels[(x+i)*w.width+y] = color & wStaticColor8
-						} else {
-							w.pixels[(x+i)*w.width+y] = color
-						}
-					}
-				}
-				if p != 0 && p2 == 0 {
-					for i := 0; i < wBorderSize; i++ {
-						if x-i > 0 && x-i < w.width {
-							if i < wStaticBorderSize {
-								w.pixels[(x-i)*w.width+y] = color & wStaticColor8
-							} else {
-								w.pixels[(x-i)*w.width+y] = color
-							}
-						}
-					}
-				}
-			}
+	// color := w.coloring.getBackground()
+	// for x := 0; x < w.width; x++ {
+	// 	for y := 0; y < w.height; y++ {
+	// 		//p := w.pixels[x*w.width+y]
+	// 		// Sides
+	// 		if x+1 < w.width {
+	// 			//	p2 := w.pixels[(x+1)*w.width+y]
+	// 			// if p == 0 && p2 != 0 {
+	// 			// 	for i := 0; i < wBorderSize; i++ {
+	// 			// 		if i < wStaticBorderSize {
+	// 			// 			w.pixels[(x+i)*w.width+y] = color & wStaticColor8
+	// 			// 		} else {
+	// 			// 			w.pixels[(x+i)*w.width+y] = color
+	// 			// 		}
+	// 			// 	}
+	// 			// }
+	// 			// if p != 0 && p2 == 0 {
+	// 			// 	for i := 0; i < wBorderSize; i++ {
+	// 			// 		if x-i > 0 && x-i < w.width {
+	// 			// 			if i < wStaticBorderSize {
+	// 			// 				w.pixels[(x-i)*w.width+y] = color & wStaticColor8
+	// 			// 			} else {
+	// 			// 				w.pixels[(x-i)*w.width+y] = color
+	// 			// 			}
+	// 			// 		}
+	// 			// 	}
+	// 			// }
+	// 		}
 
-			// Top/Bottom
-			if y+1 < w.height {
-				p2 := w.pixels[x*w.width+y+1]
-				if p == 0 && p2 != 0 {
-					for i := 0; i < wBorderSize; i++ {
-						if i < wStaticBorderSize {
-							w.pixels[x*w.width+y+i] = color & wStaticColor8
-						} else {
-							w.pixels[x*w.width+y+i] = color
-						}
-					}
-				}
-				if p != 0 && p2 == 0 {
-					for i := 0; i < wBorderSize; i++ {
-						if y-i > 0 && y-i < w.height {
-							if i < wStaticBorderSize {
-								w.pixels[x*w.width+y-i] = color & wStaticColor8
-							} else {
-								w.pixels[x*w.width+y-i] = color
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	// 		// Top/Bottom
+	// 		//if y+1 < w.height {
+	// 		//	p2 := w.pixels[x*w.width+y+1]
+	// 		//	if p == 0 && p2 != 0 {
+	// 		//		for i := 0; i < wBorderSize; i++ {
+	// 		//			if i < wStaticBorderSize {
+	// 		//				w.pixels[x*w.width+y+i] = color & wStaticColor8
+	// 		//			} else {
+	// 		//				w.pixels[x*w.width+y+i] = color
+	// 		//			}
+	// 		//		}
+	// 		//	}
+	// 		//	if p != 0 && p2 == 0 {
+	// 		//		for i := 0; i < wBorderSize; i++ {
+	// 		//			if y-i > 0 && y-i < w.height {
+	// 		//				if i < wStaticBorderSize {
+	// 		//					w.pixels[x*w.width+y-i] = color & wStaticColor8
+	// 		//				} else {
+	// 		//					w.pixels[x*w.width+y-i] = color
+	// 		//				}
+	// 		//			}
+	// 		//		}
+	// 		//	}
+	// 		//}
+	// 	}
+	// }
 
 	// Corners
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			p := w.pixels[x*w.width+y]
-			// Corners
-			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				p2 := w.pixels[(x-1)*w.width+y+1]
-				p3 := w.pixels[(x-1)*w.width+y]
-				p4 := w.pixels[x*w.width+y+1]
-				p5 := w.pixels[(x-1)*w.width+y-1]
-				p6 := w.pixels[x*w.width+y-1]
-				p7 := w.pixels[(x+1)*w.width+y-1]
-				p8 := w.pixels[(x+1)*w.width+y+1]
+	// for x := 0; x < w.width; x++ {
+	// 	for y := 0; y < w.height; y++ {
+	// 		p := w.pixels[x*w.width+y]
+	// 		// Corners
+	// 		if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
+	// 			p2 := w.pixels[(x-1)*w.width+y+1]
+	// 			p3 := w.pixels[(x-1)*w.width+y]
+	// 			p4 := w.pixels[x*w.width+y+1]
+	// 			p5 := w.pixels[(x-1)*w.width+y-1]
+	// 			p6 := w.pixels[x*w.width+y-1]
+	// 			p7 := w.pixels[(x+1)*w.width+y-1]
+	// 			p8 := w.pixels[(x+1)*w.width+y+1]
 
-				//   x--
-				//   |
-				if p != 0 && p2 == 0 && p3 != 0 && p4 != 0 {
-					for i := 0; i < wBorderSize; i++ {
-						for j := 0; j < wBorderSize; j++ {
-							if x+j < w.height && y-i > 0 {
-								w.pixels[(x+j)*w.width+y-i+j] = color
-							}
-						}
-					}
-				}
-				//   |
-				//   x--
-				if p != 0 && p2 != 0 && p5 == 0 && p6 != 0 && p3 == 0 {
-					for i := 0; i <= wBorderSize; i++ {
-						for j := 0; j < wBorderSize; j++ {
-							if x+j < w.height && y+i < w.width {
-								w.pixels[(x+j)*w.width+y+i-j] = color
-							}
-						}
-					}
-				}
-				//   |
-				// --x
-				if p != 0 && p2 != 0 && p8 != 0 && p5 != 0 && p7 == 0 {
-					for i := 0; i < wBorderSize; i++ {
-						for j := 0; j < wBorderSize; j++ {
-							if x-j > 0 && y+i < w.width {
-								w.pixels[(x-j)*w.width+y+i-j] = color
-							}
-						}
-					}
-				}
-				// --x
-				//   |
-				if p != 0 && p8 == 0 && p2 != 0 && p7 != 0 {
-					for i := 0; i < wBorderSize; i++ {
-						for j := 0; j < wBorderSize; j++ {
-							if x-j > 0 && y-i > 0 {
-								w.pixels[(x-j)*w.width+y-i+j] = color
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	// 			//   x--
+	// 			//   |
+	// 			if p != 0 && p2 == 0 && p3 != 0 && p4 != 0 {
+	// 				for i := 0; i < wBorderSize; i++ {
+	// 					for j := 0; j < wBorderSize; j++ {
+	// 						if x+j < w.height && y-i > 0 {
+	// 							w.pixels[(x+j)*w.width+y-i+j] = color
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 			//   |
+	// 			//   x--
+	// 			if p != 0 && p2 != 0 && p5 == 0 && p6 != 0 && p3 == 0 {
+	// 				for i := 0; i <= wBorderSize; i++ {
+	// 					for j := 0; j < wBorderSize; j++ {
+	// 						if x+j < w.height && y+i < w.width {
+	// 							w.pixels[(x+j)*w.width+y+i-j] = color
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 			//   |
+	// 			// --x
+	// 			if p != 0 && p2 != 0 && p8 != 0 && p5 != 0 && p7 == 0 {
+	// 				for i := 0; i < wBorderSize; i++ {
+	// 					for j := 0; j < wBorderSize; j++ {
+	// 						if x-j > 0 && y+i < w.width {
+	// 							w.pixels[(x-j)*w.width+y+i-j] = color
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 			// --x
+	// 			//   |
+	// 			if p != 0 && p8 == 0 && p2 != 0 && p7 != 0 {
+	// 				for i := 0; i < wBorderSize; i++ {
+	// 					for j := 0; j < wBorderSize; j++ {
+	// 						if x-j > 0 && y-i > 0 {
+	// 							//w.pixels[(x-j)*w.width+y-i+j] = color
+	// 							w.pixels[(x-j)*w.width+y-i+j] = color
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
@@ -491,7 +492,7 @@ func (w *world) paintMap() {
 			g := p >> 16 & 0xFF
 			b := p >> 8 & 0xFF
 			if r == 0xFF && g == 0x00 && b == 0x00 {
-				v := w.coloring.getBackground()
+				v := w.coloring.getBackgroundSoft()
 				// add some alpha to background
 				v &= wBackground32
 				w.pixels[x*w.width+y] = v
@@ -503,7 +504,7 @@ func (w *world) paintMap() {
 	}
 
 	// Ladders
-	color = w.coloring.getLadder()
+	color := w.coloring.getLadder()
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
 			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
@@ -594,44 +595,92 @@ func (w *world) paintMap() {
 	// Create objects/materials AFTER ladders otherwise we must take objects into account
 	// when generating ladders. Overhead with multiple loops, but easier.
 	pcgGen := &pcg{}
-	// Generate texture
+	// First walls
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
 			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				//before := w.pixels[(x-1)*w.width+y] & 0xFF
+				before := w.pixels[(x-1)*w.width+y] & 0xFF
 				point := w.pixels[x*w.width+y] & 0xFF
-				//after := w.pixels[(x+1)*w.width+y] & 0xFF
+				after := w.pixels[(x+1)*w.width+y] & 0xFF
 				above := w.pixels[x*w.width+y+1] & 0xFF
 				below := w.pixels[x*w.width+y-1] & 0xFF
 
-				if point == 0xFF && above == wBackground8 {
-					// Create floor
-					pcgGen.MetalFloor(x, y)
-				}
 				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
-					// Create floor
-					pcgGen.MetalRoof(x, y)
+					pcgGen.MetalFlat(x, y, false)
+				}
+				if point == 0xFF && (after == wBackground8 || after == wShadow8) {
+					pcgGen.MetalWall(x, y, false)
+				}
+				if point == 0xFF && (before == wBackground8 || before == wShadow8) {
+					pcgGen.MetalWall(x, y, true)
+				}
+				// Floor
+				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
+					pcgGen.MetalFlat(x, y, true)
 				}
 			}
 		}
 	}
 
+	// Corners
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
 			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				//before := w.pixels[(x-1)*w.width+y] & 0xFF
+				before := w.pixels[(x-1)*w.width+y] & 0xFF
 				point := w.pixels[x*w.width+y] & 0xFF
-				//after := w.pixels[(x+1)*w.width+y] & 0xFF
+				after := w.pixels[(x+1)*w.width+y] & 0xFF
 				above := w.pixels[x*w.width+y+1] & 0xFF
+				below := w.pixels[x*w.width+y-1] & 0xFF
+				cornerRight := w.pixels[(x+1)*w.width+y-1] & 0xFF
+				cornerLeft := w.pixels[(x-1)*w.width+y+1] & 0xFF
+				cornerRight2 := w.pixels[(x+1)*w.width+y+1] & 0xFF
+				cornerLeft2 := w.pixels[(x-1)*w.width+y-1] & 0xFF
 
-				// Add flowers
-				if point == 0xFF && above == wBackground8 {
-					if rand.Float64() < 0.1 {
-						pcgGen.Flower(x, y+1)
-					}
+				// corner to the left downwards
+				if point == 0xFF && (below == wBackground8 || below == wShadow8) && (before == wBackground8 || before == wShadow8) {
+					pcgGen.MetalCornerDown(x, y, true)
+				}
+				if point == 0xFF && (below == wBackground8 || below == wShadow8) && (after == wBackground8 || after == wShadow8) {
+					pcgGen.MetalCornerDown(x, y, false)
+				}
+				if point == 0xFF && (above == wBackground8 || above == wShadow8) && (after == wBackground8 || after == wShadow8) {
+					pcgGen.MetalCornerUp(x, y, true)
+				}
+				if point == 0xFF && (above == wBackground8 || above == wShadow8) && (before == wBackground8 || before == wShadow8) {
+					pcgGen.MetalCornerUp(x, y, false)
+				}
+				if point == 0xFF && after == 0xFF && (cornerRight == wShadow8 || cornerRight == wBackground8) && below == 0xFF && cornerLeft == 0xFF && above == 0xFF {
+					pcgGen.MetalCornerRight(x, y, false)
+				}
+				if point == 0xFF && before == 0xFF && (cornerLeft2 == wShadow8 || cornerLeft2 == wBackground8) && below == 0xFF && cornerRight2 == 0xFF && above == 0xFF {
+					pcgGen.MetalCornerRight(x, y, true)
+				}
+				if point == 0xFF && after == 0xFF && (cornerRight2 == wShadow8 || cornerRight2 == wBackground8) && above == 0xFF && cornerLeft2 == 0xFF && below == 0xFF {
+					pcgGen.MetalCornerLeft(x, y, false)
+				}
+				if point == 0xFF && before == 0xFF && after == 0xFF && (cornerLeft == wShadow8 || cornerLeft == wBackground8) && above == 0xFF && cornerRight == 0xFF && below == 0xFF {
+					pcgGen.MetalCornerLeft(x, y, true)
 				}
 			}
 		}
 	}
+
+	// for x := 0; x < w.width; x++ {
+	// 	for y := 0; y < w.height; y++ {
+	// 		if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
+	// 			//before := w.pixels[(x-1)*w.width+y] & 0xFF
+	// 			point := w.pixels[x*w.width+y] & 0xFF
+	// 			//after := w.pixels[(x+1)*w.width+y] & 0xFF
+	// 			above := w.pixels[x*w.width+y+1] & 0xFF
+
+	// 			// Add flowers
+	// 			if point == 0xFF && above == wBackground8 {
+	// 				if rand.Float64() < 0.1 {
+	// 					pcgGen.Flower(x, y+1)
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 }
