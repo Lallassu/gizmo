@@ -59,6 +59,10 @@ func (c *chunk) create(x, y float64) {
 //=============================================================
 func (c *chunk) draw(dt float64) {
 	c.bdt += dt
+	if dt == -1 {
+		c.build()
+		return
+	}
 	if c.dirty && c.bdt > 0.2 {
 		c.bdt = 0
 		c.build()

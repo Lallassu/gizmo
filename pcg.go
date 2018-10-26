@@ -276,9 +276,6 @@ func (p *pcg) MetalFlat(x, y int, floor bool) {
 				y+i,
 				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 			)
-			for n := 0; n < wShadowLength; n++ {
-				global.gWorld.addShadow(x+n, y-i-n)
-			}
 		} else {
 			global.gWorld.AddPixel(
 				x,
@@ -286,6 +283,47 @@ func (p *pcg) MetalFlat(x, y int, floor bool) {
 				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 			)
 		}
+	}
+}
+
+func (p *pcg) MetalFloor(x, y int) {
+	r := 0
+	g := 0
+	b := 0
+	rnd := rand.Float64()
+	for i := 0; i < 4; i++ {
+		switch i {
+		case 0:
+			if rnd < 0.01 {
+				r = 0x00
+				g = 0x7e
+				b = 0x58
+			} else {
+				r = 0x00
+				g = 0xbe
+				b = 0x98
+			}
+		case 1, 2:
+			if rnd < 0.01 {
+				r = 0x16
+				g = 0x27
+				b = 0x23
+			} else {
+				r = 0x00
+				g = 0x90
+				b = 0x75
+			}
+		case 3:
+			r = 0x16
+			g = 0x27
+			b = 0x23
+		}
+
+		global.gWorld.AddPixel(
+			x,
+			y-i,
+			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
+		)
 	}
 }
 

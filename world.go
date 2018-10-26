@@ -96,7 +96,7 @@ func (w *world) NewMap(maptype mapType) {
 
 	// Build all chunks first time.
 	for _, v := range w.qt.RetrieveIntersections(Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
-		v.entity.draw(0)
+		v.entity.draw(-1)
 	}
 
 	Debug("Tree Size:", w.qt.Total)
@@ -366,125 +366,6 @@ func (w *world) markChunkDirty(x, y int) {
 // paint generated map
 //=============================================================
 func (w *world) paintMap() {
-	// color := w.coloring.getBackground()
-	// for x := 0; x < w.width; x++ {
-	// 	for y := 0; y < w.height; y++ {
-	// 		//p := w.pixels[x*w.width+y]
-	// 		// Sides
-	// 		if x+1 < w.width {
-	// 			//	p2 := w.pixels[(x+1)*w.width+y]
-	// 			// if p == 0 && p2 != 0 {
-	// 			// 	for i := 0; i < wBorderSize; i++ {
-	// 			// 		if i < wStaticBorderSize {
-	// 			// 			w.pixels[(x+i)*w.width+y] = color & wStaticColor8
-	// 			// 		} else {
-	// 			// 			w.pixels[(x+i)*w.width+y] = color
-	// 			// 		}
-	// 			// 	}
-	// 			// }
-	// 			// if p != 0 && p2 == 0 {
-	// 			// 	for i := 0; i < wBorderSize; i++ {
-	// 			// 		if x-i > 0 && x-i < w.width {
-	// 			// 			if i < wStaticBorderSize {
-	// 			// 				w.pixels[(x-i)*w.width+y] = color & wStaticColor8
-	// 			// 			} else {
-	// 			// 				w.pixels[(x-i)*w.width+y] = color
-	// 			// 			}
-	// 			// 		}
-	// 			// 	}
-	// 			// }
-	// 		}
-
-	// 		// Top/Bottom
-	// 		//if y+1 < w.height {
-	// 		//	p2 := w.pixels[x*w.width+y+1]
-	// 		//	if p == 0 && p2 != 0 {
-	// 		//		for i := 0; i < wBorderSize; i++ {
-	// 		//			if i < wStaticBorderSize {
-	// 		//				w.pixels[x*w.width+y+i] = color & wStaticColor8
-	// 		//			} else {
-	// 		//				w.pixels[x*w.width+y+i] = color
-	// 		//			}
-	// 		//		}
-	// 		//	}
-	// 		//	if p != 0 && p2 == 0 {
-	// 		//		for i := 0; i < wBorderSize; i++ {
-	// 		//			if y-i > 0 && y-i < w.height {
-	// 		//				if i < wStaticBorderSize {
-	// 		//					w.pixels[x*w.width+y-i] = color & wStaticColor8
-	// 		//				} else {
-	// 		//					w.pixels[x*w.width+y-i] = color
-	// 		//				}
-	// 		//			}
-	// 		//		}
-	// 		//	}
-	// 		//}
-	// 	}
-	// }
-
-	// Corners
-	// for x := 0; x < w.width; x++ {
-	// 	for y := 0; y < w.height; y++ {
-	// 		p := w.pixels[x*w.width+y]
-	// 		// Corners
-	// 		if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-	// 			p2 := w.pixels[(x-1)*w.width+y+1]
-	// 			p3 := w.pixels[(x-1)*w.width+y]
-	// 			p4 := w.pixels[x*w.width+y+1]
-	// 			p5 := w.pixels[(x-1)*w.width+y-1]
-	// 			p6 := w.pixels[x*w.width+y-1]
-	// 			p7 := w.pixels[(x+1)*w.width+y-1]
-	// 			p8 := w.pixels[(x+1)*w.width+y+1]
-
-	// 			//   x--
-	// 			//   |
-	// 			if p != 0 && p2 == 0 && p3 != 0 && p4 != 0 {
-	// 				for i := 0; i < wBorderSize; i++ {
-	// 					for j := 0; j < wBorderSize; j++ {
-	// 						if x+j < w.height && y-i > 0 {
-	// 							w.pixels[(x+j)*w.width+y-i+j] = color
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 			//   |
-	// 			//   x--
-	// 			if p != 0 && p2 != 0 && p5 == 0 && p6 != 0 && p3 == 0 {
-	// 				for i := 0; i <= wBorderSize; i++ {
-	// 					for j := 0; j < wBorderSize; j++ {
-	// 						if x+j < w.height && y+i < w.width {
-	// 							w.pixels[(x+j)*w.width+y+i-j] = color
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 			//   |
-	// 			// --x
-	// 			if p != 0 && p2 != 0 && p8 != 0 && p5 != 0 && p7 == 0 {
-	// 				for i := 0; i < wBorderSize; i++ {
-	// 					for j := 0; j < wBorderSize; j++ {
-	// 						if x-j > 0 && y+i < w.width {
-	// 							w.pixels[(x-j)*w.width+y+i-j] = color
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 			// --x
-	// 			//   |
-	// 			if p != 0 && p8 == 0 && p2 != 0 && p7 != 0 {
-	// 				for i := 0; i < wBorderSize; i++ {
-	// 					for j := 0; j < wBorderSize; j++ {
-	// 						if x-j > 0 && y-i > 0 {
-	// 							//w.pixels[(x-j)*w.width+y-i+j] = color
-	// 							w.pixels[(x-j)*w.width+y-i+j] = color
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
 			p := w.pixels[x*w.width+y]
@@ -617,6 +498,9 @@ func (w *world) paintMap() {
 				// Floor
 				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
 					pcgGen.MetalFlat(x, y, true)
+				}
+				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
+					pcgGen.MetalFloor(x, y)
 				}
 			}
 		}
