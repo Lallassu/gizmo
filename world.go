@@ -118,6 +118,21 @@ func (w *world) RemoveObject(obj Entity) {
 }
 
 //=============================================================
+// Check if pixel is a background
+//=============================================================
+func (w *world) IsBackground(x_, y_ float64) bool {
+	x := int(x_)
+	y := int(y_)
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF == wBackground8 {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
 // Check if pixel is a shadow
 //=============================================================
 func (w *world) IsShadow(x_, y_ float64) bool {
@@ -175,7 +190,10 @@ func (w *world) PixelExists(x, y float64) bool {
 // Return -1 if not exist
 //=============================================================
 func (w *world) PixelColor(x, y float64) int32 {
-	return 1
+	if x < 0 || y < 0 || x >= float64(w.width) || y >= float64(w.height) {
+		return -1
+	}
+	return int32(w.pixels[uint32(int(x)*w.width+int(y))])
 }
 
 //=============================================================
@@ -552,6 +570,18 @@ func (w *world) paintMap() {
 			}
 		}
 	}
+	// Cracks in the wall?
+	// for x := 0; x < w.width; x++ {
+	// 	for y := 0; y < w.height; y++ {
+	// 		p := w.pixels[x*w.width+y] & 0xFF
+
+	// 		if p == wShadow8 || p == wBackground8 {
+	// 			if rand.Float64() < 0.0001 {
+	// 				pcgGen.GenerateBricks(x, y)
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	// Background gfx
 	for x := 0; x < w.width; x++ {
@@ -577,30 +607,21 @@ func (w *world) paintMap() {
 				p := w.pixels[x*w.width+y] & 0xFF
 				pafter := w.pixels[(x+wDoorLen)*w.width+y+1] & 0xFF
 				pbelow := w.pixels[(x+wDoorLen)*w.width+y-1] & 0xFF
+				pbelowLong := w.pixels[x*w.width+y-wDoorHeight-45] & 0xFF
 				pp := w.pixels[x*w.width+y+1] & 0xFF
 				up := w.pixels[x*w.width+y+wDoorHeight] & 0xFF
+				down := w.pixels[x*w.width+y-1] & 0xFF
+
+				if p == 0xFF && pbelowLong == 0xFF && (down == wShadow8 || down == wBackground8) {
+					pcgGen.GenerateLamp(x, y-1)
+				}
+
 				if pbelow != wBackground8 && pafter == wBackground8 && p == 0xFF && up == wBackground8 && pp == wBackground8 {
 					pcgGen.GenerateDoor(x, y+1)
 				}
+
 			}
 		}
 	}
-	// for x := 0; x < w.width; x++ {
-	// 	for y := 0; y < w.height; y++ {
-	// 		if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-	// 			//before := w.pixels[(x-1)*w.width+y] & 0xFF
-	// 			point := w.pixels[x*w.width+y] & 0xFF
-	// 			//after := w.pixels[(x+1)*w.width+y] & 0xFF
-	// 			above := w.pixels[x*w.width+y+1] & 0xFF
-
-	// 			// Add flowers
-	// 			if point == 0xFF && above == wBackground8 {
-	// 				if rand.Float64() < 0.1 {
-	// 					pcgGen.Flower(x, y+1)
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 
 }

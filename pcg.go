@@ -16,6 +16,7 @@ type pcg struct {
 	floorCnt    int
 	bgPlateCnt  int
 	doorCnt     int
+	lampCnt     int
 }
 
 func (p *pcg) Flower(x, y int) {
@@ -456,6 +457,59 @@ func (p *pcg) GenerateDoor(x, y int) {
 	}
 }
 
+func (p *pcg) GenerateLamp(x, y int) {
+	p.lampCnt++
+	if p.lampCnt < 250 {
+		return
+	}
+	p.lampCnt = 0
+
+	lr := 0x3b
+	lg := 0x3a
+	lb := 0x39
+	for i := -5; i < 5; i++ {
+		for j := 0; j <= 4; j++ {
+			if i == -5 || (i == 0 && j == 0) {
+				lr = 0xa4
+				lg = 0x81
+				lb = 0x61
+			} else {
+				lr = 0x3b
+				lg = 0x3a
+				lb = 0x39
+			}
+			if (i > -4 && i < 3 && j == 4) || (i > -3 && i < 4 && j == 3) {
+				lr = 0xff - rand.Intn(10)
+				lg = 0xd6 - rand.Intn(20)
+				lb = 0x2f
+			}
+			global.gWorld.AddPixel(
+				x+i,
+				y-j,
+				uint32(lr&0xFF<<24|lg&0xFF<<16|lb&0xFF<<8|wBackground8),
+			)
+		}
+	}
+
+	for j := 5; j < 80; j++ {
+		for i := -j * 2 / 2; i < j*2/2; i++ {
+			c := global.gWorld.PixelColor(float64(x+i), float64(y-j))
+			r := c>>24&0xFF + int32(80-j)
+			g := c>>16&0xFF + int32(80-j)
+			b := c >> 8 & 0xFF
+			a := c & 0xFF
+
+			if global.gWorld.IsShadow(float64(x+i), float64(y-j)) || global.gWorld.IsBackground(float64(x+i), float64(y-j)) {
+				global.gWorld.AddPixel(
+					x+i,
+					y-j,
+					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
+				)
+			}
+		}
+	}
+}
+
 func (p *pcg) GenerateLine(x, y int) {
 	r := 0x73
 	g := 0x80
@@ -513,6 +567,38 @@ func (p *pcg) GenerateBottomLine(x, y int) {
 		y,
 		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
 	)
+
+}
+
+func (p *pcg) GenerateBricks(x, y int) {
+	r := 0x00
+	g := 0x00
+	b := 0x00
+	a := wBackground8
+	length := 50 + rand.Intn(70)
+	height := 10 + rand.Intn(70)
+	for i := 0; i < length; i++ {
+		i += rand.Intn(1)
+		for j := 0; j < height; j++ {
+			if i%10 == 0 || j%5 == 0 {
+				r = 0x55
+				g = 0x55
+				b = 0x55
+			} else {
+				r = 0x35
+				g = 0x37
+				b = 0x2d
+			}
+			if global.gWorld.IsBackground(float64(x+i), float64(y+j)) {
+				global.gWorld.AddPixel(
+					x+i,
+					y+j,
+					uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
+				)
+			}
+		}
+	}
+
 }
 
 func (p *pcg) GrassFloor(x, y int) {
