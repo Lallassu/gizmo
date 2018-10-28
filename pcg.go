@@ -6,6 +6,7 @@
 package main
 
 import (
+	_ "math"
 	"math/rand"
 )
 
@@ -332,41 +333,99 @@ func (p *pcg) MetalFloor(x, y int) {
 	}
 }
 
-func (p *pcg) MetalWallBgPlates(x, y int) {
-	p.bgPlateCnt++
-
-	if p.bgPlateCnt < 100 {
-		return
-	}
-	p.bgPlateCnt = 0
-
-	offset := 8
-	r := 0x3e
-	g := 0x58
-	b := 0x5c
+func (p *pcg) GenerateDoor(x, y int) {
+	r := 0x73
+	g := 0x80
+	b := 0x62
 	a := wBackground8
+	doorLen := 30
+	doorHeight := 40
 
-	global.gWorld.AddPixel(
-		x-2,
-		y-offset,
-		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a&0xFF),
-	)
-	global.gWorld.AddPixel(
-		x+2,
-		y-offset,
-		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a/2&0xFF),
-	)
-
-	for i := 0; i < 30; i++ {
-		for j := 0; j < 30; j++ {
-			a += 1
+	for i := 0; i < doorLen; i++ {
+		for j := 0; j < doorHeight; j++ {
+			// Frame
+			if i == 0 || j == doorHeight-1 || i == doorLen-1 {
+				r = 0x3a
+				g = 0x3a
+				b = 0x3a
+			} else {
+				r = 0x51
+				g = 0x71
+				b = 0x74
+			}
+			if (i == doorLen-2 && j < doorHeight-1) || (i == doorLen-3 && j < doorHeight-1) {
+				r = 0x4c
+				g = 0x4c
+				b = 0x4c
+			}
+			if j == doorHeight-2 && i > 0 && i < doorLen-2 {
+				r = 0x1b
+				g = 0x1b
+				b = 0x1b
+			}
+			// Shadow
+			if j > doorHeight-5 || i < 3 {
+				r /= 3
+				g /= 3
+				b /= 3
+			}
+			// Handle
+			if j == doorHeight/3 && i > 1 && i < 5 {
+				r = 0x52
+				g = 0x67
+				b = 0x69
+			}
+			// Handle
+			if j == doorHeight/3-1 && i > 1 && i < 4 {
+				r = 0x35
+				g = 0x44
+				b = 0x46
+			}
+			// Hinge
+			if (j == doorHeight/4 || j == doorHeight/4-1 || j == doorHeight-(doorHeight/4-1) || j == doorHeight-(doorHeight/4)) && i == doorLen-3 {
+				r = 0x4c
+				g = 0x59
+				b = 0x5c
+			}
+			// Hinge
+			if (j == doorHeight/4 || j == doorHeight/4-1 || j == doorHeight-(doorHeight/4-1) || j == doorHeight-(doorHeight/4)) && i == doorLen-4 {
+				r = 0x23
+				g = 0x23
+				b = 0x23
+			}
 			global.gWorld.AddPixel(
-				x+j,
-				y-offset-i,
-				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a&0xFF),
+				x+i,
+				y+j,
+				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
 			)
 		}
 	}
+}
+
+func (p *pcg) GenerateLine(x, y int) {
+	r := 0x73
+	g := 0x80
+	b := 0x62
+	a := wBackground8
+	lineSize := 10
+
+	for i := 0; i < lineSize; i++ {
+		global.gWorld.AddPixel(
+			x,
+			y-i,
+			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
+		)
+	}
+	global.gWorld.AddPixel(
+		x,
+		y,
+		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
+	)
+	global.gWorld.AddPixel(
+		x,
+		y-lineSize,
+		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
+	)
 }
 
 func (p *pcg) GrassFloor(x, y int) {

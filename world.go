@@ -366,6 +366,8 @@ func (w *world) markChunkDirty(x, y int) {
 // paint generated map
 //=============================================================
 func (w *world) paintMap() {
+	pcgGen := &pcg{}
+
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
 			p := w.pixels[x*w.width+y]
@@ -475,7 +477,6 @@ func (w *world) paintMap() {
 
 	// Create objects/materials AFTER ladders otherwise we must take objects into account
 	// when generating ladders. Overhead with multiple loops, but easier.
-	pcgGen := &pcg{}
 	// First walls
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
@@ -489,9 +490,6 @@ func (w *world) paintMap() {
 				// Roof
 				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
 					pcgGen.MetalFlat(x, y, false)
-				}
-				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
-					pcgGen.MetalWallBgPlates(x, y)
 				}
 				// Walls
 				if point == 0xFF && (after == wBackground8 || after == wShadow8) {
@@ -555,6 +553,34 @@ func (w *world) paintMap() {
 		}
 	}
 
+	// Background gfx
+	for x := 0; x < w.width; x++ {
+		for y := 0; y < w.height; y++ {
+			if y+30 < w.height && x+1 < w.width && x > 0 && y > 0 {
+				p := w.pixels[x*w.width+y] & 0xFF
+				pp := w.pixels[x*w.width+y+1] & 0xFF
+				up := w.pixels[x*w.width+y+30] & 0xFF
+				if p == 0xFF && up == wBackground8 && pp == wBackground8 {
+					pcgGen.GenerateLine(x, y+30)
+				}
+			}
+		}
+	}
+	// Background gfx
+	for x := 0; x < w.width; x++ {
+		for y := 0; y < w.height; y++ {
+			if y+40 < w.height && x+1 < w.width && x > 0 && y > 0 {
+				p := w.pixels[x*w.width+y] & 0xFF
+				pp := w.pixels[x*w.width+y+1] & 0xFF
+				up := w.pixels[x*w.width+y+40] & 0xFF
+				if p == 0xFF && up == wBackground8 && pp == wBackground8 {
+					if rand.Float64() < 0.005 {
+						pcgGen.GenerateDoor(x, y+1)
+					}
+				}
+			}
+		}
+	}
 	// for x := 0; x < w.width; x++ {
 	// 	for y := 0; y < w.height; y++ {
 	// 		if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
