@@ -15,6 +15,7 @@ type pcg struct {
 	incr        float64
 	floorCnt    int
 	bgPlateCnt  int
+	doorCnt     int
 }
 
 func (p *pcg) Flower(x, y int) {
@@ -334,17 +335,24 @@ func (p *pcg) MetalFloor(x, y int) {
 }
 
 func (p *pcg) GenerateDoor(x, y int) {
+	p.doorCnt++
+
+	if p.doorCnt < 200 {
+		return
+	}
+	p.doorCnt = 0
+
 	r := 0x73
 	g := 0x80
 	b := 0x62
 	a := wBackground8
-	doorLen := 30
-	doorHeight := 40
+	doorType := rand.Float64()
+	doorLight := rand.Float64()
 
-	for i := 0; i < doorLen; i++ {
-		for j := 0; j < doorHeight; j++ {
+	for i := 0; i < wDoorLen; i++ {
+		for j := 0; j < wDoorHeight; j++ {
 			// Frame
-			if i == 0 || j == doorHeight-1 || i == doorLen-1 {
+			if i == 0 || j == wDoorHeight-1 || i == wDoorLen-1 {
 				r = 0x3a
 				g = 0x3a
 				b = 0x3a
@@ -353,42 +361,88 @@ func (p *pcg) GenerateDoor(x, y int) {
 				g = 0x71
 				b = 0x74
 			}
-			if (i == doorLen-2 && j < doorHeight-1) || (i == doorLen-3 && j < doorHeight-1) {
+			if (i == wDoorLen-2 && j < wDoorHeight-1) || (i == wDoorLen-3 && j < wDoorHeight-1) {
 				r = 0x4c
 				g = 0x4c
 				b = 0x4c
 			}
-			if j == doorHeight-2 && i > 0 && i < doorLen-2 {
+			if j == wDoorHeight-2 && i > 0 && i < wDoorLen-2 {
 				r = 0x1b
 				g = 0x1b
 				b = 0x1b
 			}
 			// Shadow
-			if j > doorHeight-5 || i < 3 {
+			if j > wDoorHeight-5 || i < 3 {
 				r /= 3
 				g /= 3
 				b /= 3
 			}
 			// Handle
-			if j == doorHeight/3 && i > 1 && i < 5 {
+			if j == wDoorHeight/3 && i > 1 && i < 5 {
 				r = 0x52
 				g = 0x67
 				b = 0x69
 			}
 			// Handle
-			if j == doorHeight/3-1 && i > 1 && i < 4 {
+			if j == wDoorHeight/3-1 && i > 1 && i < 4 {
 				r = 0x35
 				g = 0x44
 				b = 0x46
 			}
+			if j == wDoorHeight/3-1 && i > 1 && i < 6 {
+				r = 0x35
+				g = 0x44
+				b = 0x46
+			}
+
+			// Middle of door
+			if doorType > 0.5 {
+				if j > wDoorHeight/2 && j < wDoorHeight-wDoorHeight/3 && i >= wDoorLen/3 && i < wDoorLen-wDoorLen/3 {
+					// Jail door
+					if i%2 == 0 {
+						r = 0x00
+						g = 0x00
+						b = 0x00
+					} else {
+						r = 0x55
+						g = 0x55
+						b = 0x55
+					}
+					// Door window shadow
+					if j == wDoorHeight/2-1 || j == wDoorHeight-wDoorHeight/3-1 || i == wDoorLen/3 {
+						r = 0x00
+						g = 0x00
+						b = 0x00
+					}
+				}
+			} else {
+				if j > wDoorHeight/4 && j < wDoorHeight-wDoorHeight/3 && i >= wDoorLen/3 && i < wDoorLen-wDoorLen/3 {
+					// Light
+					if doorLight < 0.5 {
+						r = 0xf6
+						g = 0xab
+						b = 0x34
+					} else {
+						r = 0x33 - i
+						g = 0x33 - i
+						b = 0x33 - i
+					}
+					// Door window shadow
+					if j == wDoorHeight/4-1 || j == wDoorHeight-wDoorHeight/3-1 || i == wDoorLen/3 {
+						r = 0x00
+						g = 0x00
+						b = 0x00
+					}
+				}
+			}
 			// Hinge
-			if (j == doorHeight/4 || j == doorHeight/4-1 || j == doorHeight-(doorHeight/4-1) || j == doorHeight-(doorHeight/4)) && i == doorLen-3 {
+			if (j == wDoorHeight/4 || j == wDoorHeight/4-1 || j == wDoorHeight-(wDoorHeight/4-1) || j == wDoorHeight-(wDoorHeight/4)) && i == wDoorLen-3 {
 				r = 0x4c
 				g = 0x59
 				b = 0x5c
 			}
 			// Hinge
-			if (j == doorHeight/4 || j == doorHeight/4-1 || j == doorHeight-(doorHeight/4-1) || j == doorHeight-(doorHeight/4)) && i == doorLen-4 {
+			if (j == wDoorHeight/4 || j == wDoorHeight/4-1 || j == wDoorHeight-(wDoorHeight/4-1) || j == wDoorHeight-(wDoorHeight/4)) && i == wDoorLen-4 {
 				r = 0x23
 				g = 0x23
 				b = 0x23
@@ -407,6 +461,12 @@ func (p *pcg) GenerateLine(x, y int) {
 	g := 0x80
 	b := 0x62
 	a := wBackground8
+	if global.gWorld.IsShadow(float64(x), float64(y)) {
+		a = wShadow8
+		r = 0x73 / 2
+		g = 0x80 / 2
+		b = 0x62 / 2
+	}
 	lineSize := 10
 
 	for i := 0; i < lineSize; i++ {
@@ -424,6 +484,33 @@ func (p *pcg) GenerateLine(x, y int) {
 	global.gWorld.AddPixel(
 		x,
 		y-lineSize,
+		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
+	)
+}
+
+func (p *pcg) GenerateBottomLine(x, y int) {
+	r := 0x36
+	g := 0x36
+	b := 0x34
+	a := wBackground8
+	if global.gWorld.IsShadow(float64(x), float64(y)) {
+		a = wShadow8
+		r = 0x36 / 2
+		g = 0x36 / 2
+		b = 0x34 / 2
+	}
+	lineSize := 3
+
+	for i := 0; i < lineSize; i++ {
+		global.gWorld.AddPixel(
+			x,
+			y-i,
+			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
+		)
+	}
+	global.gWorld.AddPixel(
+		x,
+		y,
 		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
 	)
 }

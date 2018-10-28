@@ -560,8 +560,12 @@ func (w *world) paintMap() {
 				p := w.pixels[x*w.width+y] & 0xFF
 				pp := w.pixels[x*w.width+y+1] & 0xFF
 				up := w.pixels[x*w.width+y+30] & 0xFF
-				if p == 0xFF && up == wBackground8 && pp == wBackground8 {
+				upLow := w.pixels[x*w.width+y+5] & 0xFF
+				if p == 0xFF && (up == wBackground8 || up == wShadow8) && (pp == wShadow8 || pp == wBackground8) {
 					pcgGen.GenerateLine(x, y+30)
+				}
+				if p == 0xFF && (upLow == wBackground8 || upLow == wShadow8) && (pp == wShadow8 || pp == wBackground8) {
+					pcgGen.GenerateBottomLine(x, y+3)
 				}
 			}
 		}
@@ -569,14 +573,14 @@ func (w *world) paintMap() {
 	// Background gfx
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
-			if y+40 < w.height && x+1 < w.width && x > 0 && y > 0 {
+			if y+wDoorHeight < w.height && x+wDoorLen < w.width && x > 0 && y > 0 {
 				p := w.pixels[x*w.width+y] & 0xFF
+				pafter := w.pixels[(x+wDoorLen)*w.width+y+1] & 0xFF
+				pbelow := w.pixels[(x+wDoorLen)*w.width+y-1] & 0xFF
 				pp := w.pixels[x*w.width+y+1] & 0xFF
-				up := w.pixels[x*w.width+y+40] & 0xFF
-				if p == 0xFF && up == wBackground8 && pp == wBackground8 {
-					if rand.Float64() < 0.005 {
-						pcgGen.GenerateDoor(x, y+1)
-					}
+				up := w.pixels[x*w.width+y+wDoorHeight] & 0xFF
+				if pbelow != wBackground8 && pafter == wBackground8 && p == 0xFF && up == wBackground8 && pp == wBackground8 {
+					pcgGen.GenerateDoor(x, y+1)
 				}
 			}
 		}
