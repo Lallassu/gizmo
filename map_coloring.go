@@ -21,7 +21,7 @@ func GenerateMapColor(maptype mapType) *mapColor {
 		background:     0x10100eFF,
 		backgroundSoft: 0x3e585cFF,
 		foreground:     0x3d6253FF,
-		ladders:        0x444444FF,
+		ladders:        0x8b4513FF,
 		borders:        0xFF0000FF,
 	}
 	return m

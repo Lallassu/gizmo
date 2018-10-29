@@ -382,6 +382,7 @@ func (w *world) markChunkDirty(x, y int) {
 
 //=============================================================
 // paint generated map
+// everything has to be performed in a specific order.
 //=============================================================
 func (w *world) paintMap() {
 	pcgGen := &pcg{}
@@ -408,26 +409,23 @@ func (w *world) paintMap() {
 	color := w.coloring.getLadder()
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
-			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
+			if y+1 < w.height && x+60 < w.width && x > 0 && y > 0 {
 				before := w.pixels[(x-1)*w.width+y] & 0xFF
 				point := w.pixels[x*w.width+y] & 0xFF
 				after := w.pixels[(x+1)*w.width+y] & 0xFF
 				above := w.pixels[x*w.width+y+1] & 0xFF
-				long := uint32(0)
+				long := w.pixels[(x+60)*w.width+y] & 0xFF
 
-				if x+23 < w.width {
-					long = w.pixels[(x+23)*w.width+y] & 0xFF
-				}
-				if above == wBackground8 && point == 0xFF && before == 0xFF && after == wBackground8 && long == 0xFF {
-					for i := 0; i < 18; i++ {
+				if (above == wBackground8 || above == wShadow8) && point == 0xFF && before == 0xFF && (after == wBackground8 || after == wShadow8) && long == 0xFF {
+					for i := 5; i < 18; i++ {
 						if i == 5 || i == 17 {
 							for n := 0; n < 500000; n++ {
 								if y-n > 0 {
-									if w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 && w.pixels[(x+i)*w.width+y-n]&0xFF != wLadder8 {
+									if (w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 || w.pixels[(x+i)*w.width+y-n]&0xFF == wShadow8) && w.pixels[(x+i)*w.width+y-n]&0xFF != wLadder8 {
 										w.pixels[(x+i)*w.width+y-n] = (color & wLadder32)
 										// Shadows
 										if w.pixels[(x+i+1)*w.width+y-n-1]&0xFF != 0xFF {
-											w.pixels[(x+i+1)*w.width+y-n-1] &= (color & wLadder32)
+											w.pixels[(x+i+1)*w.width+y-n-1] &= (0x555555FF & wLadder32)
 										}
 									} else {
 										break
@@ -438,11 +436,11 @@ func (w *world) paintMap() {
 						}
 						for n := 0; ; n += 5 {
 							if y-n > 0 {
-								if w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 {
+								if w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 || w.pixels[(x+i)*w.width+y-n]&0xFF == wShadow8 {
 									w.pixels[(x+i)*w.width+y-n] = (color & wLadder32)
 									// Dont shadow above walls
 									if w.pixels[(x+i+1)*w.width+y-n-1]&0xFF != 0xFF {
-										w.pixels[(x+i+1)*w.width+y-n-1] &= (color & wLadder32)
+										w.pixels[(x+i+1)*w.width+y-n-1] &= (0x555555FF & wLadder32)
 									}
 
 								} else {
