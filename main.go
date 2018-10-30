@@ -49,9 +49,9 @@ func setup() {
 	// Camera setup
 	global.gCamera.create()
 	global.gController.create()
-	global.gParticleEngine.create()
 	global.gWorld.Init()
 	global.gWorld.NewMap(mapEasy)
+	global.gParticleEngine.create()
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 2
 	global.gWin.SetSmooth(false)
@@ -67,6 +67,19 @@ func gameLoop() {
 	//fps := time.Tick(time.Second / 60)
 	//second := time.Tick(time.Second)
 
+	test := mob{
+		sheetFile:   "/Users/nergal/Dropbox/dev/golang/src/GoD/test.png",
+		walkFrames:  []int{0, 1},
+		idleFrames:  []int{2, 3},
+		shootFrames: []int{4, 5},
+		jumpFrames:  []int{6, 7},
+		climbFrames: []int{1, 2},
+		frameWidth:  32.0,
+		life:        100.0,
+		pos:         pixel.Vec{X: 100, Y: 100},
+	}
+	test.create()
+
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
@@ -77,6 +90,7 @@ func gameLoop() {
 		global.gCamera.update(dt)
 		global.gWorld.Draw(dt)
 		global.gParticleEngine.update(dt)
+		test.draw(dt)
 
 		global.gWin.Update()
 	}

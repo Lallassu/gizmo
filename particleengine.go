@@ -70,7 +70,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 //=============================================================
 func (pe *particleEngine) create() {
 	pe.particles = make([]particle, wParticlesMax)
-	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWindowHeight), float64(global.gWindowWidth)))
+	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.height), float64(global.gWorld.width)))
 
 	// Use a channel for particles.
 	for i := 0; i < wParticlesMax; i++ {
@@ -106,7 +106,7 @@ func (pe *particleEngine) update(dt float64) {
 		}
 	}
 	pe.build()
-	pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWindowHeight/2), float64(global.gWindowWidth/2))))
+	pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.height/2), float64(global.gWorld.width/2))))
 }
 
 //=============================================================

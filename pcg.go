@@ -17,6 +17,7 @@ type pcg struct {
 	bgPlateCnt  int
 	doorCnt     int
 	lampCnt     int
+	airCnt      int
 }
 
 func (p *pcg) Flower(x, y int) {
@@ -459,7 +460,7 @@ func (p *pcg) GenerateDoor(x, y int) {
 
 func (p *pcg) GenerateLamp(x, y int) {
 	p.lampCnt++
-	if p.lampCnt < 250 {
+	if p.lampCnt < 200 {
 		return
 	}
 	p.lampCnt = 0
@@ -542,6 +543,46 @@ func (p *pcg) GenerateLine(x, y int) {
 	)
 }
 
+func (p *pcg) GenerateBottomAirIntake(x, y int) {
+	p.airCnt++
+	if p.airCnt < 250 {
+		return
+	}
+	p.airCnt = 0
+
+	r := 0x36
+	g := 0x36
+	b := 0x34
+	a := wBackground8
+
+	for i := 0; i < 6; i++ {
+		for j := 1; j < 4; j++ {
+			if global.gWorld.IsShadow(float64(x+i), float64(y+j)) {
+				a = wShadow8
+				r = 0x36
+				g = 0x36
+				b = 0x34
+			}
+			if i%2 == 0 {
+				r = 0x36 / 2
+				g = 0x36 / 2
+				b = 0x34 / 2
+			}
+			if i == 0 || j == 3 {
+				r = 0x0 + i
+				g = 0x0 + i
+				b = 0x0 + i
+			}
+
+			global.gWorld.AddPixel(
+				x+i,
+				y+j,
+				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
+			)
+		}
+	}
+}
+
 func (p *pcg) GenerateBottomLine(x, y int) {
 	r := 0x36
 	g := 0x36
@@ -571,28 +612,37 @@ func (p *pcg) GenerateBottomLine(x, y int) {
 }
 
 func (p *pcg) GenerateBricks(x, y int) {
-	r := 0x00
-	g := 0x00
-	b := 0x00
 	a := wBackground8
-	length := 50 + rand.Intn(70)
-	height := 10 + rand.Intn(70)
-	for i := 0; i < length; i++ {
-		i += rand.Intn(1)
-		for j := 0; j < height; j++ {
-			if i%10 == 0 || j%5 == 0 {
-				r = 0x55
-				g = 0x55
-				b = 0x55
+	length := 10 + rand.Intn(30)
+	height := 10 + rand.Intn(30)
+	for i := 0; i < height; i++ {
+		from := -length/3 - rand.Intn(length/2)
+		to := length/3 + rand.Intn(length/2)
+		for j := from; j < to; j++ {
+			c := global.gWorld.PixelColor(float64(x+i), float64(y-j))
+			r := int(c>>24&0xFF + int32(80-j))
+			g := int(c>>16&0xFF + int32(80-j))
+			b := int(c >> 8 & 0xFF)
+			if j%10 == 0 || i%5 == 0 {
+				rnd := rand.Intn(20)
+				r = 0x00 + rnd
+				g = 0x00 + rnd
+				b = 0x00 + rnd
 			} else {
-				r = 0x35
-				g = 0x37
-				b = 0x2d
+				rnd := 10
+				r -= rnd
+				g -= rnd
+				b -= rnd
+			}
+			if j < from+5 || j == 0 {
+				r /= 2
+				g /= 2
+				b /= 2
 			}
 			if global.gWorld.IsBackground(float64(x+i), float64(y+j)) {
 				global.gWorld.AddPixel(
-					x+i,
-					y+j,
+					x+j,
+					y+i,
 					uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
 				)
 			}

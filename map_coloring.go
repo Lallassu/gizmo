@@ -18,7 +18,7 @@ func GenerateMapColor(maptype mapType) *mapColor {
 	// types of coloring schemes depending
 	// on map type.
 	m := &mapColor{
-		background:     0x10100eFF,
+		background:     0x242c27FF,
 		backgroundSoft: 0x3e585cFF,
 		foreground:     0x3d6253FF,
 		ladders:        0x8b4513FF,

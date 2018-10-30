@@ -598,6 +598,19 @@ func (w *world) paintMap() {
 			}
 		}
 	}
+	// Air intake on floor
+	for x := 0; x < w.width; x++ {
+		for y := 0; y < w.height; y++ {
+			if y+30 < w.height && x+1 < w.width && x > 0 && y > 0 {
+				p := w.pixels[x*w.width+y] & 0xFF
+				pp := w.pixels[x*w.width+y+1] & 0xFF
+				upLow := w.pixels[x*w.width+y+5] & 0xFF
+				if p == 0xFF && (upLow == wBackground8 || upLow == wShadow8) && (pp == wShadow8 || pp == wBackground8) {
+					pcgGen.GenerateBottomAirIntake(x, y)
+				}
+			}
+		}
+	}
 	// Background gfx
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
@@ -605,7 +618,7 @@ func (w *world) paintMap() {
 				p := w.pixels[x*w.width+y] & 0xFF
 				pafter := w.pixels[(x+wDoorLen)*w.width+y+1] & 0xFF
 				pbelow := w.pixels[(x+wDoorLen)*w.width+y-1] & 0xFF
-				pbelowLong := w.pixels[x*w.width+y-wDoorHeight-45] & 0xFF
+				pbelowLong := w.pixels[x*w.width+y-wDoorHeight-55] & 0xFF
 				pp := w.pixels[x*w.width+y+1] & 0xFF
 				up := w.pixels[x*w.width+y+wDoorHeight] & 0xFF
 				down := w.pixels[x*w.width+y-1] & 0xFF
@@ -615,9 +628,18 @@ func (w *world) paintMap() {
 				}
 
 				if pbelow != wBackground8 && pafter == wBackground8 && p == 0xFF && up == wBackground8 && pp == wBackground8 {
-					pcgGen.GenerateDoor(x, y+1)
+					// Check there is no ladder
+					skip := false
+					for i := 0; i < wDoorLen; i++ {
+						if w.pixels[(x+i)*w.width+y+1]&0xFF == wLadder8 {
+							skip = true
+							break
+						}
+					}
+					if !skip {
+						pcgGen.GenerateDoor(x, y+1)
+					}
 				}
-
 			}
 		}
 	}

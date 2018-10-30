@@ -22,7 +22,7 @@ type chunk struct {
 }
 
 //=============================================================
-// Support the Entity interface
+// Impl. the Entity interface
 //=============================================================
 func (c *chunk) hit(x, y float64) bool {
 	return false

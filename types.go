@@ -35,3 +35,13 @@ const (
 	entityObject
 	entityChunk
 )
+
+type animationType int
+
+const (
+	animWalk animationType = iota
+	animJump
+	animClimb
+	animShoot
+	animIdle
+)
