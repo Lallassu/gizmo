@@ -12,6 +12,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"image/png"
+	"math/rand"
 	"os"
 )
 
@@ -27,9 +28,10 @@ type mob struct {
 	frameWidth  int
 	frameHeight int
 	currentAnim animationType
-	canvas      []*pixelgl.Canvas
+	canvas      map[int]*pixelgl.Canvas
 	frames      map[int][]uint32
 	bounds      Bounds
+	currentIdx  int
 }
 
 //=============================================================
@@ -37,7 +39,7 @@ type mob struct {
 // - load animation sheet
 //=============================================================
 func (m *mob) create() {
-	m.canvas = make([]*pixelgl.Canvas, 0)
+	m.canvas = make(map[int]*pixelgl.Canvas)
 	m.frames = make(map[int][]uint32)
 
 	// Load animation
@@ -72,14 +74,20 @@ func (m *mob) create() {
 	}
 
 	f := 0
+	size := m.frameWidth
+	if m.frameWidth < m.frameHeight {
+		size = m.frameHeight
+	}
 	for w := 0; w < imgCfg.Width; w += m.frameWidth {
-		f++
-		for x := w; x < m.frameWidth; x++ {
+		m.frames[f] = make([]uint32, size*size)
+		for x := 0; x < m.frameWidth; x++ {
 			for y := 0; y < imgCfg.Height; y++ {
-				r, g, b, a := img.At(x, imgCfg.Height-y-1).RGBA()
-				m.frames[f] = []uint32{r, g, b, a}
+				r, g, b, a := img.At(w+x, imgCfg.Height-y-1).RGBA()
+				m.frames[f][x*m.frameWidth+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}
+		m.canvas[f] = pixelgl.NewCanvas(pixel.R(0, 0, float64(m.frameWidth), float64(m.frameHeight)))
+		f++
 	}
 
 	m.buildFrames()
@@ -93,14 +101,16 @@ func (m *mob) buildFrames() {
 	for i := 0; i < len(m.frames); i++ {
 		for x := 0; x < m.frameWidth; x++ {
 			for y := 0; y < m.frameHeight; y++ {
-				r := m.frames[i][0]
-				g := m.frames[i][1]
-				b := m.frames[i][2]
-				a := m.frames[i][3]
-				model.Color = pixel.RGB(
-					float64(r), float64(g), float64(b),
-				).Mul(pixel.Alpha(float64(a)))
+				p := m.frames[i][m.frameWidth*x+y]
+				if p == 0 {
+					continue
+				}
 
+				model.Color = pixel.RGB(
+					float64(p>>24&0xFF)/255.0,
+					float64(p>>16&0xFF)/255.0,
+					float64(p>>8&0xFF)/255.0,
+				).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
 				model.Push(
 					pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
 					pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
@@ -149,7 +159,6 @@ func (m *mob) getType() entityType {
 //
 //=============================================================
 func (m *mob) draw(dt float64) {
-	idx := 0
 	switch m.currentAnim {
 	case animWalk:
 	case animJump:
@@ -158,7 +167,8 @@ func (m *mob) draw(dt float64) {
 	default:
 		// Idle
 	}
-
+	idx := rand.Intn(len(m.canvas))
 	m.canvas[idx].Draw(global.gWin, pixel.IM.Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
+	m.currentIdx = idx
 
 }

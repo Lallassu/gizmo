@@ -33,7 +33,7 @@ const (
 	wLadder32           = 0xFFFFFFAF
 	wShadow8            = 0xBF
 	wShadow32           = 0xFFFFFFBF
-	wViewMax            = 400
+	wViewMax            = 4000
 
 	wParticleDefaultLife = 5
 	wGravity             = -9.82

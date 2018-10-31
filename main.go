@@ -74,7 +74,7 @@ func gameLoop() {
 		shootFrames: []int{4, 5},
 		jumpFrames:  []int{6, 7},
 		climbFrames: []int{1, 2},
-		frameWidth:  32.0,
+		frameWidth:  12.0,
 		life:        100.0,
 		pos:         pixel.Vec{X: 100, Y: 100},
 	}
