@@ -13,7 +13,7 @@ type Quadtree struct {
 	MaxObjects int // Maximum objects a node can hold before splitting into 4 subnodes
 	MaxLevels  int // Total max levels inside root Quadtree
 	Level      int // Depth level, required for subnodes
-	Objects    []Bounds
+	Objects    []*Bounds
 	Nodes      []Quadtree
 	Total      int
 }
@@ -39,7 +39,7 @@ func (b *Bounds) IsPoint() bool {
 }
 
 // Intersects - Checks if a Bounds object intersects with another Bounds
-func (b *Bounds) Intersects(a Bounds) bool {
+func (b *Bounds) Intersects(a *Bounds) bool {
 
 	aMaxX := a.X + a.Width
 	aMaxY := a.Y + a.Height
@@ -111,7 +111,7 @@ func (qt *Quadtree) split() {
 		MaxObjects: qt.MaxObjects,
 		MaxLevels:  qt.MaxLevels,
 		Level:      nextLevel,
-		Objects:    make([]Bounds, 0),
+		Objects:    make([]*Bounds, 0),
 		Nodes:      make([]Quadtree, 0, 4),
 	})
 
@@ -126,7 +126,7 @@ func (qt *Quadtree) split() {
 		MaxObjects: qt.MaxObjects,
 		MaxLevels:  qt.MaxLevels,
 		Level:      nextLevel,
-		Objects:    make([]Bounds, 0),
+		Objects:    make([]*Bounds, 0),
 		Nodes:      make([]Quadtree, 0, 4),
 	})
 
@@ -141,7 +141,7 @@ func (qt *Quadtree) split() {
 		MaxObjects: qt.MaxObjects,
 		MaxLevels:  qt.MaxLevels,
 		Level:      nextLevel,
-		Objects:    make([]Bounds, 0),
+		Objects:    make([]*Bounds, 0),
 		Nodes:      make([]Quadtree, 0, 4),
 	})
 
@@ -156,14 +156,14 @@ func (qt *Quadtree) split() {
 		MaxObjects: qt.MaxObjects,
 		MaxLevels:  qt.MaxLevels,
 		Level:      nextLevel,
-		Objects:    make([]Bounds, 0),
+		Objects:    make([]*Bounds, 0),
 		Nodes:      make([]Quadtree, 0, 4),
 	})
 
 }
 
 // getIndex - Determine which quadrant the object belongs to (0-3)
-func (qt *Quadtree) getIndex(pRect Bounds) int {
+func (qt *Quadtree) getIndex(pRect *Bounds) int {
 
 	index := -1 // index of the subnode (0-3), or -1 if pRect cannot completely fit within a subnode and is part of the parent node
 
@@ -202,7 +202,7 @@ func (qt *Quadtree) getIndex(pRect Bounds) int {
 
 // Insert - Insert the object into the node. If the node exceeds the capacity,
 // it will split and add all objects to their corresponding subnodes.
-func (qt *Quadtree) Insert(pRect Bounds) {
+func (qt *Quadtree) Insert(pRect *Bounds) {
 
 	qt.Total++
 
@@ -256,7 +256,7 @@ func (qt *Quadtree) Insert(pRect Bounds) {
 }
 
 // Retrieve - Return all objects that could collide with the given object
-func (qt *Quadtree) Retrieve(pRect Bounds) []Bounds {
+func (qt *Quadtree) Retrieve(pRect *Bounds) []*Bounds {
 
 	index := qt.getIndex(pRect)
 
@@ -285,9 +285,9 @@ func (qt *Quadtree) Retrieve(pRect Bounds) []Bounds {
 }
 
 // RetrievePoints - Return all points that collide
-func (qt *Quadtree) RetrievePoints(find Bounds) []Bounds {
+func (qt *Quadtree) RetrievePoints(find *Bounds) []*Bounds {
 
-	var foundPoints []Bounds
+	var foundPoints []*Bounds
 	potentials := qt.Retrieve(find)
 	for o := 0; o < len(potentials); o++ {
 
@@ -303,9 +303,9 @@ func (qt *Quadtree) RetrievePoints(find Bounds) []Bounds {
 }
 
 // RetrieveIntersections - Bring back all the bounds in a Quadtree that intersect with a provided bounds
-func (qt *Quadtree) RetrieveIntersections(find Bounds) []Bounds {
+func (qt *Quadtree) RetrieveIntersections(find *Bounds) []*Bounds {
 
-	var foundIntersections []Bounds
+	var foundIntersections []*Bounds
 
 	potentials := qt.Retrieve(find)
 	for o := 0; o < len(potentials); o++ {
@@ -321,7 +321,7 @@ func (qt *Quadtree) RetrieveIntersections(find Bounds) []Bounds {
 //Clear - Clear the Quadtree
 func (qt *Quadtree) Clear() {
 
-	qt.Objects = []Bounds{}
+	qt.Objects = []*Bounds{}
 
 	if len(qt.Nodes)-1 > 0 {
 		for i := 0; i < len(qt.Nodes); i++ {

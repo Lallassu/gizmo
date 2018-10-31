@@ -17,7 +17,7 @@ import (
 type chunk struct {
 	dirty  bool
 	canvas *pixelgl.Canvas
-	bounds Bounds
+	bounds *Bounds
 	bdt    float64 // build dt
 }
 
@@ -45,7 +45,7 @@ func (c *chunk) getType() entityType {
 func (c *chunk) create(x, y float64) {
 	c.canvas = pixelgl.NewCanvas(pixel.R(0, 0, wPixelsPerChunk, wPixelsPerChunk))
 	c.dirty = true
-	c.bounds = Bounds{
+	c.bounds = &Bounds{
 		X:      x,
 		Y:      y,
 		Width:  wPixelsPerChunk,

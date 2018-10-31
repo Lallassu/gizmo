@@ -95,7 +95,7 @@ func (w *world) NewMap(maptype mapType) {
 	}
 
 	// Build all chunks first time.
-	for _, v := range w.qt.RetrieveIntersections(Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
 		v.entity.draw(-1)
 	}
 
@@ -106,8 +106,8 @@ func (w *world) NewMap(maptype mapType) {
 //=============================================================
 // Add object to world (QT)
 //=============================================================
-func (w *world) AddObject(x, y float64, obj Entity) {
-
+func (w *world) AddObject(obj *Bounds) {
+	w.qt.Insert(obj)
 }
 
 //=============================================================
@@ -201,7 +201,7 @@ func (w *world) PixelColor(x, y float64) int32 {
 //=============================================================
 func (w *world) Draw(dt float64) {
 	// Draw those around camera position only.
-	for _, v := range w.qt.RetrieveIntersections(Bounds{X: global.gCamera.pos.X, Y: global.gCamera.pos.Y, Width: wViewMax, Height: wViewMax}) {
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: global.gCamera.pos.X, Y: global.gCamera.pos.Y, Width: wViewMax, Height: wViewMax}) {
 		v.entity.draw(dt)
 	}
 }
@@ -287,10 +287,17 @@ func (w *world) Explode(x_, y_ float64, power int) {
 			if val < pow {
 				w.RemovePixel(rx, ry)
 				//w.ObjectHit(float64(rx), float64(ry))
+				//for _, v := range w.qt.RetrieveIntersections(&Bounds{X: float64(rx), Y: float64(ry), Width: 1, Height: 1}) {
+				//	v.entity.hit(x_, y_)
+				//}
 			} else {
 				ff = append(ff, pixel.Vec{X: float64(rx), Y: float64(ry)})
 			}
 		}
+	}
+
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: x_ - float64(power), Y: y_ - float64(power), Width: float64(power + power), Height: float64(power + power)}) {
+		v.entity.hit(x_, y_)
 	}
 
 	// Add shadows
@@ -373,7 +380,7 @@ func (w *world) addShadow(x, y int) {
 //=============================================================
 func (w *world) markChunkDirty(x, y int) {
 	// Get all chunks in this area.
-	for _, v := range w.qt.RetrieveIntersections(Bounds{X: float64(x), Y: float64(y), Width: 3, Height: 3}) {
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: float64(x), Y: float64(y), Width: 3, Height: 3}) {
 		if v.entity.getType() == entityChunk {
 			v.entity.(*chunk).dirty = true
 		}

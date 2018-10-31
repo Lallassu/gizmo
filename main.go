@@ -70,15 +70,15 @@ func gameLoop() {
 	test := mob{
 		sheetFile:   "/Users/nergal/Dropbox/dev/golang/src/GoD/test.png",
 		walkFrames:  []int{0, 1},
-		idleFrames:  []int{2, 3},
+		idleFrames:  []int{3, 4, 5, 6, 1, 2},
 		shootFrames: []int{4, 5},
 		jumpFrames:  []int{6, 7},
 		climbFrames: []int{1, 2},
 		frameWidth:  12.0,
 		life:        100.0,
-		pos:         pixel.Vec{X: 100, Y: 100},
+		mobType:     entityPlayer,
 	}
-	test.create()
+	test.create(100, 70)
 
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
@@ -90,7 +90,6 @@ func gameLoop() {
 		global.gCamera.update(dt)
 		global.gWorld.Draw(dt)
 		global.gParticleEngine.update(dt)
-		test.draw(dt)
 
 		global.gWin.Update()
 	}

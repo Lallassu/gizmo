@@ -12,6 +12,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"image/png"
+	"math"
 	"math/rand"
 	"os"
 )
@@ -19,7 +20,6 @@ import (
 type mob struct {
 	sheetFile   string
 	life        float64
-	pos         pixel.Vec
 	walkFrames  []int
 	jumpFrames  []int
 	climbFrames []int
@@ -30,17 +30,20 @@ type mob struct {
 	currentAnim animationType
 	canvas      map[int]*pixelgl.Canvas
 	frames      map[int][]uint32
-	bounds      Bounds
-	currentIdx  int
+	bounds      *Bounds
+	animIdx     int
+	animDt      float64
+	mobType     entityType
 }
 
 //=============================================================
 // Create mob
 // - load animation sheet
 //=============================================================
-func (m *mob) create() {
+func (m *mob) create(x, y float64) {
 	m.canvas = make(map[int]*pixelgl.Canvas)
 	m.frames = make(map[int][]uint32)
+	m.currentAnim = animIdle
 
 	// Load animation
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
@@ -65,9 +68,9 @@ func (m *mob) create() {
 	m.frameHeight = imgCfg.Height
 
 	// Initiate bounds for qt
-	m.bounds = Bounds{
-		X:      m.pos.X,
-		Y:      m.pos.Y,
+	m.bounds = &Bounds{
+		X:      x,
+		Y:      y,
 		Width:  float64(m.frameWidth),
 		Height: float64(m.frameHeight),
 		entity: Entity(m),
@@ -91,6 +94,8 @@ func (m *mob) create() {
 	}
 
 	m.buildFrames()
+
+	global.gWorld.AddObject(m.bounds)
 }
 
 //=============================================================
@@ -131,7 +136,18 @@ func (m *mob) buildFrames() {
 //=============================================================
 //
 //=============================================================
-func (m *mob) hit(x, y float64) bool {
+func (m *mob) hit(x_, y_ float64) bool {
+	x := int(math.Abs(float64(m.bounds.X - x_)))
+	y := int(math.Abs(float64(m.bounds.Y - y_)))
+	for i := 0; i < len(m.frames); i++ {
+		pos := m.frameWidth*x + y
+		if pos >= 0 && pos < m.frameWidth*m.frameWidth {
+			if m.frams[i][pos] != 0 {
+				m.frames[i][pos] = 0xFF0000FF
+			}
+		}
+	}
+	m.buildFrames()
 	return true
 }
 
@@ -155,20 +171,33 @@ func (m *mob) getType() entityType {
 	return entityEnemy
 }
 
+func (m *mob) setPos(x, y float64) {
+	m.bounds.X = x
+	m.bounds.Y = y
+}
+
 //=============================================================
 //
 //=============================================================
 func (m *mob) draw(dt float64) {
-	switch m.currentAnim {
-	case animWalk:
-	case animJump:
-	case animClimb:
-	case animShoot:
-	default:
-		// Idle
+	m.animDt += dt
+
+	idx := 0
+	if m.animDt < 1 {
+		idx = m.animIdx
+	} else {
+		m.animDt = 0
+		switch m.currentAnim {
+		case animWalk:
+		case animJump:
+		case animClimb:
+		case animShoot:
+		case animIdle:
+			idx = rand.Intn(len(m.idleFrames))
+		}
 	}
-	idx := rand.Intn(len(m.canvas))
+	m.bounds.X += dt * 10
 	m.canvas[idx].Draw(global.gWin, pixel.IM.Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
-	m.currentIdx = idx
+	m.animIdx = idx
 
 }
