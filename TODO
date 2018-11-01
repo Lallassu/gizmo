@@ -1,6 +1,7 @@
 General
 --------
-- Generera bricks
+- Camera shall follow the active entity
+- Camera lerp
 
 Classes
 -----------

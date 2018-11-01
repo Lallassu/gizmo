@@ -142,7 +142,7 @@ func (m *mob) hit(x_, y_ float64) bool {
 	for i := 0; i < len(m.frames); i++ {
 		pos := m.frameWidth*x + y
 		if pos >= 0 && pos < m.frameWidth*m.frameWidth {
-			if m.frams[i][pos] != 0 {
+			if m.frames[i][pos] != 0 {
 				m.frames[i][pos] = 0xFF0000FF
 			}
 		}
@@ -155,6 +155,14 @@ func (m *mob) hit(x_, y_ float64) bool {
 //
 //=============================================================
 func (m *mob) explode() {
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) move(x, y float64) {
+	m.bounds.X += x
+	m.bounds.Y += y
 }
 
 //=============================================================
@@ -196,7 +204,6 @@ func (m *mob) draw(dt float64) {
 			idx = rand.Intn(len(m.idleFrames))
 		}
 	}
-	m.bounds.X += dt * 10
 	m.canvas[idx].Draw(global.gWin, pixel.IM.Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
 	m.animIdx = idx
 

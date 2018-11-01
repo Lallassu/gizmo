@@ -31,6 +31,9 @@ func (c *chunk) hit(x, y float64) bool {
 func (c *chunk) explode() {
 }
 
+func (c *chunk) move(x, y float64) {
+}
+
 func (c *chunk) getMass() float64 {
 	return 1.0
 }

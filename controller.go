@@ -47,16 +47,20 @@ func (c *controller) update(dt float64) {
 		global.gCamera.zoom += 0.1
 	}
 	if global.gWin.Pressed(pixelgl.KeyLeft) {
-		global.gCamera.pos.X -= 5.1
+		global.gCamera.pos.X -= 2.1
+		c.entity.move(-2.1, 0)
 	}
 	if global.gWin.Pressed(pixelgl.KeyRight) {
-		global.gCamera.pos.X += 5.1
+		global.gCamera.pos.X += 2.1
+		c.entity.move(2.1, 0)
 	}
 	if global.gWin.Pressed(pixelgl.KeyUp) {
-		global.gCamera.pos.Y += 5.1
+		global.gCamera.pos.Y += 2.1
+		c.entity.move(0, 2.1)
 	}
 	if global.gWin.Pressed(pixelgl.KeyDown) {
-		global.gCamera.pos.Y -= 5.1
+		global.gCamera.pos.Y -= 2.1
+		c.entity.move(0, -2.1)
 	}
 	if global.gWin.Pressed(pixelgl.KeyM) {
 		PrintMemoryUsage()

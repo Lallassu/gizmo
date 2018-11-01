@@ -15,4 +15,5 @@ type Entity interface {
 	getMass() float64
 	getType() entityType
 	draw(dt float64)
+	move(x, y float64)
 }

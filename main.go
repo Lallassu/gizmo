@@ -68,7 +68,8 @@ func gameLoop() {
 	//second := time.Tick(time.Second)
 
 	test := mob{
-		sheetFile:   "/Users/nergal/Dropbox/dev/golang/src/GoD/test.png",
+		//sheetFile:   "/Users/nergal/Dropbox/dev/golang/src/GoD/test.png",
+		sheetFile:   "test.png",
 		walkFrames:  []int{0, 1},
 		idleFrames:  []int{3, 4, 5, 6, 1, 2},
 		shootFrames: []int{4, 5},
@@ -79,6 +80,7 @@ func gameLoop() {
 		mobType:     entityPlayer,
 	}
 	test.create(100, 70)
+	global.gController.setActiveEntity(&test)
 
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
