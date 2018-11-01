@@ -6,7 +6,7 @@
 package main
 
 import (
-	_ "github.com/faiface/pixel"
+	"github.com/faiface/pixel"
 )
 
 type Entity interface {
@@ -16,4 +16,5 @@ type Entity interface {
 	getType() entityType
 	draw(dt float64)
 	move(x, y float64)
+	getPosition() pixel.Vec
 }

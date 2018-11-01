@@ -460,7 +460,7 @@ func (p *pcg) GenerateDoor(x, y int) {
 
 func (p *pcg) GenerateLamp(x, y int) {
 	p.lampCnt++
-	if p.lampCnt < 200 {
+	if p.lampCnt < 100 {
 		return
 	}
 	p.lampCnt = 0

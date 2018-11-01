@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 	"math"
 	"runtime"
 )
@@ -23,4 +24,16 @@ func PrintMemoryUsage() {
 	Debug(fmt.Sprintf("\tTotalAlloc = %v MiB", m.TotalAlloc/1024/1024))
 	Debug(fmt.Sprintf("\tSys = %v MiB", m.Sys/1024/1024))
 	Debug(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
+}
+
+// Without this window is black, bug after mojave update for osx?
+func CenterWindow(win *pixelgl.Window) {
+	x, y := pixelgl.PrimaryMonitor().Size()
+	width, height := win.Bounds().Size().XY()
+	win.SetPos(
+		pixel.V(
+			x/2-width/2,
+			y/2-height/2,
+		),
+	)
 }

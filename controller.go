@@ -41,25 +41,25 @@ func (c *controller) create() {
 func (c *controller) update(dt float64) {
 	// Handle controllers
 	if global.gWin.Pressed(pixelgl.KeyS) {
-		global.gCamera.zoom -= 0.1
+		global.gCamera.zoom -= 0.05
 	}
 	if global.gWin.Pressed(pixelgl.KeyW) {
-		global.gCamera.zoom += 0.1
+		global.gCamera.zoom += 0.05
 	}
 	if global.gWin.Pressed(pixelgl.KeyLeft) {
-		global.gCamera.pos.X -= 2.1
+		//global.gCamera.pos.X -= 2.1
 		c.entity.move(-2.1, 0)
 	}
 	if global.gWin.Pressed(pixelgl.KeyRight) {
-		global.gCamera.pos.X += 2.1
+		//global.gCamera.pos.X += 2.1
 		c.entity.move(2.1, 0)
 	}
 	if global.gWin.Pressed(pixelgl.KeyUp) {
-		global.gCamera.pos.Y += 2.1
+		//	global.gCamera.pos.Y += 2.1
 		c.entity.move(0, 2.1)
 	}
 	if global.gWin.Pressed(pixelgl.KeyDown) {
-		global.gCamera.pos.Y -= 2.1
+		//	global.gCamera.pos.Y -= 2.1
 		c.entity.move(0, -2.1)
 	}
 	if global.gWin.Pressed(pixelgl.KeyM) {
@@ -67,6 +67,9 @@ func (c *controller) update(dt float64) {
 	}
 	if global.gWin.Pressed(pixelgl.KeyQ) {
 		c.quit = true
+	}
+	if global.gWin.Pressed(pixelgl.KeyP) {
+		global.gCamera.setFollow(nil)
 	}
 
 	// Handle mouse

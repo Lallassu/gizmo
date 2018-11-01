@@ -28,9 +28,11 @@ func run() {
 		Undecorated: global.gUndecorated,
 	}
 	gWin, err := pixelgl.NewWindow(cfg)
+
 	if err != nil {
 		panic(err)
 	}
+	CenterWindow(gWin)
 	global.gWin = gWin
 
 	PrintMemoryUsage()
@@ -68,7 +70,6 @@ func gameLoop() {
 	//second := time.Tick(time.Second)
 
 	test := mob{
-		//sheetFile:   "/Users/nergal/Dropbox/dev/golang/src/GoD/test.png",
 		sheetFile:   "test.png",
 		walkFrames:  []int{0, 1},
 		idleFrames:  []int{3, 4, 5, 6, 1, 2},
@@ -81,6 +82,7 @@ func gameLoop() {
 	}
 	test.create(100, 70)
 	global.gController.setActiveEntity(&test)
+	global.gCamera.setFollow(&test)
 
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
