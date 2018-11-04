@@ -33,11 +33,11 @@ const (
 	wLadder32           = 0xFFFFFFAF
 	wShadow8            = 0xBF
 	wShadow32           = 0xFFFFFFBF
-	wViewMax            = 4000
+	wViewMax            = 400
 
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
-	wParticlesMax        = 3000
+	wParticlesMax        = 2000
 
 	wDoorLen    = 30
 	wDoorHeight = 40

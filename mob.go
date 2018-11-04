@@ -27,8 +27,10 @@ type mob struct {
 	idleFrames  []int
 	frameWidth  int
 	frameHeight int
+	size        int
 	currentAnim animationType
-	canvas      map[int]*pixelgl.Canvas
+	models      map[int]*imdraw.IMDraw
+	canvas      *pixelgl.Canvas
 	frames      map[int][]uint32
 	bounds      *Bounds
 	mobType     entityType
@@ -43,7 +45,7 @@ type mob struct {
 // - load animation sheet
 //=============================================================
 func (m *mob) create(x, y float64) {
-	m.canvas = make(map[int]*pixelgl.Canvas)
+	m.models = make(map[int]*imdraw.IMDraw)
 	m.frames = make(map[int][]uint32)
 	m.currentAnim = animIdle
 
@@ -82,23 +84,24 @@ func (m *mob) create(x, y float64) {
 	}
 
 	f := 0
-	size := m.frameWidth
+	m.size = m.frameWidth
 	if m.frameWidth < m.frameHeight {
-		size = m.frameHeight
+		m.size = m.frameHeight
 	}
 	for w := 0; w < imgCfg.Width; w += m.frameWidth {
-		m.frames[f] = make([]uint32, size*size)
-		for x := 0; x < m.frameWidth; x++ {
-			for y := 0; y < imgCfg.Height; y++ {
+		m.frames[f] = make([]uint32, m.size*m.size)
+		for x := 0; x <= m.frameWidth; x++ {
+			for y := 0; y <= imgCfg.Height; y++ {
 				r, g, b, a := img.At(w+x, imgCfg.Height-y).RGBA()
-				m.frames[f][x*m.frameWidth+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+				m.frames[f][x*m.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}
-		m.canvas[f] = pixelgl.NewCanvas(pixel.R(0, 0, float64(m.frameWidth), float64(m.frameHeight)))
 		f++
 	}
 
-	// Build all frames (canvases)
+	m.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(m.frameWidth), float64(m.frameHeight)))
+
+	// Build all frames
 	m.buildFrames()
 
 	// Add object to QT
@@ -109,29 +112,27 @@ func (m *mob) create(x, y float64) {
 // Build each frame into a canvas
 //=============================================================
 func (m *mob) buildFrames() {
-	model := imdraw.New(nil)
 	for i := 0; i < len(m.frames); i++ {
+		m.models[i] = imdraw.New(nil)
 		for x := 0; x < m.frameWidth; x++ {
 			for y := 0; y < m.frameHeight; y++ {
-				p := m.frames[i][m.frameWidth*x+y]
+				p := m.frames[i][x*m.size+y]
 				if p == 0 {
 					continue
 				}
 
-				model.Color = pixel.RGB(
+				m.models[i].Color = pixel.RGB(
 					float64(p>>24&0xFF)/255.0,
 					float64(p>>16&0xFF)/255.0,
 					float64(p>>8&0xFF)/255.0,
 				).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
-				model.Push(
+				m.models[i].Push(
 					pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
 					pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
 				)
-				model.Rectangle(0)
+				m.models[i].Rectangle(0)
 			}
 		}
-		m.canvas[i].Clear(pixel.RGBA{0, 0, 0, 0})
-		model.Draw(m.canvas[i])
 	}
 }
 
@@ -147,33 +148,11 @@ func (m *mob) hit(x_, y_ float64) bool {
 	x := int(math.Abs(float64(m.bounds.X - x_)))
 	y := int(math.Abs(float64(m.bounds.Y - y_)))
 	for i := 0; i < len(m.frames); i++ {
-		pos := m.frameWidth*x + y
+		pos := m.size*x + y
 		if pos >= 0 && pos < m.frameWidth*m.frameWidth {
 			if m.frames[i][pos] != 0 {
-				// Make some blood (TBD: ADD TO PARTICLE ENGINE)
-				for i := 0; i < 10; i++ {
-					r := 175 + rand.Intn(50)
-					g := 10 + rand.Intn(20)
-					b := 10 + rand.Intn(20)
-					a := 20 + rand.Intn(220)
-					m.frames[i][pos] = 0
-					global.gParticleEngine.newParticle(
-						particle{
-							x:           float64(x_),
-							y:           float64(y_),
-							size:        rand.Float64() * 3,
-							restitution: -0.1 - rand.Float64()/4,
-							life:        wParticleDefaultLife,
-							fx:          rand.Float64() * 5,
-							fy:          rand.Float64() * 5,
-							vx:          float64(5 - rand.Intn(10)),
-							vy:          float64(5 - rand.Intn(10)),
-							mass:        2,
-							pType:       particleRegular,
-							color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
-							static:      true,
-						})
-				}
+				// Add some blood
+				global.gParticleEngine.effectBlood(x_, y_, 1)
 				// Remove part
 				m.frames[i][pos] = 0
 				global.gParticleEngine.newParticle(
@@ -248,6 +227,9 @@ func (m *mob) getType() entityType {
 	return entityEnemy
 }
 
+//=============================================================
+//
+//=============================================================
 func (m *mob) setPos(x, y float64) {
 	m.bounds.X = x
 	m.bounds.Y = y
@@ -266,14 +248,21 @@ func (m *mob) draw(dt float64) {
 	case animJump:
 		idx = m.jumpFrames[idx%len(m.jumpFrames)]
 	case animClimb:
-		idx = m.climbFrames[idx%len(m.climbFrames)]
+		idx = m.climbFrames[idx/2%len(m.climbFrames)]
 	case animShoot:
 		idx = m.shootFrames[idx%len(m.shootFrames)]
 	case animIdle:
-		idx = m.idleFrames[idx%len(m.idleFrames)]
+		idx = m.idleFrames[idx/30%len(m.idleFrames)]
 	default:
-		idx = m.idleFrames[idx%len(m.idleFrames)]
+		idx = m.idleFrames[idx/30%len(m.idleFrames)]
 	}
-	m.canvas[idx].Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
 
+	// reset animation
+	if m.currentAnim != animClimb && m.currentAnim != animJump {
+		m.currentAnim = animIdle
+	}
+
+	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	m.models[idx].Draw(m.canvas)
+	m.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
 }
