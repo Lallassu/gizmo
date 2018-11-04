@@ -31,9 +31,11 @@ type mob struct {
 	canvas      map[int]*pixelgl.Canvas
 	frames      map[int][]uint32
 	bounds      *Bounds
-	animIdx     int
-	animDt      float64
 	mobType     entityType
+	animCounter float64
+	animRate    float64
+	speed       float64
+	dir         float64
 }
 
 //=============================================================
@@ -44,6 +46,9 @@ func (m *mob) create(x, y float64) {
 	m.canvas = make(map[int]*pixelgl.Canvas)
 	m.frames = make(map[int][]uint32)
 	m.currentAnim = animIdle
+
+	m.animRate = 0.1
+	m.speed = 10
 
 	// Load animation
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
@@ -85,7 +90,7 @@ func (m *mob) create(x, y float64) {
 		m.frames[f] = make([]uint32, size*size)
 		for x := 0; x < m.frameWidth; x++ {
 			for y := 0; y < imgCfg.Height; y++ {
-				r, g, b, a := img.At(w+x, imgCfg.Height-y-1).RGBA()
+				r, g, b, a := img.At(w+x, imgCfg.Height-y).RGBA()
 				m.frames[f][x*m.frameWidth+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}
@@ -93,8 +98,10 @@ func (m *mob) create(x, y float64) {
 		f++
 	}
 
+	// Build all frames (canvases)
 	m.buildFrames()
 
+	// Add object to QT
 	global.gWorld.AddObject(m.bounds)
 }
 
@@ -143,7 +150,48 @@ func (m *mob) hit(x_, y_ float64) bool {
 		pos := m.frameWidth*x + y
 		if pos >= 0 && pos < m.frameWidth*m.frameWidth {
 			if m.frames[i][pos] != 0 {
-				m.frames[i][pos] = 0xFF0000FF
+				// Make some blood (TBD: ADD TO PARTICLE ENGINE)
+				for i := 0; i < 10; i++ {
+					r := 175 + rand.Intn(50)
+					g := 10 + rand.Intn(20)
+					b := 10 + rand.Intn(20)
+					a := 20 + rand.Intn(220)
+					m.frames[i][pos] = 0
+					global.gParticleEngine.newParticle(
+						particle{
+							x:           float64(x_),
+							y:           float64(y_),
+							size:        rand.Float64() * 3,
+							restitution: -0.1 - rand.Float64()/4,
+							life:        wParticleDefaultLife,
+							fx:          rand.Float64() * 5,
+							fy:          rand.Float64() * 5,
+							vx:          float64(5 - rand.Intn(10)),
+							vy:          float64(5 - rand.Intn(10)),
+							mass:        2,
+							pType:       particleRegular,
+							color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
+							static:      true,
+						})
+				}
+				// Remove part
+				m.frames[i][pos] = 0
+				global.gParticleEngine.newParticle(
+					particle{
+						x:           float64(x_),
+						y:           float64(y_),
+						size:        1,
+						restitution: -0.1 - rand.Float64()/4,
+						life:        wParticleDefaultLife,
+						fx:          10,
+						fy:          10,
+						vx:          float64(5 - rand.Intn(10)),
+						vy:          float64(5 - rand.Intn(10)),
+						mass:        1,
+						pType:       particleRegular,
+						color:       m.frames[i][pos],
+						static:      true,
+					})
 			}
 		}
 	}
@@ -161,6 +209,20 @@ func (m *mob) explode() {
 //
 //=============================================================
 func (m *mob) move(x, y float64) {
+	if math.Abs(x) > 0 {
+		m.currentAnim = animWalk
+	} else {
+		m.currentAnim = animIdle
+	}
+	if math.Abs(y) > 0 {
+		m.currentAnim = animClimb
+	}
+
+	if x > 0 {
+		m.dir = 1
+	} else {
+		m.dir = -1
+	}
 	m.bounds.X += x
 	m.bounds.Y += y
 }
@@ -195,23 +257,23 @@ func (m *mob) setPos(x, y float64) {
 //
 //=============================================================
 func (m *mob) draw(dt float64) {
-	m.animDt += dt
+	m.animCounter += dt
+	idx := int(math.Floor(m.animCounter / m.animRate))
 
-	idx := 0
-	if m.animDt < 1 {
-		idx = m.animIdx
-	} else {
-		m.animDt = 0
-		switch m.currentAnim {
-		case animWalk:
-		case animJump:
-		case animClimb:
-		case animShoot:
-		case animIdle:
-			idx = rand.Intn(len(m.idleFrames))
-		}
+	switch m.currentAnim {
+	case animWalk:
+		idx = m.walkFrames[idx%len(m.walkFrames)]
+	case animJump:
+		idx = m.jumpFrames[idx%len(m.jumpFrames)]
+	case animClimb:
+		idx = m.climbFrames[idx%len(m.climbFrames)]
+	case animShoot:
+		idx = m.shootFrames[idx%len(m.shootFrames)]
+	case animIdle:
+		idx = m.idleFrames[idx%len(m.idleFrames)]
+	default:
+		idx = m.idleFrames[idx%len(m.idleFrames)]
 	}
-	m.canvas[idx].Draw(global.gWin, pixel.IM.Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
-	m.animIdx = idx
+	m.canvas[idx].Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
 
 }

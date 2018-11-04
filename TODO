@@ -1,7 +1,8 @@
 General
 --------
-- Camera shall follow the active entity
-- Camera lerp
+- Styra en mob
+- Animationer för en mob
+- Vector för vilket håll en "hit" kommer från.
 
 Classes
 -----------
