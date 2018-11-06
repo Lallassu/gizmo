@@ -39,6 +39,8 @@ type mob struct {
 	speed       float64
 	dir         float64
 	mass        float64
+	climbing    bool
+	jumping     bool
 }
 
 //=============================================================
@@ -52,7 +54,7 @@ func (m *mob) create(x, y float64) {
 
 	m.animRate = 0.1
 	m.speed = 200
-	m.mass = 100
+	m.mass = 50
 
 	// Load animation
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
@@ -187,15 +189,27 @@ func (m *mob) explode() {
 }
 
 //=============================================================
+// Check if on ground
+//=============================================================
+func (m *mob) IsOnGround() bool {
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, m.bounds.Y) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
 // Check if on ladder
 //=============================================================
 func (m *mob) IsOnLadder() bool {
-	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x++ {
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
 		if global.gWorld.IsLadder(x, m.bounds.Y) {
 			return true
 		}
 	}
-	for y := m.bounds.Y; y < m.bounds.Y+m.bounds.Height; y++ {
+	for y := m.bounds.Y; y < m.bounds.Y+m.bounds.Height; y += 2 {
 		if global.gWorld.IsLadder(m.bounds.X, y) {
 			return true
 		}
@@ -207,17 +221,21 @@ func (m *mob) IsOnLadder() bool {
 //
 //=============================================================
 func (m *mob) move(dx, dy float64) {
-	if math.Abs(dx) > 0 {
+	m.climbing = false
+	m.jumping = false
+	grounded := m.IsOnGround()
+
+	switch {
+	case m.IsOnLadder():
+		m.climbing = true
+		m.currentAnim = animClimb
+	case !grounded:
+		m.jumping = true
+		m.currentAnim = animJump
+	case math.Abs(dx) > 0:
 		m.currentAnim = animWalk
-	} else {
+	case dx == 0:
 		m.currentAnim = animIdle
-	}
-	if math.Abs(dy) > 0 {
-		if m.IsOnLadder() {
-			m.currentAnim = animClimb
-		} else {
-			m.currentAnim = animJump
-		}
 	}
 
 	if dx > 0 {
@@ -225,8 +243,12 @@ func (m *mob) move(dx, dy float64) {
 	} else {
 		m.dir = -1
 	}
+
 	m.bounds.X += dx * m.speed
-	m.bounds.Y += dy * m.speed
+
+	if grounded || m.climbing == true {
+		m.bounds.Y += dy * m.speed
+	}
 }
 
 //=============================================================
@@ -271,7 +293,9 @@ func (m *mob) physics(dt float64) {
 	// Check up/down collision
 
 	if m.currentAnim == animJump {
-		m.bounds.Y += global.gWorld.gravity * dt * m.mass
+		if !m.IsOnGround() {
+			m.bounds.Y += global.gWorld.gravity * dt * m.mass
+		}
 	}
 }
 
