@@ -38,6 +38,7 @@ type mob struct {
 	animRate    float64
 	speed       float64
 	dir         float64
+	mass        float64
 }
 
 //=============================================================
@@ -50,7 +51,8 @@ func (m *mob) create(x, y float64) {
 	m.currentAnim = animIdle
 
 	m.animRate = 0.1
-	m.speed = 10
+	m.speed = 200
+	m.mass = 100
 
 	// Load animation
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
@@ -185,25 +187,46 @@ func (m *mob) explode() {
 }
 
 //=============================================================
+// Check if on ladder
+//=============================================================
+func (m *mob) IsOnLadder() bool {
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x++ {
+		if global.gWorld.IsLadder(x, m.bounds.Y) {
+			return true
+		}
+	}
+	for y := m.bounds.Y; y < m.bounds.Y+m.bounds.Height; y++ {
+		if global.gWorld.IsLadder(m.bounds.X, y) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
 //
 //=============================================================
-func (m *mob) move(x, y float64) {
-	if math.Abs(x) > 0 {
+func (m *mob) move(dx, dy float64) {
+	if math.Abs(dx) > 0 {
 		m.currentAnim = animWalk
 	} else {
 		m.currentAnim = animIdle
 	}
-	if math.Abs(y) > 0 {
-		m.currentAnim = animClimb
+	if math.Abs(dy) > 0 {
+		if m.IsOnLadder() {
+			m.currentAnim = animClimb
+		} else {
+			m.currentAnim = animJump
+		}
 	}
 
-	if x > 0 {
+	if dx > 0 {
 		m.dir = 1
 	} else {
 		m.dir = -1
 	}
-	m.bounds.X += x
-	m.bounds.Y += y
+	m.bounds.X += dx * m.speed
+	m.bounds.Y += dy * m.speed
 }
 
 //=============================================================
@@ -217,7 +240,7 @@ func (m *mob) getPosition() pixel.Vec {
 //
 //=============================================================
 func (m *mob) getMass() float64 {
-	return 1.0
+	return m.mass
 }
 
 //=============================================================
@@ -238,7 +261,28 @@ func (m *mob) setPos(x, y float64) {
 //=============================================================
 //
 //=============================================================
+func (m *mob) physics(dt float64) {
+	//if global.gWorld.IsWall(m.bounds.X+x, m.bounds.Y+y-1) {
+
+	// Check if jump
+
+	// Check wall collision
+
+	// Check up/down collision
+
+	if m.currentAnim == animJump {
+		m.bounds.Y += global.gWorld.gravity * dt * m.mass
+	}
+}
+
+//=============================================================
+//
+//=============================================================
 func (m *mob) draw(dt float64) {
+	// Update physics
+	m.physics(dt)
+
+	// Update animation
 	m.animCounter += dt
 	idx := int(math.Floor(m.animCounter / m.animRate))
 

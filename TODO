@@ -1,7 +1,8 @@
 General
 --------
-- Styra en mob
-- Animationer för en mob
+- Mob climb
+- Mob Jump
+- Mob collission detection
 - Vector för vilket håll en "hit" kommer från.
 
 Classes

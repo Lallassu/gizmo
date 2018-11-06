@@ -48,19 +48,19 @@ func (c *controller) update(dt float64) {
 	}
 	if global.gWin.Pressed(pixelgl.KeyLeft) {
 		//global.gCamera.pos.X -= 2.1
-		c.entity.move(-2.1, 0)
+		c.entity.move(-dt, 0)
 	}
 	if global.gWin.Pressed(pixelgl.KeyRight) {
 		//global.gCamera.pos.X += 2.1
-		c.entity.move(2.1, 0)
+		c.entity.move(dt, 0)
 	}
 	if global.gWin.Pressed(pixelgl.KeyUp) {
 		//	global.gCamera.pos.Y += 2.1
-		c.entity.move(0, 2.1)
+		c.entity.move(0, dt)
 	}
 	if global.gWin.Pressed(pixelgl.KeyDown) {
 		//	global.gCamera.pos.Y -= 2.1
-		c.entity.move(0, -2.1)
+		c.entity.move(0, -dt)
 	}
 	if global.gWin.Pressed(pixelgl.KeyM) {
 		PrintMemoryUsage()

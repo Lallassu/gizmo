@@ -175,6 +175,21 @@ func (w *world) IsWall(x_, y_ float64) bool {
 		}
 	}
 	return false
+}
+
+//=============================================================
+// Check if it's a ladder
+//=============================================================
+func (w *world) IsLadder(x_, y_ float64) bool {
+	x := int(x_)
+	y := int(y_)
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		if w.pixels[pos]&0xFF == wLadder8 {
+			return true
+		}
+	}
+	return false
 
 }
 
