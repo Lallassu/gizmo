@@ -15,6 +15,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"time"
 )
 
 type mob struct {
@@ -41,6 +42,7 @@ type mob struct {
 	mass        float64
 	climbing    bool
 	jumping     bool
+	cdPixels    [][2]uint32
 }
 
 //=============================================================
@@ -50,6 +52,7 @@ type mob struct {
 func (m *mob) create(x, y float64) {
 	m.models = make(map[int]*imdraw.IMDraw)
 	m.frames = make(map[int][]uint32)
+	m.cdPixels = make([][2]uint32, 10)
 	m.currentAnim = animIdle
 
 	m.animRate = 0.1
@@ -101,6 +104,12 @@ func (m *mob) create(x, y float64) {
 			}
 		}
 		f++
+	}
+
+	// Generate some CD pixel for faster CD check.
+	rand.Seed(time.Now().UTC().UnixNano())
+	for x := 0; x < 20; x++ {
+		m.cdPixels = append(m.cdPixels, [2]uint32{uint32(rand.Intn(m.frameWidth)), uint32(rand.Intn(m.frameHeight))})
 	}
 
 	m.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(m.frameWidth), float64(m.frameHeight)))
@@ -201,16 +210,35 @@ func (m *mob) IsOnGround() bool {
 }
 
 //=============================================================
-// Check if on ladder
+// Check if touching a wall on the left
 //=============================================================
-func (m *mob) IsOnLadder() bool {
-	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
-		if global.gWorld.IsLadder(x, m.bounds.Y) {
+func (m *mob) IsOnWallLeft() bool {
+	for y := m.bounds.Y + 2; y < m.bounds.Y+m.bounds.Height; y += 2 {
+		if global.gWorld.IsRegular(m.bounds.X, y) {
 			return true
 		}
 	}
-	for y := m.bounds.Y; y < m.bounds.Y+m.bounds.Height; y += 2 {
-		if global.gWorld.IsLadder(m.bounds.X, y) {
+	return false
+}
+
+//=============================================================
+// Check if touching a wall on the right
+//=============================================================
+func (m *mob) IsOnWallRight() bool {
+	for y := m.bounds.Y + 2; y < m.bounds.Y+m.bounds.Height; y += 2 {
+		if global.gWorld.IsRegular(m.bounds.X+m.bounds.Width, y) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
+// Check if on ladder
+//=============================================================
+func (m *mob) IsOnLadder() bool {
+	for _, p := range m.cdPixels {
+		if global.gWorld.IsLadder(m.bounds.X+float64(p[0]), m.bounds.Y+float64(p[1])) {
 			return true
 		}
 	}
@@ -225,26 +253,41 @@ func (m *mob) move(dx, dy float64) {
 	m.jumping = false
 	grounded := m.IsOnGround()
 
+	m.currentAnim = animIdle
+
 	switch {
 	case m.IsOnLadder():
 		m.climbing = true
 		m.currentAnim = animClimb
 	case !grounded:
-		m.jumping = true
-		m.currentAnim = animJump
+		if !m.jumping {
+			m.jumping = true
+			m.currentAnim = animJump
+			m.bounds.Y += dy * m.speed * 3
+		}
 	case math.Abs(dx) > 0:
 		m.currentAnim = animWalk
 	case dx == 0:
 		m.currentAnim = animIdle
 	}
 
+	// Rotation of animation
 	if dx > 0 {
 		m.dir = 1
 	} else {
 		m.dir = -1
 	}
 
-	m.bounds.X += dx * m.speed
+	if m.IsOnWallLeft() {
+		//	for m.IsOnWallLeft() {
+		//	m.bounds.X += math.Abs(dx) * m.speed
+		//	}
+		//m.bounds.X += dx * m.speed * -1
+	} else if m.IsOnWallRight() {
+		m.bounds.X += dx * m.speed
+	} else {
+		m.bounds.X += dx * m.speed
+	}
 
 	if grounded || m.climbing == true {
 		m.bounds.Y += dy * m.speed
@@ -295,6 +338,8 @@ func (m *mob) physics(dt float64) {
 	if m.currentAnim == animJump {
 		if !m.IsOnGround() {
 			m.bounds.Y += global.gWorld.gravity * dt * m.mass
+		} else {
+			m.currentAnim = animIdle
 		}
 	}
 }
