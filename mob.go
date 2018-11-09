@@ -42,7 +42,7 @@ type mob struct {
 	mass        float64
 	cdPixels    [][2]uint32
 
-	prevPos     pixel.Vec
+	prevPos     []pixel.Vec
 	force       pixel.Vec
 	moveVec     pixel.Vec
 	restitution float64
@@ -59,10 +59,11 @@ func (m *mob) create(x, y float64) {
 	m.models = make(map[int]*imdraw.IMDraw)
 	m.frames = make(map[int][]uint32)
 	m.cdPixels = make([][2]uint32, 10)
+	m.prevPos = make([]pixel.Vec, 100)
 	m.currentAnim = animIdle
 
 	m.animRate = 0.1
-	m.jumpPower = 10.0
+	m.jumpPower = 35.0
 	m.speed = 200
 	m.mass = 50
 
@@ -289,13 +290,22 @@ func (m *mob) setPosition(x, y float64) {
 }
 
 //=============================================================
+//=============================================================
+func (m *mob) saveMove() {
+	m.prevPos = append(m.prevPos, pixel.Vec{m.bounds.X, m.bounds.Y})
+	// TBD: Only remove every second or something
+	if len(m.prevPos) > 100 {
+		m.prevPos = m.prevPos[:100]
+	}
+}
+
+//=============================================================
 // Physics for mob.
 // I don't want real physics, better to have a good feeling for
 // movement than accurate physic simulation.
 //=============================================================
 func (m *mob) physics(dt float64) {
-	m.prevPos.X = m.bounds.X
-	m.prevPos.Y = m.bounds.Y
+	m.saveMove()
 
 	// Only move if no wall collision
 	if !m.IsOnWall() {
@@ -307,11 +317,15 @@ func (m *mob) physics(dt float64) {
 	}
 
 	if m.jumping > 0 {
-		// 10 is arbitrary number to make the jump more smooth
-		m.force.Y = m.speed * dt
+		// First half, up, then decrease force.
+		if m.jumping > m.jumpPower/2 {
+			m.force.Y = m.speed * dt
+		} else {
+			m.force.Y = -m.speed * dt
+		}
 		if !m.IsOnWall() {
 			m.bounds.Y += m.force.Y
-			m.bounds.X += m.force.X
+			m.bounds.X += m.force.X / 2
 			m.currentAnim = animJump
 		}
 		m.jumping--
@@ -321,7 +335,7 @@ func (m *mob) physics(dt float64) {
 			m.jumping = m.jumpPower
 		} else if m.IsOnLadder() {
 			// Climb
-			m.bounds.Y += m.force.Y // / 2
+			m.bounds.Y += m.force.Y / 2
 			m.currentAnim = animClimb
 		} else if m.IsOnGround() {
 			// Jump
@@ -333,6 +347,11 @@ func (m *mob) physics(dt float64) {
 			m.currentAnim = animJump
 		}
 	}
+
+	// Check if stuck!
+	//  for m.IsStuck() {
+
+	//  }
 
 	m.force.X = 0
 	m.force.Y = 0
