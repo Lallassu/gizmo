@@ -80,7 +80,7 @@ func gameLoop() {
 		life:        100.0,
 		mobType:     entityPlayer,
 	}
-	test.create(100, 70)
+	test.create(100, 120)
 	global.gController.setActiveEntity(&test)
 	global.gCamera.setFollow(&test)
 

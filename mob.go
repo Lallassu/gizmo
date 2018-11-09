@@ -40,9 +40,15 @@ type mob struct {
 	speed       float64
 	dir         float64
 	mass        float64
-	climbing    bool
-	jumping     bool
 	cdPixels    [][2]uint32
+
+	prevPos     pixel.Vec
+	force       pixel.Vec
+	moveVec     pixel.Vec
+	restitution float64
+	climbing    bool
+	jumping     float64
+	jumpPower   float64
 }
 
 //=============================================================
@@ -56,6 +62,7 @@ func (m *mob) create(x, y float64) {
 	m.currentAnim = animIdle
 
 	m.animRate = 0.1
+	m.jumpPower = 10.0
 	m.speed = 200
 	m.mass = 50
 
@@ -210,30 +217,6 @@ func (m *mob) IsOnGround() bool {
 }
 
 //=============================================================
-// Check if touching a wall on the left
-//=============================================================
-func (m *mob) IsOnWallLeft() bool {
-	for y := m.bounds.Y + 2; y < m.bounds.Y+m.bounds.Height; y += 2 {
-		if global.gWorld.IsRegular(m.bounds.X, y) {
-			return true
-		}
-	}
-	return false
-}
-
-//=============================================================
-// Check if touching a wall on the right
-//=============================================================
-func (m *mob) IsOnWallRight() bool {
-	for y := m.bounds.Y + 2; y < m.bounds.Y+m.bounds.Height; y += 2 {
-		if global.gWorld.IsRegular(m.bounds.X+m.bounds.Width, y) {
-			return true
-		}
-	}
-	return false
-}
-
-//=============================================================
 // Check if on ladder
 //=============================================================
 func (m *mob) IsOnLadder() bool {
@@ -246,51 +229,33 @@ func (m *mob) IsOnLadder() bool {
 }
 
 //=============================================================
+// Check if on wall
+//=============================================================
+func (m *mob) IsOnWall() bool {
+	offset := 2.0
+	for _, p := range m.cdPixels {
+		if global.gWorld.IsRegular(m.bounds.X+float64(p[0])+m.force.X, m.bounds.Y+float64(p[1])+m.force.Y+offset) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
 //
 //=============================================================
 func (m *mob) move(dx, dy float64) {
-	m.climbing = false
-	m.jumping = false
-	grounded := m.IsOnGround()
-
-	m.currentAnim = animIdle
-
-	switch {
-	case m.IsOnLadder():
-		m.climbing = true
-		m.currentAnim = animClimb
-	case !grounded:
-		if !m.jumping {
-			m.jumping = true
-			m.currentAnim = animJump
-			m.bounds.Y += dy * m.speed * 3
-		}
-	case math.Abs(dx) > 0:
-		m.currentAnim = animWalk
-	case dx == 0:
-		m.currentAnim = animIdle
-	}
+	// Add the force, movenment is handled in the physics function
+	m.force.X += dx * m.speed
+	m.force.Y += dy * m.speed
 
 	// Rotation of animation
-	if dx > 0 {
-		m.dir = 1
-	} else {
-		m.dir = -1
-	}
-
-	if m.IsOnWallLeft() {
-		//	for m.IsOnWallLeft() {
-		//	m.bounds.X += math.Abs(dx) * m.speed
-		//	}
-		//m.bounds.X += dx * m.speed * -1
-	} else if m.IsOnWallRight() {
-		m.bounds.X += dx * m.speed
-	} else {
-		m.bounds.X += dx * m.speed
-	}
-
-	if grounded || m.climbing == true {
-		m.bounds.Y += dy * m.speed
+	if dx != 0 {
+		if dx > 0 {
+			m.dir = 1
+		} else {
+			m.dir = -1
+		}
 	}
 }
 
@@ -318,30 +283,60 @@ func (m *mob) getType() entityType {
 //=============================================================
 //
 //=============================================================
-func (m *mob) setPos(x, y float64) {
+func (m *mob) setPosition(x, y float64) {
 	m.bounds.X = x
 	m.bounds.Y = y
 }
 
 //=============================================================
-//
+// Physics for mob.
+// I don't want real physics, better to have a good feeling for
+// movement than accurate physic simulation.
 //=============================================================
 func (m *mob) physics(dt float64) {
-	//if global.gWorld.IsWall(m.bounds.X+x, m.bounds.Y+y-1) {
+	m.prevPos.X = m.bounds.X
+	m.prevPos.Y = m.bounds.Y
 
-	// Check if jump
-
-	// Check wall collision
-
-	// Check up/down collision
-
-	if m.currentAnim == animJump {
-		if !m.IsOnGround() {
-			m.bounds.Y += global.gWorld.gravity * dt * m.mass
-		} else {
+	// Only move if no wall collision
+	if !m.IsOnWall() {
+		m.bounds.X += m.force.X
+		m.currentAnim = animWalk
+		if m.force.X == 0 {
 			m.currentAnim = animIdle
 		}
 	}
+
+	if m.jumping > 0 {
+		// 10 is arbitrary number to make the jump more smooth
+		m.force.Y = m.speed * dt
+		if !m.IsOnWall() {
+			m.bounds.Y += m.force.Y
+			m.bounds.X += m.force.X
+			m.currentAnim = animJump
+		}
+		m.jumping--
+	} else {
+		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && m.jumping <= 0 {
+			// Jump from ladder
+			m.jumping = m.jumpPower
+		} else if m.IsOnLadder() {
+			// Climb
+			m.bounds.Y += m.force.Y // / 2
+			m.currentAnim = animClimb
+		} else if m.IsOnGround() {
+			// Jump
+			if m.force.Y > 0 && m.jumping <= 0 && !m.IsOnLadder() {
+				m.jumping = m.jumpPower
+			}
+		} else {
+			m.bounds.Y += global.gWorld.gravity * dt * m.mass
+			m.currentAnim = animJump
+		}
+	}
+
+	m.force.X = 0
+	m.force.Y = 0
+
 }
 
 //=============================================================

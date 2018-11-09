@@ -1,8 +1,7 @@
 General
 --------
-- Mob climb
-- Mob Jump
-- Mob collission detection
+- Smooth jump
+- Mob smooth terrain walking (above +-2 pixels?)
 - Vector för vilket håll en "hit" kommer från.
 
 Classes

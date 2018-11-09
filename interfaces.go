@@ -17,4 +17,5 @@ type Entity interface {
 	draw(dt float64)
 	move(x, y float64)
 	getPosition() pixel.Vec
+	setPosition(x, y float64)
 }
