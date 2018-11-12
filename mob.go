@@ -63,7 +63,7 @@ func (m *mob) create(x, y float64) {
 	m.currentAnim = animIdle
 
 	m.animRate = 0.1
-	m.jumpPower = 35.0
+	m.jumpPower = 55.0
 	m.speed = 200
 	m.mass = 50
 
@@ -233,13 +233,43 @@ func (m *mob) IsOnLadder() bool {
 // Check if on wall
 //=============================================================
 func (m *mob) IsOnWall() bool {
-	offset := 2.0
+	offset := 3.0
 	for _, p := range m.cdPixels {
 		if global.gWorld.IsRegular(m.bounds.X+float64(p[0])+m.force.X, m.bounds.Y+float64(p[1])+m.force.Y+offset) {
 			return true
 		}
 	}
 	return false
+}
+
+//=============================================================
+// Unstuck the mob if stuck.
+//=============================================================
+func (m *mob) unStuck(dt float64) {
+	bottom := false
+	top := false
+	offset := 1.0
+	// Check bottom pixels
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, m.bounds.Y+offset) {
+			bottom = true
+			break
+		}
+	}
+
+	//Check top pixels
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, m.bounds.Y+m.bounds.Height-offset) {
+			top = true
+			break
+		}
+	}
+
+	if bottom {
+		m.bounds.Y += m.speed * dt
+	} else if top {
+		m.bounds.Y -= m.speed * dt
+	}
 }
 
 //=============================================================
@@ -317,11 +347,11 @@ func (m *mob) physics(dt float64) {
 	}
 
 	if m.jumping > 0 {
-		// First half, up, then decrease force.
+		// Simplified jumping
 		if m.jumping > m.jumpPower/2 {
-			m.force.Y = m.speed * dt
+			m.force.Y += m.speed * dt * (10 / m.jumping)
 		} else {
-			m.force.Y = -m.speed * dt
+			m.force.Y = -m.speed * dt * (10 / m.jumping)
 		}
 		if !m.IsOnWall() {
 			m.bounds.Y += m.force.Y
@@ -348,13 +378,11 @@ func (m *mob) physics(dt float64) {
 		}
 	}
 
-	// Check if stuck!
-	//  for m.IsStuck() {
-
-	//  }
-
 	m.force.X = 0
 	m.force.Y = 0
+
+	// Check if stuck!
+	m.unStuck(dt)
 
 }
 
