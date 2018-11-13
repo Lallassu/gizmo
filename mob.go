@@ -60,12 +60,13 @@ func (m *mob) create(x, y float64) {
 	m.frames = make(map[int][]uint32)
 	m.cdPixels = make([][2]uint32, 10)
 	m.prevPos = make([]pixel.Vec, 100)
-	m.currentAnim = animIdle
 
 	m.animRate = 0.1
 	m.jumpPower = 55.0
 	m.speed = 200
 	m.mass = 50
+	m.currentAnim = animIdle
+	m.dir = 1
 
 	// Load animation
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
@@ -265,10 +266,11 @@ func (m *mob) unStuck(dt float64) {
 		}
 	}
 
+	// Divide speed by 3 to make it smoother and not too choppy.
 	if bottom {
-		m.bounds.Y += m.speed * dt
+		m.bounds.Y += m.speed / 3 * dt
 	} else if top {
-		m.bounds.Y -= m.speed * dt
+		m.bounds.Y -= m.speed / 3 * dt
 	}
 }
 

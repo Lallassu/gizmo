@@ -104,6 +104,7 @@ func (c *chunk) build() {
 				float64(p>>24&0xFF)/255.0,
 				float64(p>>16&0xFF)/255.0,
 				float64(p>>8&0xFF)/255.0,
+			//).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
 			).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
 
 			model.Push(

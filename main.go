@@ -26,6 +26,7 @@ func run() {
 		Bounds:      pixel.R(0, 0, 1024, 768),
 		VSync:       global.gVsync,
 		Undecorated: global.gUndecorated,
+		//	Monitor:     pixelgl.PrimaryMonitor(), // Fullscreen
 	}
 	gWin, err := pixelgl.NewWindow(cfg)
 
@@ -91,9 +92,9 @@ func gameLoop() {
 		global.gWin.Clear(global.gClearColor)
 
 		global.gController.update(dt)
-		global.gCamera.update(dt)
 		global.gWorld.Draw(dt)
 		global.gParticleEngine.update(dt)
+		global.gCamera.update(dt)
 
 		global.gWin.Update()
 	}
