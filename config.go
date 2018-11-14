@@ -16,31 +16,29 @@ const (
 
 // World constants
 const (
-	wShadowLength       = 5
-	wPixelsPerChunk     = 64
-	wPixelSize          = 1
-	wBorderSize         = 4
-	wStaticBorderSize   = 0
-	wStaticColor32      = 0xFFFFFFFE
-	wStaticColor8       = 0xFE
-	wFloodFill8         = 0xFC
-	wFloodFill32        = 0xFFFFFFFC
-	wFloodFillVisited8  = 0xFB
-	wFloodFillVisited32 = 0xFFFFFFFB
-	wBackground32       = 0xFFFFFF8F
-	wBackground8        = 0x8F
-	wLadder8            = 0xAF
-	wLadder32           = 0xFFFFFFAF
-	wShadow8            = 0xBF
-	wShadow32           = 0xFFFFFFBF
-	wViewMax            = 400
-
+	wShadowLength        = 5
+	wPixelsPerChunk      = 64
+	wPixelSize           = 1
+	wBorderSize          = 4
+	wStaticBorderSize    = 0
+	wStaticColor32       = 0xFFFFFFFE
+	wStaticColor8        = 0xFE
+	wFloodFill8          = 0xFC
+	wFloodFill32         = 0xFFFFFFFC
+	wFloodFillVisited8   = 0xFB
+	wFloodFillVisited32  = 0xFFFFFFFB
+	wBackground32        = 0xFFFFFF8F
+	wBackground8         = 0x8F
+	wLadder8             = 0xAF
+	wLadder32            = 0xFFFFFFAF
+	wShadow8             = 0xBF
+	wShadow32            = 0xFFFFFFBF
+	wViewMax             = 400
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
 	wParticlesMax        = 2000
-
-	wDoorLen    = 30
-	wDoorHeight = 40
+	wDoorLen             = 30
+	wDoorHeight          = 40
 )
 
 //=============================================================

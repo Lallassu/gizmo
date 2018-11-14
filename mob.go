@@ -44,7 +44,6 @@ type mob struct {
 
 	prevPos     []pixel.Vec
 	force       pixel.Vec
-	moveVec     pixel.Vec
 	restitution float64
 	climbing    bool
 	jumping     float64
@@ -207,6 +206,122 @@ func (m *mob) explode() {
 }
 
 //=============================================================
+//
+//=============================================================
+func (m *mob) move(dx, dy float64) {
+	// Add the force, movenment is handled in the physics function
+	m.force.X += dx * m.speed
+	m.force.Y += dy * m.speed
+
+	// Rotation of animation
+	if dx != 0 {
+		if dx > 0 {
+			m.dir = 1
+		} else {
+			m.dir = -1
+		}
+	}
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) getPosition() pixel.Vec {
+	return pixel.Vec{m.bounds.X, m.bounds.Y}
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) getMass() float64 {
+	return m.mass
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) getType() entityType {
+	return entityEnemy
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) setPosition(x, y float64) {
+	m.bounds.X = x
+	m.bounds.Y = y
+}
+
+//=============================================================
+// TBD: Fix so that it works like a queue!
+//=============================================================
+func (m *mob) saveMove() {
+	m.prevPos = append(m.prevPos, pixel.Vec{m.bounds.X, m.bounds.Y})
+	// TBD: Only remove every second or something
+	if len(m.prevPos) > 100 {
+		m.prevPos = m.prevPos[:100]
+	}
+}
+
+//=============================================================
+// Physics for mob.
+// I don't want real physics, better to have a good feeling for
+// movement than accurate physic simulation.
+//=============================================================
+func (m *mob) physics(dt float64) {
+
+	// Only move if no wall collision
+	if !m.IsOnWall() {
+		m.bounds.X += m.force.X
+		m.currentAnim = animWalk
+		if m.force.X == 0 {
+			m.currentAnim = animIdle
+		}
+	}
+
+	if m.jumping > 0 {
+		// Simplified jumping
+		if m.jumping > m.jumpPower/2 {
+			m.force.Y += m.speed * dt * (10 / m.jumping)
+		} else {
+			m.force.Y = -m.speed * dt * (10 / m.jumping)
+		}
+		if !m.IsOnWall() {
+			m.bounds.Y += m.force.Y
+			m.bounds.X += m.force.X / 2
+			m.currentAnim = animJump
+		}
+		m.jumping--
+	} else {
+		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && m.jumping <= 0 {
+			// Jump from ladder
+			m.jumping = m.jumpPower
+		} else if m.IsOnLadder() {
+			// Climb
+			m.bounds.Y += m.force.Y / 2
+			m.currentAnim = animClimb
+		} else if m.IsOnGround() {
+			// Jump
+			if m.force.Y > 0 && m.jumping <= 0 && !m.IsOnLadder() {
+				m.jumping = m.jumpPower
+			}
+		} else {
+			m.bounds.Y += global.gWorld.gravity * dt * m.mass
+			m.currentAnim = animJump
+		}
+	}
+
+	m.force.X = 0
+	m.force.Y = 0
+
+	// Check if stuck!
+	m.unStuck(dt)
+
+	// Save move if we changed since last move.
+	m.saveMove()
+}
+
+//=============================================================
 // Check if on ground
 //=============================================================
 func (m *mob) IsOnGround() bool {
@@ -272,120 +387,6 @@ func (m *mob) unStuck(dt float64) {
 	} else if top {
 		m.bounds.Y -= m.speed / 3 * dt
 	}
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) move(dx, dy float64) {
-	// Add the force, movenment is handled in the physics function
-	m.force.X += dx * m.speed
-	m.force.Y += dy * m.speed
-
-	// Rotation of animation
-	if dx != 0 {
-		if dx > 0 {
-			m.dir = 1
-		} else {
-			m.dir = -1
-		}
-	}
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) getPosition() pixel.Vec {
-	return pixel.Vec{m.bounds.X, m.bounds.Y}
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) getMass() float64 {
-	return m.mass
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) getType() entityType {
-	return entityEnemy
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) setPosition(x, y float64) {
-	m.bounds.X = x
-	m.bounds.Y = y
-}
-
-//=============================================================
-//=============================================================
-func (m *mob) saveMove() {
-	m.prevPos = append(m.prevPos, pixel.Vec{m.bounds.X, m.bounds.Y})
-	// TBD: Only remove every second or something
-	if len(m.prevPos) > 100 {
-		m.prevPos = m.prevPos[:100]
-	}
-}
-
-//=============================================================
-// Physics for mob.
-// I don't want real physics, better to have a good feeling for
-// movement than accurate physic simulation.
-//=============================================================
-func (m *mob) physics(dt float64) {
-	m.saveMove()
-
-	// Only move if no wall collision
-	if !m.IsOnWall() {
-		m.bounds.X += m.force.X
-		m.currentAnim = animWalk
-		if m.force.X == 0 {
-			m.currentAnim = animIdle
-		}
-	}
-
-	if m.jumping > 0 {
-		// Simplified jumping
-		if m.jumping > m.jumpPower/2 {
-			m.force.Y += m.speed * dt * (10 / m.jumping)
-		} else {
-			m.force.Y = -m.speed * dt * (10 / m.jumping)
-		}
-		if !m.IsOnWall() {
-			m.bounds.Y += m.force.Y
-			m.bounds.X += m.force.X / 2
-			m.currentAnim = animJump
-		}
-		m.jumping--
-	} else {
-		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && m.jumping <= 0 {
-			// Jump from ladder
-			m.jumping = m.jumpPower
-		} else if m.IsOnLadder() {
-			// Climb
-			m.bounds.Y += m.force.Y / 2
-			m.currentAnim = animClimb
-		} else if m.IsOnGround() {
-			// Jump
-			if m.force.Y > 0 && m.jumping <= 0 && !m.IsOnLadder() {
-				m.jumping = m.jumpPower
-			}
-		} else {
-			m.bounds.Y += global.gWorld.gravity * dt * m.mass
-			m.currentAnim = animJump
-		}
-	}
-
-	m.force.X = 0
-	m.force.Y = 0
-
-	// Check if stuck!
-	m.unStuck(dt)
-
 }
 
 //=============================================================
