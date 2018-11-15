@@ -1,17 +1,22 @@
+//=============================================================
+// object.go
+//-------------------------------------------------------------
+// Different objects that are subject to physics and flood fill
+// for destuction into pieces. Much like mob, but special adds
+// like FF and different physics and actions.
+//=============================================================
 package main
 
 import (
-	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"image"
-	"image/png"
-	"os"
 )
 
 type object struct {
 	textureFile string
+	img         image.Image
 	model       *imdraw.IMDraw
 	canvas      *pixelgl.Canvas
 	bounds      *Bounds
@@ -34,27 +39,7 @@ func (o *object) create(x, y float64) {
 
 	o.mass = 50
 
-	// Load image (TBD: Move to utility)
-	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-
-	imgfile, err := os.Open(o.textureFile)
-	if err != nil {
-		Error(fmt.Sprintf("Failed to open file %v", o.textureFile))
-		return
-	}
-
-	defer imgfile.Close()
-
-	imgCfg, _, err := image.DecodeConfig(imgfile)
-	if err != nil {
-		Error(fmt.Sprintf("Failed to decode file %v: %v", o.textureFile, err))
-		return
-	}
-
-	imgfile.Seek(0, 0)
-	img, _, _ := image.Decode(imgfile)
-
-	o.height = imgCfg.Height
+	o.img, o.width, o.height, o.size = loadTexture(o.textureFile)
 
 	// Initiate bounds for qt
 	o.bounds = &Bounds{
@@ -65,15 +50,11 @@ func (o *object) create(x, y float64) {
 		entity: Entity(o),
 	}
 
-	o.size = o.width
-	if o.width < o.height {
-		o.size = o.height
-	}
 	o.pixels = make([]uint32, o.size*o.size)
 
 	for x := 0; x <= o.width; x++ {
 		for y := 0; y <= o.height; y++ {
-			r, g, b, a := img.At(x, o.height-y).RGBA()
+			r, g, b, a := o.img.At(x, o.height-y).RGBA()
 			o.pixels[x*o.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 		}
 	}

@@ -2,10 +2,12 @@ General
 --------
 - Vector för vilket håll en "hit" kommer från.
 
-- Move read png to utility
 - Fix so that saveMove works like a queue
 - Only saveMove when mob actually changed position
 
+- Event handler for objects
+    -> for example if player hit, what should happen?
+    -> trampoline effect etc.
 
 - Object class
     - Read texture

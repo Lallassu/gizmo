@@ -6,15 +6,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"image"
-	"image/png"
 	"math"
 	"math/rand"
-	"os"
 	"time"
 )
 
@@ -41,6 +38,7 @@ type mob struct {
 	dir         float64
 	mass        float64
 	cdPixels    [][2]uint32
+	img         image.Image
 
 	prevPos     []pixel.Vec
 	force       pixel.Vec
@@ -67,27 +65,9 @@ func (m *mob) create(x, y float64) {
 	m.currentAnim = animIdle
 	m.dir = 1
 
-	// Load animation
-	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+	fullWidth := 0
 
-	imgfile, err := os.Open(m.sheetFile)
-	if err != nil {
-		Error(fmt.Sprintf("Failed to open sheet file %v", m.sheetFile))
-		return
-	}
-
-	defer imgfile.Close()
-
-	imgCfg, _, err := image.DecodeConfig(imgfile)
-	if err != nil {
-		Error(fmt.Sprintf("Failed to decode sheet file %v: %v", m.sheetFile, err))
-		return
-	}
-
-	imgfile.Seek(0, 0)
-	img, _, _ := image.Decode(imgfile)
-
-	m.frameHeight = imgCfg.Height
+	m.img, fullWidth, m.frameHeight, m.size = loadTexture(m.sheetFile)
 
 	// Initiate bounds for qt
 	m.bounds = &Bounds{
@@ -99,15 +79,11 @@ func (m *mob) create(x, y float64) {
 	}
 
 	f := 0
-	m.size = m.frameWidth
-	if m.frameWidth < m.frameHeight {
-		m.size = m.frameHeight
-	}
-	for w := 0; w < imgCfg.Width; w += m.frameWidth {
+	for w := 0; w < fullWidth; w += m.frameWidth {
 		m.frames[f] = make([]uint32, m.size*m.size)
 		for x := 0; x <= m.frameWidth; x++ {
-			for y := 0; y <= imgCfg.Height; y++ {
-				r, g, b, a := img.At(w+x, imgCfg.Height-y).RGBA()
+			for y := 0; y <= m.frameHeight; y++ {
+				r, g, b, a := m.img.At(w+x, m.frameHeight-y).RGBA()
 				m.frames[f][x*m.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}

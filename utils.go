@@ -9,14 +9,60 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"image"
+	"image/png"
 	"math"
+	"os"
 	"runtime"
 )
 
+//=============================================================
+// Load texture file (could also be spritesheets) (png format)
+// Size is the largest of height/width used for 1D pixel arrays
+//=============================================================
+func loadTexture(file string) (img image.Image, width, height, size int) {
+	width = 0
+	height = 0
+	size = 0
+	img = nil
+	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+
+	imgfile, err := os.Open(file)
+	if err != nil {
+		Error(fmt.Sprintf("Failed to open file %v", file))
+		return
+	}
+
+	defer imgfile.Close()
+
+	imgCfg, _, err := image.DecodeConfig(imgfile)
+	if err != nil {
+		Error(fmt.Sprintf("Failed to decode file %v: %v", file, err))
+		return
+	}
+
+	imgfile.Seek(0, 0)
+	img, _, _ = image.Decode(imgfile)
+
+	height = imgCfg.Height
+	width = imgCfg.Width
+	size = width
+	if width < height {
+		size = height
+	}
+	return
+}
+
+//=============================================================
+// Distance between two points in 2D space
+//=============================================================
 func distance(p1, p2 pixel.Vec) float64 {
 	return math.Sqrt(math.Pow(float64(p1.X-p2.X), 2) + math.Pow(float64(p1.Y-p2.Y), 2))
 }
 
+//=============================================================
+// Just print current memory usage
+//=============================================================
 func PrintMemoryUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
@@ -26,7 +72,12 @@ func PrintMemoryUsage() {
 	Debug(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
 }
 
-// Without this window is black, bug after mojave update for osx?
+//=============================================================
+// Without this window is black, bug after mojave update for
+// osx?
+// Must move window a bit in order to make it draw the first
+// time.
+//=============================================================
 func CenterWindow(win *pixelgl.Window) {
 	x, y := pixelgl.PrimaryMonitor().Size()
 	width, height := win.Bounds().Size().XY()
