@@ -5,14 +5,15 @@ General
 - Fix so that saveMove works like a queue
 - Only saveMove when mob actually changed position
 
+
 - Event handler for objects
     -> for example if player hit, what should happen?
     -> trampoline effect etc.
 
 - Object class
-    - Read texture
-    - Create canvas
     - Physics
+        - Handle bounce-rate.
+        - pushable
     - breakable
     - Can be a weapon
         - Shoot

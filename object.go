@@ -29,31 +29,42 @@ type object struct {
 	force       pixel.Vec
 	pixels      []uint32
 	prevPos     []pixel.Vec
+	bounces     int
+	vx          float64
+	vy          float64
+	fx          float64
+	fy          float64
+	scale       float64
 }
 
 //=============================================================
 //
 //=============================================================
-func (o *object) create(x, y float64) {
+func (o *object) create(x_, y_ float64) {
 	o.prevPos = make([]pixel.Vec, 100)
 
-	o.mass = 50
+	o.mass = 5
+	o.restitution = -0.3
+	o.fx = 1
+	o.fy = 1
+	o.vx = 1
+	o.vy = 1
 
 	o.img, o.width, o.height, o.size = loadTexture(o.textureFile)
 
 	// Initiate bounds for qt
 	o.bounds = &Bounds{
-		X:      x,
-		Y:      y,
-		Width:  float64(o.width),
-		Height: float64(o.height),
+		X:      x_,
+		Y:      y_,
+		Width:  float64(o.width) * o.scale,
+		Height: float64(o.height) * o.scale,
 		entity: Entity(o),
 	}
 
 	o.pixels = make([]uint32, o.size*o.size)
 
-	for x := 0; x <= o.width; x++ {
-		for y := 0; y <= o.height; y++ {
+	for x := 0; x < o.width; x++ {
+		for y := 0; y < o.height; y++ {
 			r, g, b, a := o.img.At(x, o.height-y).RGBA()
 			o.pixels[x*o.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 		}
@@ -167,18 +178,54 @@ func (o *object) setPosition(x, y float64) {
 //
 //=============================================================
 func (o *object) saveMove() {
-	o.prevPos = append(o.prevPos, pixel.Vec{o.bounds.X, o.bounds.Y})
-	// TBD: Only remove every second or something
-	if len(o.prevPos) > 100 {
-		o.prevPos = o.prevPos[:100]
-	}
+	//o.prevPos = append(o.prevPos, pixel.Vec{o.bounds.X, o.bounds.Y})
+	//// TBD: Only remove every second or something
+	//if len(o.prevPos) > 100 {
+	//	o.prevPos = o.prevPos[:100]
+	//}
 }
 
 //=============================================================
 // Physics
 //=============================================================
 func (o *object) physics(dt float64) {
-	o.saveMove()
+
+	if global.gWorld.IsWall(o.bounds.X, o.bounds.Y) {
+		o.bounces++
+		if o.bounces <= 4 {
+			if o.vy < 0 {
+				o.vy *= o.restitution
+			} else {
+				if o.vx > 0 {
+					o.vx *= -o.restitution
+					o.vy *= -o.restitution
+				} else if o.vx < 0 {
+					o.vx *= -o.restitution
+					o.vy *= -o.restitution
+				}
+			}
+		} else {
+			o.fx = 0
+			o.fy = 0
+		}
+	}
+	//o.saveMove()
+	ax := o.fx * dt * o.vx * o.mass
+	ay := o.fy * dt * o.vy * o.mass
+	o.bounds.X += ax
+	o.bounds.Y += ay
+
+	o.vy -= dt * o.fy
+
+	if o.fx > 0 {
+		o.fx -= dt * global.gWorld.gravity * o.mass
+	} else {
+		o.fx = 0
+	}
+	if o.fy > 0 {
+		o.fy -= dt * global.gWorld.gravity * o.mass
+	}
+
 }
 
 //=============================================================
@@ -188,4 +235,36 @@ func (o *object) draw(dt float64) {
 	// Update physics
 	o.physics(dt)
 
+	o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
+	o.unStuck(dt)
+}
+
+//=============================================================
+// Unstuck the objet if stuck.
+//=============================================================
+func (o *object) unStuck(dt float64) {
+	bottom := false
+	top := false
+	offset := 1.0
+	// Check bottom pixels
+	for x := o.bounds.X; x < o.bounds.X+o.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, o.bounds.Y+offset) {
+			bottom = true
+			break
+		}
+	}
+
+	//Check top pixels
+	for x := o.bounds.X; x < o.bounds.X+o.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, o.bounds.Y+o.bounds.Height-offset) {
+			top = true
+			break
+		}
+	}
+
+	if bottom {
+		o.bounds.Y += 10 * o.mass * dt
+	} else if top {
+		o.bounds.Y -= 10 * o.mass * dt
+	}
 }

@@ -5,8 +5,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"math/rand"
 	"time"
 )
 
@@ -69,6 +71,15 @@ func gameLoop() {
 	//frames := 0
 	//fps := time.Tick(time.Second / 60)
 	//second := time.Tick(time.Second)
+
+	for _, x := range []string{"ak47.png", "p90.png", "rocketlauncher.png", "shotgun.png"} {
+		objTest := object{
+			textureFile: fmt.Sprintf("assets/objects/%v", x),
+			objectType:  entityObject,
+			scale:       0.2,
+		}
+		objTest.create(100+float64(rand.Intn(50)), 180+float64(rand.Intn(50)))
+	}
 
 	test := mob{
 		sheetFile:   "test.png",

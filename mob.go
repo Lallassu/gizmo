@@ -294,7 +294,7 @@ func (m *mob) physics(dt float64) {
 	m.unStuck(dt)
 
 	// Save move if we changed since last move.
-	m.saveMove()
+	//m.saveMove()
 }
 
 //=============================================================
