@@ -40,7 +40,7 @@ func (pe *particleEngine) effectBlood(x, y float64, size int) {
 				vy:          float64(5 - rand.Intn(10)),
 				mass:        2,
 				pType:       particleRegular,
-				color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
+				color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
 				static:      true,
 			})
 	}
@@ -55,7 +55,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 		b := 16
 		a := 20 + rand.Intn(220)
 		pe.newParticle(particle{
-			color:       uint32((r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | (a & 0xFF)),
+			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
 			size:        rand.Float64() * 2,
 			x:           x, // + float64((size/2)-rand.Intn(size)),
 			y:           y, // + float64((size/2)-rand.Intn(size)),
@@ -75,7 +75,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 		c := 50 + rand.Intn(205)
 		a := 20 + rand.Intn(220)
 		pe.newParticle(particle{
-			color:       uint32((c & 0xFF << 24) | (c & 0xFF << 16) | (c & 0xFF << 8) | (a & 0xFF)),
+			color:       uint32(c&0xFF<<24 | c&0xFF<<16 | c&0xFF<<8 | a&0xFF),
 			size:        rand.Float64() * 2,
 			x:           x + float64(size/2-rand.Intn(size)) + rand.Float64()*2,
 			y:           y + float64(size/2-rand.Intn(size)) + rand.Float64()*2,

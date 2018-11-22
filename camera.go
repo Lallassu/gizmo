@@ -36,8 +36,8 @@ func (c *camera) update(dt float64) {
 	pos := c.pos
 	if c.follow != nil {
 		pos = c.follow.getPosition()
-		pos.X -= (float64(global.gWindowWidth) / 2) / c.zoom
-		pos.Y -= (float64(global.gWindowHeight) / 2) / c.zoom
+		pos.X -= float64(global.gWindowWidth) / 2 / c.zoom
+		pos.Y -= float64(global.gWindowHeight) / 2 / c.zoom
 	}
 
 	pos = pixel.Lerp(c.pos, pos, 1-math.Pow(1.0/128, dt))

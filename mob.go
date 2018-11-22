@@ -39,6 +39,7 @@ type mob struct {
 	mass        float64
 	cdPixels    [][2]uint32
 	img         image.Image
+	carry       *object
 
 	prevPos     []pixel.Vec
 	force       pixel.Vec
@@ -106,7 +107,7 @@ func (m *mob) create(x, y float64) {
 }
 
 //=============================================================
-// Build each frame into a canvas
+// Build each frame
 //=============================================================
 func (m *mob) buildFrames() {
 	for i := 0; i < len(m.frames); i++ {
@@ -150,6 +151,7 @@ func (m *mob) hit(x_, y_ float64) bool {
 			if m.frames[i][pos] != 0 {
 				// Add some blood
 				global.gParticleEngine.effectBlood(x_, y_, 1)
+
 				// Remove part
 				m.frames[i][pos] = 0
 				global.gParticleEngine.newParticle(
@@ -173,6 +175,26 @@ func (m *mob) hit(x_, y_ float64) bool {
 	}
 	m.buildFrames()
 	return true
+}
+
+//=============================================================
+// Attach object to self
+//=============================================================
+func (m *mob) attach(o *object) {
+	if m.carry == nil {
+		m.carry = o
+		o.setOwner(m)
+	}
+}
+
+//=============================================================
+// Throw/drop object
+//=============================================================
+func (m *mob) throw() {
+	if m.carry != nil {
+		m.carry.owner = nil
+		m.carry = nil
+	}
 }
 
 //=============================================================
@@ -214,10 +236,17 @@ func (m *mob) getMass() float64 {
 }
 
 //=============================================================
+// Get bounds
+//=============================================================
+func (m *mob) getBounds() *Bounds {
+	return m.bounds
+}
+
+//=============================================================
 //
 //=============================================================
 func (m *mob) getType() entityType {
-	return entityEnemy
+	return m.mobType
 }
 
 //=============================================================
@@ -398,5 +427,14 @@ func (m *mob) draw(dt float64) {
 
 	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 	m.models[idx].Draw(m.canvas)
+
 	m.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
+
+	// Draw object attached.
+	if m.carry != nil {
+		m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)))
+		// Update object positions based on mob
+		m.carry.bounds.X = m.bounds.X
+		m.carry.bounds.Y = m.bounds.Y
+	}
 }

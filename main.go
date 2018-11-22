@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/pkg/profile"
 	"math/rand"
 	"time"
 )
@@ -16,6 +17,8 @@ import (
 // Main
 //=============================================================
 func main() {
+	//defer profile.Start().Stop()
+	defer profile.Start(profile.MemProfile).Stop()
 	pixelgl.Run(run)
 }
 
@@ -38,9 +41,9 @@ func run() {
 	CenterWindow(gWin)
 	global.gWin = gWin
 
-	PrintMemoryUsage()
 	// Setup world etc.
 	setup()
+
 	PrintMemoryUsage()
 
 	// Start game loop
@@ -68,9 +71,9 @@ func setup() {
 //=============================================================
 func gameLoop() {
 	last := time.Now()
-	//frames := 0
-	//fps := time.Tick(time.Second / 60)
-	//second := time.Tick(time.Second)
+	fps := time.Tick(time.Second / 1000)
+	second := time.Tick(time.Second)
+	frames := 0
 
 	for _, x := range []string{"ak47.png", "p90.png", "rocketlauncher.png", "shotgun.png"} {
 		objTest := object{
@@ -108,5 +111,18 @@ func gameLoop() {
 		global.gCamera.update(dt)
 
 		global.gWin.Update()
+
+		<-fps
+		updateFPSDisplay(global.gWin, &frames, second)
+	}
+}
+
+func updateFPSDisplay(win *pixelgl.Window, frames *int, second <-chan time.Time) {
+	*frames++
+	select {
+	case <-second:
+		win.SetTitle(fmt.Sprintf("%s (FPS: %d)", GameTitle, *frames))
+		*frames = 0
+	default:
 	}
 }

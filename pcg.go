@@ -131,7 +131,7 @@ func (p *pcg) MetalCornerRight(x, y int, left bool) {
 	b := 0
 	for i := 0; i < 6; i++ {
 		for j := 0; j < 6; j++ {
-			if i == 5 || j == 5 || (j == 1 && i == 1) || (j == 1 && i == 0) || (j == 0 && i == 1) {
+			if i == 5 || j == 5 || j == 1 && i == 1 || j == 1 && i == 0 || j == 0 && i == 1 {
 				r = 0x1e
 				g = 0x2c
 				b = 0x26
@@ -139,7 +139,7 @@ func (p *pcg) MetalCornerRight(x, y int, left bool) {
 				r = 0x2b
 				g = 0x37
 				b = 0x31
-			} else if i == 4 || j == 4 || (j == 2 && i == 1) || (i == 2 && j == 1) || (j == 2 && i == 2) || (j == 2 && i == 0) || (j == 0 && i == 2) {
+			} else if i == 4 || j == 4 || j == 2 && i == 1 || i == 2 && j == 1 || j == 2 && i == 2 || j == 2 && i == 0 || j == 0 && i == 2 {
 				r = 0x44
 				g = 0x55
 				b = 0x49
@@ -171,7 +171,7 @@ func (p *pcg) MetalCornerLeft(x, y int, left bool) {
 	b := 0
 	for i := 0; i < 6; i++ {
 		for j := 0; j < 6; j++ {
-			if i == 5 || j == 5 || (j == 1 && i == 1) || (j == 1 && i == 0) || (j == 0 && i == 1) {
+			if i == 5 || j == 5 || j == 1 && i == 1 || j == 1 && i == 0 || j == 0 && i == 1 {
 				r = 0x1e
 				g = 0x2c
 				b = 0x26
@@ -179,7 +179,7 @@ func (p *pcg) MetalCornerLeft(x, y int, left bool) {
 				r = 0x2b
 				g = 0x37
 				b = 0x31
-			} else if i == 4 || j == 4 || (j == 2 && i == 1) || (i == 2 && j == 1) || (j == 2 && i == 2) || (j == 2 && i == 0) || (j == 0 && i == 2) {
+			} else if i == 4 || j == 4 || j == 2 && i == 1 || i == 2 && j == 1 || j == 2 && i == 2 || j == 2 && i == 0 || j == 0 && i == 2 {
 				r = 0x44
 				g = 0x55
 				b = 0x49
@@ -363,7 +363,7 @@ func (p *pcg) GenerateDoor(x, y int) {
 				g = 0x71
 				b = 0x74
 			}
-			if (i == wDoorLen-2 && j < wDoorHeight-1) || (i == wDoorLen-3 && j < wDoorHeight-1) {
+			if i == wDoorLen-2 && j < wDoorHeight-1 || i == wDoorLen-3 && j < wDoorHeight-1 {
 				r = 0x4c
 				g = 0x4c
 				b = 0x4c
@@ -438,13 +438,13 @@ func (p *pcg) GenerateDoor(x, y int) {
 				}
 			}
 			// Hinge
-			if (j == wDoorHeight/4 || j == wDoorHeight/4-1 || j == wDoorHeight-(wDoorHeight/4-1) || j == wDoorHeight-(wDoorHeight/4)) && i == wDoorLen-3 {
+			if (j == wDoorHeight/4 || j == wDoorHeight/4-1 || j == wDoorHeight-(wDoorHeight/4-1) || j == wDoorHeight-wDoorHeight/4) && i == wDoorLen-3 {
 				r = 0x4c
 				g = 0x59
 				b = 0x5c
 			}
 			// Hinge
-			if (j == wDoorHeight/4 || j == wDoorHeight/4-1 || j == wDoorHeight-(wDoorHeight/4-1) || j == wDoorHeight-(wDoorHeight/4)) && i == wDoorLen-4 {
+			if (j == wDoorHeight/4 || j == wDoorHeight/4-1 || j == wDoorHeight-(wDoorHeight/4-1) || j == wDoorHeight-wDoorHeight/4) && i == wDoorLen-4 {
 				r = 0x23
 				g = 0x23
 				b = 0x23
@@ -470,7 +470,7 @@ func (p *pcg) GenerateLamp(x, y int) {
 	lb := 0x39
 	for i := -5; i < 5; i++ {
 		for j := 0; j <= 4; j++ {
-			if i == -5 || (i == 0 && j == 0) {
+			if i == -5 || i == 0 && j == 0 {
 				lr = 0xa4
 				lg = 0x81
 				lb = 0x61
@@ -479,7 +479,7 @@ func (p *pcg) GenerateLamp(x, y int) {
 				lg = 0x3a
 				lb = 0x39
 			}
-			if (i > -4 && i < 3 && j == 4) || (i > -3 && i < 4 && j == 3) {
+			if i > -4 && i < 3 && j == 4 || i > -3 && i < 4 && j == 3 {
 				lr = 0xff - rand.Intn(10)
 				lg = 0xd6 - rand.Intn(20)
 				lb = 0x2f

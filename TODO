@@ -2,6 +2,8 @@ General
 --------
 - Vector för vilket håll en "hit" kommer från.
 
+- Fix jump, now dependent on CPU speed
+
 - Fix so that saveMove works like a queue
 - Only saveMove when mob actually changed position
 
@@ -9,6 +11,12 @@ General
 - Event handler for objects
     -> for example if player hit, what should happen?
     -> trampoline effect etc.
+
+- Skapa mob/weapon/item
+    - Alla har ett object (nu mob)
+    - Varje del har egna funktioner
+        - Weapon har shoot etc.
+        - Mob har jump etc.
 
 - Object class
     - Physics
@@ -29,12 +37,14 @@ General
     - Physics
     - pool
 
-
+- GLSL for lights
 - More details in maps
 - Different color layouts for map
-- Add fullscreen support
 - Configuration support
     - Json file -> struct
+    - Add fullscreen support
+    - Controllers
+    - Features (vsync etc)
 
 Classes
 -----------

@@ -41,6 +41,29 @@ func (c *controller) create() {
 //=============================================================
 func (c *controller) update(dt float64) {
 	// Handle controllers
+
+	// Test pickup
+	if global.gWin.Pressed(pixelgl.KeyB) {
+		if c.entity.getType() == entityPlayer {
+			// Check if anything to pickup?
+			for _, v := range global.gWorld.qt.RetrieveIntersections(c.entity.getBounds()) {
+				if v.entity.getType() == entityObject {
+					if v.entity.(*object).isFree() {
+						c.entity.(*mob).attach(v.entity.(*object))
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// Throw object
+	if global.gWin.Pressed(pixelgl.KeyV) {
+		if c.entity.getType() == entityPlayer {
+			c.entity.(*mob).throw()
+		}
+	}
+
 	if global.gWin.Pressed(pixelgl.KeyS) {
 		global.gCamera.zoom -= 0.05
 	}

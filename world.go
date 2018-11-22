@@ -21,6 +21,7 @@ import (
 type world struct {
 	width      int
 	height     int
+	size       int
 	coloring   *mapColor
 	qt         *Quadtree
 	pixels     []uint32
@@ -71,7 +72,9 @@ func (w *world) NewMap(maptype mapType) {
 
 	w.coloring = GenerateMapColor(maptype)
 
-	w.pixels = make([]uint32, w.width*w.height)
+	w.size = w.width * w.height
+
+	w.pixels = make([]uint32, w.size)
 
 	Debug("Generating world", w.width, w.height)
 	g := generator{}
@@ -124,7 +127,7 @@ func (w *world) IsBackground(x_, y_ float64) bool {
 	x := int(x_)
 	y := int(y_)
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == wBackground8 {
 			return true
 		}
@@ -363,12 +366,12 @@ func (w *world) floodFill(x, y int) {
 //=============================================================
 func (w *world) removeShadow(x, y int) {
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == wShadow8 {
-			r := uint32(float64((w.pixels[pos]>>24)&0xFF) * 1.5)
-			g := uint32(float64((w.pixels[pos]>>16)&0xFF) * 1.5)
-			b := uint32(float64((w.pixels[pos]>>8)&0xFF) * 1.5)
-			w.pixels[pos] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wBackground8
+			r := uint32(float64(w.pixels[pos]>>24&0xFF) * 1.5)
+			g := uint32(float64(w.pixels[pos]>>16&0xFF) * 1.5)
+			b := uint32(float64(w.pixels[pos]>>8&0xFF) * 1.5)
+			w.pixels[pos] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wBackground8
 			w.markChunkDirty(x, y)
 		}
 	}
@@ -381,10 +384,10 @@ func (w *world) addShadow(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != 0xFF {
-			r := uint32(float64((w.pixels[pos]>>24)&0xFF) / 1.5)
-			g := uint32(float64((w.pixels[pos]>>16)&0xFF) / 1.5)
-			b := uint32(float64((w.pixels[pos]>>8)&0xFF) / 1.5)
-			w.pixels[pos] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wShadow8
+			r := uint32(float64(w.pixels[pos]>>24&0xFF) / 1.5)
+			g := uint32(float64(w.pixels[pos]>>16&0xFF) / 1.5)
+			b := uint32(float64(w.pixels[pos]>>8&0xFF) / 1.5)
+			w.pixels[pos] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8
 			w.markChunkDirty(x, y)
 		}
 	}
@@ -444,10 +447,10 @@ func (w *world) paintMap() {
 							for n := 0; n < 500000; n++ {
 								if y-n > 0 {
 									if (w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 || w.pixels[(x+i)*w.width+y-n]&0xFF == wShadow8) && w.pixels[(x+i)*w.width+y-n]&0xFF != wLadder8 {
-										w.pixels[(x+i)*w.width+y-n] = (color & wLadder32)
+										w.pixels[(x+i)*w.width+y-n] = color & wLadder32
 										// Shadows
 										if w.pixels[(x+i+1)*w.width+y-n-1]&0xFF != 0xFF {
-											w.pixels[(x+i+1)*w.width+y-n-1] &= (0x555555FF & wLadder32)
+											w.pixels[(x+i+1)*w.width+y-n-1] &= 0x555555FF & wLadder32
 										}
 									} else {
 										break
@@ -459,10 +462,10 @@ func (w *world) paintMap() {
 						for n := 0; ; n += 5 {
 							if y-n > 0 {
 								if w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 || w.pixels[(x+i)*w.width+y-n]&0xFF == wShadow8 {
-									w.pixels[(x+i)*w.width+y-n] = (color & wLadder32)
+									w.pixels[(x+i)*w.width+y-n] = color & wLadder32
 									// Dont shadow above walls
 									if w.pixels[(x+i+1)*w.width+y-n-1]&0xFF != 0xFF {
-										w.pixels[(x+i+1)*w.width+y-n-1] &= (0x555555FF & wLadder32)
+										w.pixels[(x+i+1)*w.width+y-n-1] &= 0x555555FF & wLadder32
 									}
 
 								} else {
@@ -482,10 +485,10 @@ func (w *world) paintMap() {
 						for i := 1; i < wShadowLength; i++ {
 							p := w.pixels[(x+i)*w.width+y-i]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
-								r := uint32(float64((p >> 24 & 0xFF)) / 1.5)
-								g := uint32(float64((p >> 16 & 0xFF)) / 1.5)
-								b := uint32(float64((p >> 8 & 0xFF)) / 1.5)
-								w.pixels[(x+i)*w.width+y-i] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wShadow8&0xFF
+								r := uint32(float64(p>>24&0xFF) / 1.5)
+								g := uint32(float64(p>>16&0xFF) / 1.5)
+								b := uint32(float64(p>>8&0xFF) / 1.5)
+								w.pixels[(x+i)*w.width+y-i] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
 							}
 						}
 					}
@@ -493,17 +496,17 @@ func (w *world) paintMap() {
 						for i := 0; i < wShadowLength; i++ {
 							p := w.pixels[(x+i)*w.width+y-i]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
-								r := uint32(float64((p >> 24 & 0xFF)) / 1.5)
-								g := uint32(float64((p >> 16 & 0xFF)) / 1.5)
-								b := uint32(float64((p >> 8 & 0xFF)) / 1.5)
-								w.pixels[(x+i)*w.width+y-i] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wShadow8&0xFF
+								r := uint32(float64(p>>24&0xFF) / 1.5)
+								g := uint32(float64(p>>16&0xFF) / 1.5)
+								b := uint32(float64(p>>8&0xFF) / 1.5)
+								w.pixels[(x+i)*w.width+y-i] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
 							}
 							p = w.pixels[(x+i)*w.width+y-i-1]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF && i < 4 {
-								r := uint32(float64((p >> 24 & 0xFF)) / 1.5)
-								g := uint32(float64((p >> 16 & 0xFF)) / 1.5)
-								b := uint32(float64((p >> 8 & 0xFF)) / 1.5)
-								w.pixels[(x+i)*w.width+y-i-1] = (r & 0xFF << 24) | (g & 0xFF << 16) | (b & 0xFF << 8) | wShadow8&0xFF
+								r := uint32(float64(p>>24&0xFF) / 1.5)
+								g := uint32(float64(p>>16&0xFF) / 1.5)
+								b := uint32(float64(p>>8&0xFF) / 1.5)
+								w.pixels[(x+i)*w.width+y-i-1] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
 							}
 						}
 					}

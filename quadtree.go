@@ -167,17 +167,17 @@ func (qt *Quadtree) getIndex(pRect *Bounds) int {
 
 	index := -1 // index of the subnode (0-3), or -1 if pRect cannot completely fit within a subnode and is part of the parent node
 
-	verticalMidpoint := qt.Bounds.X + (qt.Bounds.Width / 2)
-	horizontalMidpoint := qt.Bounds.Y + (qt.Bounds.Height / 2)
+	verticalMidpoint := qt.Bounds.X + qt.Bounds.Width/2
+	horizontalMidpoint := qt.Bounds.Y + qt.Bounds.Height/2
 
 	//pRect can completely fit within the top quadrants
-	topQuadrant := (pRect.Y < horizontalMidpoint) && (pRect.Y+pRect.Height < horizontalMidpoint)
+	topQuadrant := pRect.Y < horizontalMidpoint && pRect.Y+pRect.Height < horizontalMidpoint
 
 	//pRect can completely fit within the bottom quadrants
-	bottomQuadrant := (pRect.Y > horizontalMidpoint)
+	bottomQuadrant := pRect.Y > horizontalMidpoint
 
 	//pRect can completely fit within the left quadrants
-	if (pRect.X < verticalMidpoint) && (pRect.X+pRect.Width < verticalMidpoint) {
+	if pRect.X < verticalMidpoint && pRect.X+pRect.Width < verticalMidpoint {
 
 		if topQuadrant {
 			index = 1
@@ -224,7 +224,7 @@ func (qt *Quadtree) Insert(pRect *Bounds) {
 	qt.Objects = append(qt.Objects, pRect)
 
 	// If total objects is greater than max objects and level is less than max levels
-	if (len(qt.Objects) > qt.MaxObjects) && (qt.Level < qt.MaxLevels) {
+	if len(qt.Objects) > qt.MaxObjects && qt.Level < qt.MaxLevels {
 
 		// split if we don't already have subnodes
 		if len(qt.Nodes) > 0 == false {

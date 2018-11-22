@@ -18,4 +18,5 @@ type Entity interface {
 	move(x, y float64)
 	getPosition() pixel.Vec
 	setPosition(x, y float64)
+	getBounds() *Bounds
 }

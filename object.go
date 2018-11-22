@@ -35,6 +35,7 @@ type object struct {
 	fx          float64
 	fy          float64
 	scale       float64
+	owner       Entity
 }
 
 //=============================================================
@@ -133,6 +134,16 @@ func (o *object) hit(x_, y_ float64) bool {
 //=============================================================
 //
 //=============================================================
+func (o *object) isFree() bool {
+	if o.owner == nil {
+		return true
+	}
+	return false
+}
+
+//=============================================================
+//
+//=============================================================
 func (o *object) explode() {
 }
 
@@ -177,6 +188,20 @@ func (o *object) setPosition(x, y float64) {
 //=============================================================
 //
 //=============================================================
+func (o *object) setOwner(e Entity) {
+	o.owner = e
+}
+
+//=============================================================
+// Get bounds
+//=============================================================
+func (o *object) getBounds() *Bounds {
+	return o.bounds
+}
+
+//=============================================================
+//
+//=============================================================
 func (o *object) saveMove() {
 	//o.prevPos = append(o.prevPos, pixel.Vec{o.bounds.X, o.bounds.Y})
 	//// TBD: Only remove every second or something
@@ -189,6 +214,10 @@ func (o *object) saveMove() {
 // Physics
 //=============================================================
 func (o *object) physics(dt float64) {
+	// Only apply physics if not hold by an entity
+	if o.owner != nil {
+		return
+	}
 
 	if global.gWorld.IsWall(o.bounds.X, o.bounds.Y) {
 		o.bounces++
@@ -232,11 +261,11 @@ func (o *object) physics(dt float64) {
 //
 //=============================================================
 func (o *object) draw(dt float64) {
-	// Update physics
-	o.physics(dt)
-
-	o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
-	o.unStuck(dt)
+	if o.owner == nil {
+		o.physics(dt)
+		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
+		o.unStuck(dt)
+	}
 }
 
 //=============================================================
