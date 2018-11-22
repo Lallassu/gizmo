@@ -75,15 +75,17 @@ func gameLoop() {
 	second := time.Tick(time.Second)
 	frames := 0
 
+	// Load a bunch of weapons
 	for _, x := range []string{"ak47.png", "p90.png", "rocketlauncher.png", "shotgun.png"} {
 		objTest := object{
 			textureFile: fmt.Sprintf("assets/objects/%v", x),
-			objectType:  entityObject,
-			scale:       0.2,
+			entityType:  entityObject,
+			scale:       0.15,
 		}
 		objTest.create(100+float64(rand.Intn(50)), 180+float64(rand.Intn(50)))
 	}
 
+	// Load a player
 	test := mob{
 		sheetFile:   "test.png",
 		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},

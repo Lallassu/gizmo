@@ -136,11 +136,6 @@ func (m *mob) buildFrames() {
 
 //=============================================================
 //
-//  Function to implement Entity interface
-//
-//=============================================================
-//=============================================================
-//
 //=============================================================
 func (m *mob) hit(x_, y_ float64) bool {
 	x := int(math.Abs(float64(m.bounds.X - x_)))
@@ -175,6 +170,15 @@ func (m *mob) hit(x_, y_ float64) bool {
 	}
 	m.buildFrames()
 	return true
+}
+
+//=============================================================
+// Shoot if weapon attached
+//=============================================================
+func (m *mob) shoot() {
+	if m.carry != nil {
+		m.carry.shoot()
+	}
 }
 
 //=============================================================
@@ -430,9 +434,11 @@ func (m *mob) draw(dt float64) {
 
 	m.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
 
-	// Draw object attached.
+	// Draw any object attached.
 	if m.carry != nil {
-		m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)))
+		m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).
+			Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)).
+			Rotated(pixel.Vec{m.carry.bounds.X + m.carry.bounds.Width/2, m.carry.bounds.Y + m.carry.bounds.Height/2}, m.carry.rotation*m.dir))
 		// Update object positions based on mob
 		m.carry.bounds.X = m.bounds.X
 		m.carry.bounds.Y = m.bounds.Y

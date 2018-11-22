@@ -2,6 +2,12 @@ General
 --------
 - Vector för vilket håll en "hit" kommer från.
 
+- Ammo class
+    - pixels?
+
+- 
+
+
 - Fix jump, now dependent on CPU speed
 
 - Fix so that saveMove works like a queue
@@ -11,12 +17,6 @@ General
 - Event handler for objects
     -> for example if player hit, what should happen?
     -> trampoline effect etc.
-
-- Skapa mob/weapon/item
-    - Alla har ett object (nu mob)
-    - Varje del har egna funktioner
-        - Weapon har shoot etc.
-        - Mob har jump etc.
 
 - Object class
     - Physics

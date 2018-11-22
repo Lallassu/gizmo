@@ -12,6 +12,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"image"
+	"math"
 )
 
 type object struct {
@@ -20,7 +21,8 @@ type object struct {
 	model       *imdraw.IMDraw
 	canvas      *pixelgl.Canvas
 	bounds      *Bounds
-	objectType  entityType
+	entityType  entityType
+	objectType  objectType
 	mass        float64
 	restitution float64
 	height      int
@@ -36,6 +38,7 @@ type object struct {
 	fy          float64
 	scale       float64
 	owner       Entity
+	rotation    float64
 }
 
 //=============================================================
@@ -265,6 +268,11 @@ func (o *object) draw(dt float64) {
 		o.physics(dt)
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
 		o.unStuck(dt)
+	} else {
+		mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
+		mouse.X = math.Abs(mouse.X - o.bounds.X)
+		mouse.Y = mouse.Y - o.bounds.Y
+		o.rotation = math.Atan2(mouse.Y, mouse.X)
 	}
 }
 
@@ -295,5 +303,22 @@ func (o *object) unStuck(dt float64) {
 		o.bounds.Y += 10 * o.mass * dt
 	} else if top {
 		o.bounds.Y -= 10 * o.mass * dt
+	}
+}
+
+//=============================================================
+//
+//=============================================================
+func (o *object) shoot() {
+	// Check weapon type and create appropriate ammo.
+	switch o.objectType {
+	case weaponAk47:
+		Debug("Ak47 BANG!")
+	case weaponRocket:
+		Debug("Rocket BANG!")
+	case weaponGrenade:
+		Debug("Grenade BANG!")
+	default:
+		Debug("Unknown BANG!")
 	}
 }

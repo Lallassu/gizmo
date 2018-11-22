@@ -10,10 +10,10 @@ const (
 	mapWtf
 )
 
-type weaponType int
+type objectType int
 
 const (
-	weaponAk47 weaponType = iota
+	weaponAk47 objectType = iota
 	weaponRocket
 	weaponGrenade
 )
