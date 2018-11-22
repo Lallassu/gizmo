@@ -92,7 +92,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 }
 
 //=============================================================
-// Draw the canvas
+// Create the particle engine pool
 //=============================================================
 func (pe *particleEngine) create() {
 	pe.particles = make([]particle, wParticlesMax)

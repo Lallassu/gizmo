@@ -60,6 +60,7 @@ func setup() {
 	global.gWorld.Init()
 	global.gWorld.NewMap(mapEasy)
 	global.gParticleEngine.create()
+	global.gAmmoEngine.create()
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 2
 	global.gWin.SetSmooth(false)
@@ -110,6 +111,7 @@ func gameLoop() {
 		global.gController.update(dt)
 		global.gWorld.Draw(dt)
 		global.gParticleEngine.update(dt)
+		global.gAmmoEngine.update(dt)
 		global.gCamera.update(dt)
 
 		global.gWin.Update()

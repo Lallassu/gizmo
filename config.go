@@ -37,6 +37,7 @@ const (
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
 	wParticlesMax        = 4000
+	wAmmoMax             = 2000
 	wDoorLen             = 30
 	wDoorHeight          = 40
 )
@@ -55,6 +56,7 @@ type Global struct {
 	gClearColor     pixel.RGBA
 	gWin            *pixelgl.Window
 	gController     *controller
+	gAmmoEngine     *ammoEngine
 }
 
 var global = &Global{
@@ -68,4 +70,5 @@ var global = &Global{
 	gParticleEngine: &particleEngine{},
 	gClearColor:     pixel.RGBA{0.4, 0.4, 0.4, 1.0},
 	gWin:            &pixelgl.Window{},
+	gAmmoEngine:     &ammoEngine{},
 }

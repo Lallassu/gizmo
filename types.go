@@ -10,6 +10,14 @@ const (
 	mapWtf
 )
 
+type ammoType int
+
+const (
+	ammoRegular ammoType = iota
+	ammoMissile
+	ammoShotgun
+)
+
 type objectType int
 
 const (

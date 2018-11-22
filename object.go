@@ -313,12 +313,20 @@ func (o *object) shoot() {
 	// Check weapon type and create appropriate ammo.
 	switch o.objectType {
 	case weaponAk47:
-		Debug("Ak47 BANG!")
+		global.gAmmoEngine.newAmmo(ammo{x: o.bounds.X,
+			y:     o.bounds.Y,
+			color: 0xFF0000FF,
+			size:  0.5,
+			life:  10.0,
+			mass:  10,
+			fx:    10.0,
+			fy:    10.0,
+			power: 2,
+			vx:    10.0 * o.owner.(*mob).dir,
+			vy:    10.0 * o.rotation,
+		})
 	case weaponRocket:
-		Debug("Rocket BANG!")
 	case weaponGrenade:
-		Debug("Grenade BANG!")
 	default:
-		Debug("Unknown BANG!")
 	}
 }

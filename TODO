@@ -4,8 +4,11 @@ General
 
 - Ammo class
     - pixels?
+    - Pool?
+    - Ammo should hit by looking up QT
+      or by hitting pixels (wall)
 
-- 
+- Sound class
 
 
 - Fix jump, now dependent on CPU speed
@@ -31,11 +34,6 @@ General
     - Impl. entity if
     - Possible Owner: entity
 
-- Ammo class
-    - Read texture
-    - Create canvas
-    - Physics
-    - pool
 
 - GLSL for lights
 - More details in maps
