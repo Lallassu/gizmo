@@ -24,7 +24,7 @@ type chunk struct {
 //=============================================================
 // Impl. the Entity interface
 //=============================================================
-func (c *chunk) hit(x, y float64) bool {
+func (c *chunk) hit(x, y, vx, vy float64) bool {
 	return false
 }
 
@@ -70,7 +70,7 @@ func (c *chunk) draw(dt float64) {
 		c.bdt = 0
 		c.build()
 	}
-	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+c.bounds.Width/2, c.bounds.Y+c.bounds.Height/2)))
+	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+(c.bounds.Width)/2, c.bounds.Y+c.bounds.Height/2)))
 }
 
 //=============================================================
@@ -116,6 +116,7 @@ func (c *chunk) build() {
 
 			model.Push(
 				pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
+				//pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
 				pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
 			)
 			model.Rectangle(0)

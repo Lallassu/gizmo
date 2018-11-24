@@ -10,7 +10,7 @@ import (
 )
 
 type Entity interface {
-	hit(x, y float64) bool
+	hit(x, y, vx, vy float64) bool
 	explode()
 	getMass() float64
 	getType() entityType

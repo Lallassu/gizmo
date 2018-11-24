@@ -21,28 +21,28 @@ type particleEngine struct {
 //=============================================================
 // Blood effect
 //=============================================================
-func (pe *particleEngine) effectBlood(x, y float64, size int) {
+func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 	for i := 0; i < 3; i++ {
 		r := 175 + rand.Intn(50)
 		g := 10 + rand.Intn(20)
 		b := 10 + rand.Intn(20)
 		a := 20 + rand.Intn(220)
-		pe.newParticle(
-			particle{
-				x:           float64(x),
-				y:           float64(y),
-				size:        rand.Float64() * 3,
-				restitution: -0.1 - rand.Float64()/4,
-				life:        wParticleDefaultLife,
-				fx:          rand.Float64() * 5,
-				fy:          rand.Float64() * 5,
-				vx:          float64(5 - rand.Intn(10)),
-				vy:          float64(5 - rand.Intn(10)),
-				mass:        2,
-				pType:       particleRegular,
-				color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
-				static:      true,
-			})
+
+		pe.newParticle(particle{
+			x:           float64(x),
+			y:           float64(y),
+			size:        rand.Float64() * 3,
+			restitution: -0.1 - rand.Float64()/4,
+			life:        wParticleDefaultLife,
+			fx:          rand.Float64() * 5,
+			fy:          rand.Float64() * 5,
+			vx:          vx / 2, //float64(5 - rand.Intn(10)),
+			vy:          float64(5 - rand.Intn(10)),
+			mass:        2,
+			pType:       particleRegular,
+			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
+			static:      true,
+		})
 	}
 
 }

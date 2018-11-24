@@ -10,6 +10,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/pkg/profile"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -64,7 +65,6 @@ func setup() {
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 2
 	global.gWin.SetSmooth(false)
-
 }
 
 //=============================================================
@@ -77,18 +77,44 @@ func gameLoop() {
 	frames := 0
 
 	// Load a bunch of weapons
-	for _, x := range []string{"ak47.png", "p90.png", "rocketlauncher.png", "shotgun.png"} {
+	for _, x := range []string{"ak47_weapon.png", "p90_weapon.png", "rocketlauncher_weapon.png", "shotgun_weapon.png", "crate_obj.png"} {
+		var otype objectType
+		scale := 0.15
+
+		if strings.Contains(x, "_weapon") {
+			otype = objectWeapon
+		} else if strings.Contains(x, "_obj") {
+			otype = objectCrate
+			scale = 0.8
+		}
+
 		objTest := object{
 			textureFile: fmt.Sprintf("assets/objects/%v", x),
 			entityType:  entityObject,
-			scale:       0.15,
+			objectType:  otype,
+			scale:       scale,
 		}
 		objTest.create(100+float64(rand.Intn(50)), 180+float64(rand.Intn(50)))
 	}
 
+	for i := 0; i < 50; i++ {
+		test := mob{
+			sheetFile:   "assets/mobs/enemy1.png",
+			walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
+			idleFrames:  []int{0, 2, 3, 4, 5, 6},
+			shootFrames: []int{26},
+			jumpFrames:  []int{15, 16, 17, 18, 19, 20},
+			climbFrames: []int{1, 7},
+			frameWidth:  12.0,
+			life:        100.0,
+			mobType:     entityEnemy,
+		}
+		test.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
+	}
+
 	// Load a player
 	test := mob{
-		sheetFile:   "test.png",
+		sheetFile:   "assets/mobs/player.png",
 		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
 		idleFrames:  []int{0, 2, 3, 4, 5, 6},
 		shootFrames: []int{26},

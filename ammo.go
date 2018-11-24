@@ -63,6 +63,7 @@ func (pe *ammoEngine) newAmmo(p ammo) {
 	}
 	newp := pe.bullets[pe.idx : pe.idx+1][0]
 	newp = p
+	newp.life = 3
 	newp.active = true
 	pe.bullets[pe.idx : pe.idx+1][0] = newp
 }
@@ -118,7 +119,7 @@ func (p *ammo) explode() {
 // Update ammo
 //=============================================================
 func (p *ammo) update(dt float64) {
-	if p.life <= 0 {
+	if p.life <= 0 || !p.active {
 		p.active = false
 		return
 	}
@@ -161,6 +162,15 @@ func (p *ammo) update(dt float64) {
 		} else {
 			p.x += lx
 			p.y += ly
+		}
+	}
+
+	// Check if hit object.
+	for _, x := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: p.x, Y: p.y, Width: 1, Height: 1}) {
+		if x.entity.getType() != entityChunk {
+			x.entity.hit(p.x, p.y, p.vx, p.vy)
+			p.explode()
+			break
 		}
 	}
 

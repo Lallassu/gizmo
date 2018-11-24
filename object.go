@@ -13,6 +13,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"math"
+	"math/rand"
 )
 
 type object struct {
@@ -39,6 +40,7 @@ type object struct {
 	scale       float64
 	owner       Entity
 	rotation    float64
+	active      bool
 }
 
 //=============================================================
@@ -53,6 +55,7 @@ func (o *object) create(x_, y_ float64) {
 	o.fy = 1
 	o.vx = 1
 	o.vy = 1
+	o.active = true
 
 	o.img, o.width, o.height, o.size = loadTexture(o.textureFile)
 
@@ -126,11 +129,39 @@ func (o *object) build() {
 //=============================================================
 //
 //=============================================================
-func (o *object) hit(x_, y_ float64) bool {
-	//x := int(math.Abs(float64(o.bounds.X - x_)))
-	//y := int(math.Abs(float64(o.bounds.Y - y_)))
+func (o *object) hit(x_, y_, vx, vy float64) bool {
+	if !o.active {
+		return false
+	}
 
-	o.build()
+	if o.objectType == objectCrate {
+		o.active = false
+		for x := 0; x < o.width; x++ {
+			for y := 0; y < o.height; y++ {
+				p := o.pixels[x*o.size+y]
+				o.pixels[x*o.size+y] = 0
+
+				global.gParticleEngine.newParticle(
+					particle{
+						x:           o.bounds.X + float64(x),
+						y:           o.bounds.Y + float64(y),
+						size:        1,
+						restitution: -0.1 - rand.Float64()/4,
+						life:        wParticleDefaultLife,
+						fx:          10,
+						fy:          10,
+						vx:          float64(5 - rand.Intn(10)),
+						vy:          float64(5 - rand.Intn(10)),
+						mass:        1,
+						pType:       particleRegular,
+						color:       p,
+						static:      true,
+					})
+			}
+		}
+		o.build()
+		// TBD: Remove from QT
+	}
 	return true
 }
 
@@ -148,6 +179,7 @@ func (o *object) isFree() bool {
 //
 //=============================================================
 func (o *object) explode() {
+	Debug("Explode")
 }
 
 //=============================================================
@@ -264,6 +296,10 @@ func (o *object) physics(dt float64) {
 //
 //=============================================================
 func (o *object) draw(dt float64) {
+	if !o.active {
+		return
+	}
+
 	if o.owner == nil {
 		o.physics(dt)
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
@@ -312,12 +348,13 @@ func (o *object) unStuck(dt float64) {
 func (o *object) shoot() {
 	// Check weapon type and create appropriate ammo.
 	switch o.objectType {
-	case weaponAk47:
-		global.gAmmoEngine.newAmmo(ammo{x: o.bounds.X,
+	case objectWeapon:
+		// Check type of weapon (name?)
+		global.gAmmoEngine.newAmmo(ammo{x: o.bounds.X + o.owner.(*mob).dir*o.bounds.Width/2 + 1,
 			y:     o.bounds.Y,
 			color: 0xFF0000FF,
 			size:  0.5,
-			life:  10.0,
+			life:  3.0,
 			mass:  10,
 			fx:    10.0,
 			fy:    10.0,
@@ -325,8 +362,6 @@ func (o *object) shoot() {
 			vx:    10.0 * o.owner.(*mob).dir,
 			vy:    10.0 * o.rotation,
 		})
-	case weaponRocket:
-	case weaponGrenade:
 	default:
 	}
 }

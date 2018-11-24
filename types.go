@@ -21,9 +21,8 @@ const (
 type objectType int
 
 const (
-	weaponAk47 objectType = iota
-	weaponRocket
-	weaponGrenade
+	objectWeapon objectType = iota
+	objectCrate
 )
 
 type particleType int

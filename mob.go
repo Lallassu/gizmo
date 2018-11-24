@@ -137,16 +137,15 @@ func (m *mob) buildFrames() {
 //=============================================================
 //
 //=============================================================
-func (m *mob) hit(x_, y_ float64) bool {
+func (m *mob) hit(x_, y_, vx, vy float64) bool {
+	global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
+
 	x := int(math.Abs(float64(m.bounds.X - x_)))
 	y := int(math.Abs(float64(m.bounds.Y - y_)))
 	for i := 0; i < len(m.frames); i++ {
 		pos := m.size*x + y
 		if pos >= 0 && pos < m.frameWidth*m.frameWidth {
 			if m.frames[i][pos] != 0 {
-				// Add some blood
-				global.gParticleEngine.effectBlood(x_, y_, 1)
-
 				// Remove part
 				m.frames[i][pos] = 0
 				global.gParticleEngine.newParticle(
@@ -158,7 +157,7 @@ func (m *mob) hit(x_, y_ float64) bool {
 						life:        wParticleDefaultLife,
 						fx:          10,
 						fy:          10,
-						vx:          float64(5 - rand.Intn(10)),
+						vx:          vx, //float64(5 - rand.Intn(10)),
 						vy:          float64(5 - rand.Intn(10)),
 						mass:        1,
 						pType:       particleRegular,
@@ -178,6 +177,7 @@ func (m *mob) hit(x_, y_ float64) bool {
 func (m *mob) shoot() {
 	if m.carry != nil {
 		m.carry.shoot()
+		m.currentAnim = animShoot
 	}
 }
 
@@ -402,8 +402,15 @@ func (m *mob) unStuck(dt float64) {
 //
 //=============================================================
 func (m *mob) draw(dt float64) {
+	shooting := false
+	if m.currentAnim == animShoot {
+		shooting = true
+	}
 	// Update physics
 	m.physics(dt)
+	if shooting {
+		m.currentAnim = animShoot
+	}
 
 	// Update animation
 	m.animCounter += dt

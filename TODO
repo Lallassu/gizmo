@@ -1,12 +1,13 @@
 General
 --------
+- Remove from QT
+
 - Vector för vilket håll en "hit" kommer från.
+- Testa enemy + skjuten + blood splatter + % destroyed etc.
 
 - Ammo class
-    - pixels?
-    - Pool?
+    - Fix lagg
     - Ammo should hit by looking up QT
-      or by hitting pixels (wall)
 
 - Sound class
 
@@ -16,24 +17,9 @@ General
 - Fix so that saveMove works like a queue
 - Only saveMove when mob actually changed position
 
-
 - Event handler for objects
     -> for example if player hit, what should happen?
     -> trampoline effect etc.
-
-- Object class
-    - Physics
-        - Handle bounce-rate.
-        - pushable
-    - breakable
-    - Can be a weapon
-        - Shoot
-        - Pickup
-        - Drop
-        - Throw
-    - Impl. entity if
-    - Possible Owner: entity
-
 
 - GLSL for lights
 - More details in maps
