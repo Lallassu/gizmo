@@ -129,11 +129,63 @@ func (o *object) build() {
 //=============================================================
 //
 //=============================================================
-func (o *object) hit(x_, y_, vx, vy float64) bool {
-	if !o.active {
-		return false
+func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
+	x := int(math.Abs(float64(o.bounds.X - x_)))
+	y := int(math.Abs(float64(o.bounds.Y - y_)))
+
+	pow := power * power
+	for rx := x - power; rx <= x+power; rx++ {
+		xx := (rx - x) * (rx - x)
+		for ry := y - power; ry <= y+power; ry++ {
+			if ry < 0 {
+				continue
+			}
+			val := (ry-y)*(ry-y) + xx
+			if val < pow {
+				pos := o.size*rx + ry
+				if pos >= 0 && pos < o.size*o.size {
+					if o.pixels[pos] != 0 {
+						o.pixels[pos] = 0
+						global.gParticleEngine.newParticle(
+							particle{
+								x:           float64(x_),
+								y:           float64(y_),
+								size:        1,
+								restitution: -0.1 - rand.Float64()/4,
+								life:        wParticleDefaultLife,
+								fx:          10,
+								fy:          10,
+								vx:          vx, //float64(5 - rand.Intn(10)),
+								vy:          float64(5 - rand.Intn(10)),
+								mass:        1,
+								pType:       particleRegular,
+								color:       o.pixels[pos],
+								static:      true,
+							})
+					}
+				}
+			}
+		}
 	}
 
+	o.build()
+	return true
+}
+
+//=============================================================
+//
+//=============================================================
+func (o *object) isFree() bool {
+	if o.owner == nil {
+		return true
+	}
+	return false
+}
+
+//=============================================================
+//
+//=============================================================
+func (o *object) explode() {
 	if o.objectType == objectCrate {
 		o.active = false
 		for x := 0; x < o.width; x++ {
@@ -162,24 +214,6 @@ func (o *object) hit(x_, y_, vx, vy float64) bool {
 		o.build()
 		// TBD: Remove from QT
 	}
-	return true
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) isFree() bool {
-	if o.owner == nil {
-		return true
-	}
-	return false
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) explode() {
-	Debug("Explode")
 }
 
 //=============================================================
@@ -350,17 +384,19 @@ func (o *object) shoot() {
 	switch o.objectType {
 	case objectWeapon:
 		// Check type of weapon (name?)
-		global.gAmmoEngine.newAmmo(ammo{x: o.bounds.X + o.owner.(*mob).dir*o.bounds.Width/2 + 1,
-			y:     o.bounds.Y,
-			color: 0xFF0000FF,
-			size:  0.5,
+		global.gAmmoEngine.newAmmo(ammo{
+			x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
+			y:     o.bounds.Y + o.bounds.Height,
+			color: 0x55AA00FF,
+			size:  0.8,
 			life:  3.0,
-			mass:  10,
+			mass:  1,
 			fx:    10.0,
 			fy:    10.0,
 			power: 2,
 			vx:    10.0 * o.owner.(*mob).dir,
 			vy:    10.0 * o.rotation,
+			owner: o.owner,
 		})
 	default:
 	}

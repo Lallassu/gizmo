@@ -10,6 +10,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"math"
+	"reflect"
 )
 
 type ammoEngine struct {
@@ -30,6 +31,7 @@ type ammo struct {
 	fx       float64
 	fy       float64
 	power    int
+	owner    Entity
 
 	vx    float64
 	vy    float64
@@ -65,6 +67,7 @@ func (pe *ammoEngine) newAmmo(p ammo) {
 	newp = p
 	newp.life = 3
 	newp.active = true
+	newp.owner = p.owner
 	pe.bullets[pe.idx : pe.idx+1][0] = newp
 }
 
@@ -168,9 +171,18 @@ func (p *ammo) update(dt float64) {
 	// Check if hit object.
 	for _, x := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: p.x, Y: p.y, Width: 1, Height: 1}) {
 		if x.entity.getType() != entityChunk {
-			x.entity.hit(p.x, p.y, p.vx, p.vy)
-			p.explode()
-			break
+			isSelf := false
+			if reflect.TypeOf(x.entity) == reflect.TypeOf(&mob{}) {
+				if x.entity.(*mob) == p.owner.(*mob) {
+					// Don't shoot self.
+					isSelf = true
+				}
+			}
+			if !isSelf {
+				x.entity.hit(p.x, p.y, p.vx, p.vy, p.power)
+				p.explode()
+				break
+			}
 		}
 	}
 

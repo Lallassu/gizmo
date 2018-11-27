@@ -315,7 +315,7 @@ func (w *world) Explode(x_, y_ float64, power int) {
 	}
 
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: x_ - float64(power), Y: y_ - float64(power), Width: float64(power + power), Height: float64(power + power)}) {
-		v.entity.hit(x_, y_, 0, 0)
+		v.entity.hit(x_, y_, 0, 0, power)
 	}
 
 	// Add shadows

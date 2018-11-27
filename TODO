@@ -1,21 +1,20 @@
 General
 --------
+- Use reflections instead of interface getType()
+
 - Remove from QT
+    - Mobs + objects
 
-- Vector för vilket håll en "hit" kommer från.
-- Testa enemy + skjuten + blood splatter + % destroyed etc.
+- Better hit of enemies/objects. Seems to miss a bit now.
+    - Trace back on path?
 
-- Ammo class
-    - Fix lagg
-    - Ammo should hit by looking up QT
+- Shots should be fired from the barrel of the gun!
 
 - Sound class
 
+- Fix jump
+- Fix better walk (Smoother)
 
-- Fix jump, now dependent on CPU speed
-
-- Fix so that saveMove works like a queue
-- Only saveMove when mob actually changed position
 
 - Event handler for objects
     -> for example if player hit, what should happen?
@@ -29,6 +28,11 @@ General
     - Add fullscreen support
     - Controllers
     - Features (vsync etc)
+
+Prio2
+-------
+- Fix so that saveMove works like a queue
+- Only saveMove when mob actually changed position
 
 Classes
 -----------

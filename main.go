@@ -72,9 +72,9 @@ func setup() {
 //=============================================================
 func gameLoop() {
 	last := time.Now()
-	fps := time.Tick(time.Second / 1000)
-	second := time.Tick(time.Second)
-	frames := 0
+	//fps := time.Tick(time.Second / 60)
+	//second := time.Tick(time.Second)
+	//frames := 0
 
 	// Load a bunch of weapons
 	for _, x := range []string{"ak47_weapon.png", "p90_weapon.png", "rocketlauncher_weapon.png", "shotgun_weapon.png", "crate_obj.png"} {
@@ -88,16 +88,18 @@ func gameLoop() {
 			scale = 0.8
 		}
 
-		objTest := object{
-			textureFile: fmt.Sprintf("assets/objects/%v", x),
-			entityType:  entityObject,
-			objectType:  otype,
-			scale:       scale,
+		for i := 0; i < 20; i++ {
+			objTest := object{
+				textureFile: fmt.Sprintf("assets/objects/%v", x),
+				entityType:  entityObject,
+				objectType:  otype,
+				scale:       scale,
+			}
+			objTest.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
 		}
-		objTest.create(100+float64(rand.Intn(50)), 180+float64(rand.Intn(50)))
 	}
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 20; i++ {
 		test := mob{
 			sheetFile:   "assets/mobs/enemy1.png",
 			walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
@@ -124,7 +126,7 @@ func gameLoop() {
 		life:        100.0,
 		mobType:     entityPlayer,
 	}
-	test.create(100, 120)
+	test.create(100, 320)
 	global.gController.setActiveEntity(&test)
 	global.gCamera.setFollow(&test)
 
@@ -142,8 +144,8 @@ func gameLoop() {
 
 		global.gWin.Update()
 
-		<-fps
-		updateFPSDisplay(global.gWin, &frames, second)
+		//	<-fps
+		//	updateFPSDisplay(global.gWin, &frames, second)
 	}
 }
 

@@ -26,7 +26,7 @@ func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 		r := 175 + rand.Intn(50)
 		g := 10 + rand.Intn(20)
 		b := 10 + rand.Intn(20)
-		a := 20 + rand.Intn(220)
+		a := 100 + rand.Intn(150)
 
 		pe.newParticle(particle{
 			x:           float64(x),

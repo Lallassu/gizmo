@@ -45,7 +45,7 @@ type mob struct {
 	force       pixel.Vec
 	restitution float64
 	climbing    bool
-	jumping     float64
+	jumping     bool
 	jumpPower   float64
 }
 
@@ -137,36 +137,49 @@ func (m *mob) buildFrames() {
 //=============================================================
 //
 //=============================================================
-func (m *mob) hit(x_, y_, vx, vy float64) bool {
+func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 	global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 
 	x := int(math.Abs(float64(m.bounds.X - x_)))
 	y := int(math.Abs(float64(m.bounds.Y - y_)))
-	for i := 0; i < len(m.frames); i++ {
-		pos := m.size*x + y
-		if pos >= 0 && pos < m.frameWidth*m.frameWidth {
-			if m.frames[i][pos] != 0 {
-				// Remove part
-				m.frames[i][pos] = 0
-				global.gParticleEngine.newParticle(
-					particle{
-						x:           float64(x_),
-						y:           float64(y_),
-						size:        1,
-						restitution: -0.1 - rand.Float64()/4,
-						life:        wParticleDefaultLife,
-						fx:          10,
-						fy:          10,
-						vx:          vx, //float64(5 - rand.Intn(10)),
-						vy:          float64(5 - rand.Intn(10)),
-						mass:        1,
-						pType:       particleRegular,
-						color:       m.frames[i][pos],
-						static:      true,
-					})
+
+	pow := power * power
+	for rx := x - power; rx <= x+power; rx++ {
+		xx := (rx - x) * (rx - x)
+		for ry := y - power; ry <= y+power; ry++ {
+			if ry < 0 {
+				continue
+			}
+			val := (ry-y)*(ry-y) + xx
+			if val < pow {
+				for i := 0; i < len(m.frames); i++ {
+					pos := m.size*rx + ry
+					if pos >= 0 && pos < m.size*m.size {
+						if m.frames[i][pos] != 0 {
+							m.frames[i][pos] = 0
+							global.gParticleEngine.newParticle(
+								particle{
+									x:           float64(x_),
+									y:           float64(y_),
+									size:        1,
+									restitution: -0.1 - rand.Float64()/4,
+									life:        wParticleDefaultLife,
+									fx:          10,
+									fy:          10,
+									vx:          vx, //float64(5 - rand.Intn(10)),
+									vy:          float64(5 - rand.Intn(10)),
+									mass:        1,
+									pType:       particleRegular,
+									color:       m.frames[i][pos],
+									static:      true,
+								})
+						}
+					}
+				}
 			}
 		}
 	}
+
 	m.buildFrames()
 	return true
 }
@@ -205,6 +218,34 @@ func (m *mob) throw() {
 //
 //=============================================================
 func (m *mob) explode() {
+	for i := 0; i < len(m.frames); i++ {
+		for x := 0; x < m.frameWidth; x++ {
+			for y := 0; y < m.frameHeight; y++ {
+				pos := m.size*x + y
+				if m.frames[i][pos] != 0 {
+					// Remove part
+					global.gParticleEngine.newParticle(
+						particle{
+							x:           m.bounds.X + float64(x),
+							y:           m.bounds.Y + float64(y),
+							size:        1,
+							restitution: -0.1 - rand.Float64()/4,
+							life:        wParticleDefaultLife,
+							fx:          10,
+							fy:          10,
+							vx:          float64(5 - rand.Intn(10)),
+							vy:          float64(5 - rand.Intn(20)),
+							mass:        1,
+							pType:       particleRegular,
+							color:       m.frames[i][pos],
+							static:      true,
+						})
+				}
+				m.frames[i][pos] = 0
+			}
+		}
+	}
+	m.buildFrames()
 }
 
 //=============================================================
@@ -212,8 +253,8 @@ func (m *mob) explode() {
 //=============================================================
 func (m *mob) move(dx, dy float64) {
 	// Add the force, movenment is handled in the physics function
-	m.force.X += dx * m.speed
-	m.force.Y += dy * m.speed
+	m.force.X = dx * m.speed
+	m.force.Y = dy * m.speed
 
 	// Rotation of animation
 	if dx != 0 {
@@ -265,11 +306,11 @@ func (m *mob) setPosition(x, y float64) {
 // TBD: Fix so that it works like a queue!
 //=============================================================
 func (m *mob) saveMove() {
-	m.prevPos = append(m.prevPos, pixel.Vec{m.bounds.X, m.bounds.Y})
-	// TBD: Only remove every second or something
-	if len(m.prevPos) > 100 {
-		m.prevPos = m.prevPos[:100]
-	}
+	// m.prevPos = append(m.prevPos, pixel.Vec{m.bounds.X, m.bounds.Y})
+	// // TBD: Only remove every second or something
+	// if len(m.prevPos) > 100 {
+	// 	m.prevPos = m.prevPos[:100]
+	// }
 }
 
 //=============================================================
@@ -288,31 +329,28 @@ func (m *mob) physics(dt float64) {
 		}
 	}
 
-	if m.jumping > 0 {
+	if m.jumping {
 		// Simplified jumping
-		if m.jumping > m.jumpPower/2 {
-			m.force.Y += m.speed * dt * (10 / m.jumping)
-		} else {
-			m.force.Y = -m.speed * dt * (10 / m.jumping)
-		}
+		m.force.Y -= m.speed * dt
 		if !m.IsOnWall() {
 			m.bounds.Y += m.force.Y
 			m.bounds.X += m.force.X / 2
 			m.currentAnim = animJump
 		}
-		m.jumping--
 	} else {
-		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && m.jumping <= 0 {
+		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && !m.jumping {
 			// Jump from ladder
-			m.jumping = m.jumpPower
+			m.jumping = true
+			m.force.Y = m.jumpPower
 		} else if m.IsOnLadder() {
 			// Climb
 			m.bounds.Y += m.force.Y / 2
 			m.currentAnim = animClimb
 		} else if m.IsOnGround() {
 			// Jump
-			if m.force.Y > 0 && m.jumping <= 0 && !m.IsOnLadder() {
-				m.jumping = m.jumpPower
+			if m.force.Y > 0 && !m.jumping && !m.IsOnLadder() {
+				m.jumping = true
+				m.force.Y = m.jumpPower
 			}
 		} else {
 			m.bounds.Y += global.gWorld.gravity * dt * m.mass
