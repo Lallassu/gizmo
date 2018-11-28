@@ -72,7 +72,7 @@ func setup() {
 //=============================================================
 func gameLoop() {
 	last := time.Now()
-	//fps := time.Tick(time.Second / 60)
+	//fps := time.Tick(time.Second / 1000)
 	//second := time.Tick(time.Second)
 	//frames := 0
 
@@ -85,10 +85,10 @@ func gameLoop() {
 			otype = objectWeapon
 		} else if strings.Contains(x, "_obj") {
 			otype = objectCrate
-			scale = 0.8
+			scale = 1
 		}
 
-		for i := 0; i < 20; i++ {
+		for i := 0; i < 5; i++ {
 			objTest := object{
 				textureFile: fmt.Sprintf("assets/objects/%v", x),
 				entityType:  entityObject,
@@ -99,7 +99,7 @@ func gameLoop() {
 		}
 	}
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 10; i++ {
 		test := mob{
 			sheetFile:   "assets/mobs/enemy1.png",
 			walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
@@ -144,8 +144,8 @@ func gameLoop() {
 
 		global.gWin.Update()
 
-		//	<-fps
-		//	updateFPSDisplay(global.gWin, &frames, second)
+		// <-fps
+		// updateFPSDisplay(global.gWin, &frames, second)
 	}
 }
 

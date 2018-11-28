@@ -7,7 +7,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
+	_ "github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"math"
 	"reflect"
@@ -17,6 +17,7 @@ type ammoEngine struct {
 	canvas  *pixelgl.Canvas
 	bullets []ammo
 	idx     int
+	batch   *pixel.Batch
 }
 
 type ammo struct {
@@ -45,9 +46,10 @@ type ammo struct {
 //=============================================================
 func (pe *ammoEngine) create() {
 	pe.bullets = make([]ammo, wAmmoMax)
-	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.height), float64(global.gWorld.width)))
+	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
+	pe.canvas.Clear(pixel.RGBA{1, 0, 0, 1})
+	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 
-	// Use a channel for ammos.
 	for i := 0; i < wAmmoMax; i++ {
 		p := ammo{active: false}
 		pe.bullets = append(pe.bullets, p)
@@ -75,37 +77,19 @@ func (pe *ammoEngine) newAmmo(p ammo) {
 // Draw the canvas
 //=============================================================
 func (pe *ammoEngine) update(dt float64) {
+	pe.batch.Clear()
 	for i, _ := range pe.bullets {
 		if pe.bullets[i].active {
 			pe.bullets[i].update(dt)
+			pe.canvas.Clear(pixel.RGBA{
+				float64((pe.bullets[i].color >> 24 & 0xFF)) / 255.0,
+				float64((pe.bullets[i].color >> 16 & 0xFF)) / 255.0,
+				float64((pe.bullets[i].color >> 8 & 0xFF)) / 255.0,
+				1})
+			pe.canvas.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, 1).Moved(pixel.V(pe.bullets[i].x, pe.bullets[i].y)))
 		}
 	}
-	pe.build()
-	pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.height/2), float64(global.gWorld.width/2))))
-}
-
-//=============================================================
-// Build ammo canvas
-//=============================================================
-func (pe *ammoEngine) build() {
-	model := imdraw.New(nil)
-	for _, p := range pe.bullets {
-		if p.active {
-			model.Color = pixel.RGB(
-				float64(p.color>>24&0xFF)/255.0,
-				float64(p.color>>16&0xFF)/255.0,
-				float64(p.color>>8&0xFF)/255.0,
-			).Mul(pixel.Alpha(float64(p.color&0xFF) / 255.0))
-
-			model.Push(
-				pixel.V(float64(p.x), float64(p.y)),
-				pixel.V(float64(p.x+p.size), float64(p.y+p.size)),
-			)
-			model.Rectangle(0)
-		}
-	}
-	pe.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	model.Draw(pe.canvas)
+	pe.batch.Draw(global.gWin)
 }
 
 //=============================================================
@@ -180,7 +164,8 @@ func (p *ammo) update(dt float64) {
 			}
 			if !isSelf {
 				x.entity.hit(p.x, p.y, p.vx, p.vy, p.power)
-				p.explode()
+				//p.explode()
+				p.active = false
 				break
 			}
 		}

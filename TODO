@@ -1,14 +1,15 @@
 General
 --------
+- Batch for particleEngine
+- Batch for chunks!?
+
 - Use reflections instead of interface getType()
+ 
+- Handle scale for objects Hit() functions
 
 - Remove from QT
     - Mobs + objects
 
-- Better hit of enemies/objects. Seems to miss a bit now.
-    - Trace back on path?
-
-- Shots should be fired from the barrel of the gun!
 
 - Sound class
 

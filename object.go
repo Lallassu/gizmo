@@ -390,7 +390,7 @@ func (o *object) shoot() {
 			color: 0x55AA00FF,
 			size:  0.8,
 			life:  3.0,
-			mass:  1,
+			mass:  5,
 			fx:    10.0,
 			fy:    10.0,
 			power: 2,
