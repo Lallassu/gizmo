@@ -16,6 +16,8 @@ type particleEngine struct {
 	canvas    *pixelgl.Canvas
 	particles []particle
 	idx       int
+	batch     *pixel.Batch
+	colors    []uint8
 }
 
 //=============================================================
@@ -92,11 +94,51 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 }
 
 //=============================================================
+// Add or verify that the color exists in batch canvas.
+//=============================================================
+func (pe *particleEngine) addColorToBatch(color uint32) int {
+	exists := false
+	r := uint8(color >> 24 & 0xFF)
+	g := uint8(color >> 16 & 0xFF)
+	b := uint8(color >> 8 & 0xFF)
+	a := uint8(color & 0xFF)
+
+	for i := 0; i < len(pe.colors); i += 4 {
+		if r == pe.colors[i] && g == pe.colors[i+1] && b == pe.colors[i+2] && a == pe.colors[i+3] {
+			exists = true
+			break
+		}
+	}
+
+	if !exists {
+		pe.colors = append(pe.colors, r, g, b, a)
+		// Add to batch canvas.
+		pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(len(pe.colors)/4), 0))
+		pe.canvas.SetPixels(pe.colors)
+		pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
+	}
+	return 0
+}
+
+//=============================================================
 // Create the particle engine pool
 //=============================================================
 func (pe *particleEngine) create() {
+	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 255*255*255, 1))
+	//pe.canvas.Clear(pixel.RGBA{0, 0, 0, 1})
+	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
+
 	pe.particles = make([]particle, wParticlesMax)
-	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.height), float64(global.gWorld.width)))
+	//pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.height), float64(global.gWorld.width)))
+
+	// Initiate canvas.
+	for r := 0; r < 0xFF; r++ {
+		for g := 0; g < 0xFF; g++ {
+			for b := 0; b < 0xFF; b++ {
+				pe.colors = append(pe.colors, uint8(r), uint8(g), uint8(b))
+			}
+		}
+	}
 
 	// Use a channel for particles.
 	for i := 0; i < wParticlesMax; i++ {
@@ -115,6 +157,8 @@ func (pe *particleEngine) newParticle(p particle) {
 		pe.idx = 0
 	}
 	newp := pe.particles[pe.idx : pe.idx+1][0]
+	// Check if color are defined if not,create and add to batch
+	//pe.addColorToBatch(p.color)
 	// Make a shallow copy, no pointers in particle so we're fine.
 	newp = p
 	newp.active = true
@@ -126,13 +170,30 @@ func (pe *particleEngine) newParticle(p particle) {
 // Draw the canvas
 //=============================================================
 func (pe *particleEngine) update(dt float64) {
+	pe.batch.Clear()
+	sprite := pixel.NewSprite(pe.canvas, pixel.R(0, 0, 1, 1))
 	for i, _ := range pe.particles {
 		if pe.particles[i].active {
 			pe.particles[i].update(dt)
+			color := pe.particles[i].color
+			r := uint8(color >> 24 & 0xFF)
+			g := uint8(color >> 16 & 0xFF)
+			b := uint8(color >> 8 & 0xFF)
+			//a := uint8(color & 0xFF)
+			sprite.Set(pe.canvas, pixel.R(float64(r*g*b), 0, float64(r*g*b+1), 1))
+			// //canvas.SetBounds(pixel.R(0, 0, pe.particles[i].size, pe.particles[i].size))
+			// sprite.Clear(pixel.RGBA{
+			// 	float64((pe.particles[i].color >> 24 & 0xFF)) / 255.0,
+			// 	float64((pe.particles[i].color >> 16 & 0xFF)) / 255.0,
+			// 	float64((pe.particles[i].color >> 8 & 0xFF)) / 255.0,
+			// 	float64((pe.particles[i].color & 0xFF)) / 255.0,
+			// })
+			sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
 		}
 	}
-	pe.build()
-	pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.height/2), float64(global.gWorld.width/2))))
+	pe.batch.Draw(global.gWin)
+	//pe.build()
+	//pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.height/2), float64(global.gWorld.width/2))))
 }
 
 //=============================================================

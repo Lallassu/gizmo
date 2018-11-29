@@ -387,7 +387,7 @@ func (o *object) shoot() {
 		global.gAmmoEngine.newAmmo(ammo{
 			x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
 			y:     o.bounds.Y + o.bounds.Height,
-			color: 0x55AA00FF,
+			color: 0x555500FF,
 			size:  0.8,
 			life:  3.0,
 			mass:  5,

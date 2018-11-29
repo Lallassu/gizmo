@@ -47,7 +47,8 @@ type ammo struct {
 func (pe *ammoEngine) create() {
 	pe.bullets = make([]ammo, wAmmoMax)
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
-	pe.canvas.Clear(pixel.RGBA{1, 0, 0, 1})
+	pe.canvas.Clear(pixel.RGBA{0, 0, 0, 1})
+	//pe.canvas.SetSmooth(true)
 	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 
 	for i := 0; i < wAmmoMax; i++ {

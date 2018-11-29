@@ -36,7 +36,7 @@ const (
 	wViewMax             = 400
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
-	wParticlesMax        = 4000
+	wParticlesMax        = 10000
 	wAmmoMax             = 2000
 	wDoorLen             = 30
 	wDoorHeight          = 40
