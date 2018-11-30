@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/pkg/profile"
+	_ "github.com/pkg/profile"
 	"math/rand"
 	"strings"
 	"time"
@@ -19,7 +19,7 @@ import (
 //=============================================================
 func main() {
 	//defer profile.Start().Stop()
-	defer profile.Start(profile.MemProfile).Stop()
+	//defer profile.Start(profile.MemProfile).Stop()
 	pixelgl.Run(run)
 }
 

@@ -145,7 +145,6 @@ func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
 				pos := o.size*rx + ry
 				if pos >= 0 && pos < o.size*o.size {
 					if o.pixels[pos] != 0 {
-						o.pixels[pos] = 0
 						global.gParticleEngine.newParticle(
 							particle{
 								x:           float64(x_),
@@ -162,6 +161,7 @@ func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
 								color:       o.pixels[pos],
 								static:      true,
 							})
+						o.pixels[pos] = 0
 					}
 				}
 			}

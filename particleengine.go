@@ -18,6 +18,7 @@ type particleEngine struct {
 	idx       int
 	batch     *pixel.Batch
 	colors    []uint8
+	colormap  map[uint32]int
 }
 
 //=============================================================
@@ -96,51 +97,32 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 //=============================================================
 // Add or verify that the color exists in batch canvas.
 //=============================================================
-func (pe *particleEngine) addColorToBatch(color uint32) int {
-	exists := false
-	r := uint8(color >> 24 & 0xFF)
-	g := uint8(color >> 16 & 0xFF)
-	b := uint8(color >> 8 & 0xFF)
-	a := uint8(color & 0xFF)
+func (pe *particleEngine) addColorToBatch(color uint32) {
+	// TBD: Optimize to just get color w/o alpha
+	r := color >> 24 & 0xFF
+	g := color >> 16 & 0xFF
+	b := color >> 8 & 0xFF
 
-	for i := 0; i < len(pe.colors); i += 4 {
-		if r == pe.colors[i] && g == pe.colors[i+1] && b == pe.colors[i+2] && a == pe.colors[i+3] {
-			exists = true
-			break
-		}
-	}
+	pos := r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF
+	if _, ok := pe.colormap[pos]; !ok {
+		pe.colors = append(pe.colors, uint8(r), uint8(g), uint8(b), 255.0)
+		pe.colormap[pos] = (len(pe.colors) / 4) - 1
 
-	if !exists {
-		pe.colors = append(pe.colors, r, g, b, a)
-		// Add to batch canvas.
-		pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(len(pe.colors)/4), 0))
+		pe.canvas.SetBounds(pixel.R(0, 0, float64(len(pe.colors)/4), 1))
 		pe.canvas.SetPixels(pe.colors)
-		pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 	}
-	return 0
 }
 
 //=============================================================
 // Create the particle engine pool
 //=============================================================
 func (pe *particleEngine) create() {
-	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 255*255*255, 1))
-	//pe.canvas.Clear(pixel.RGBA{0, 0, 0, 1})
+	pe.particles = make([]particle, wParticlesMax)
+	pe.colormap = make(map[uint32]int)
+
+	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)) // Max seems to be 2^14 per row
 	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 
-	pe.particles = make([]particle, wParticlesMax)
-	//pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.height), float64(global.gWorld.width)))
-
-	// Initiate canvas.
-	for r := 0; r < 0xFF; r++ {
-		for g := 0; g < 0xFF; g++ {
-			for b := 0; b < 0xFF; b++ {
-				pe.colors = append(pe.colors, uint8(r), uint8(g), uint8(b))
-			}
-		}
-	}
-
-	// Use a channel for particles.
 	for i := 0; i < wParticlesMax; i++ {
 		p := particle{active: false}
 		pe.particles = append(pe.particles, p)
@@ -157,10 +139,15 @@ func (pe *particleEngine) newParticle(p particle) {
 		pe.idx = 0
 	}
 	newp := pe.particles[pe.idx : pe.idx+1][0]
+
 	// Check if color are defined if not,create and add to batch
-	//pe.addColorToBatch(p.color)
+	pe.addColorToBatch(p.color)
+
 	// Make a shallow copy, no pointers in particle so we're fine.
 	newp = p
+	if p.size <= 0 {
+		p.size = 1
+	}
 	newp.active = true
 	newp.bounces = 0
 	pe.particles[pe.idx : pe.idx+1][0] = newp
@@ -176,60 +163,15 @@ func (pe *particleEngine) update(dt float64) {
 		if pe.particles[i].active {
 			pe.particles[i].update(dt)
 			color := pe.particles[i].color
-			r := uint8(color >> 24 & 0xFF)
-			g := uint8(color >> 16 & 0xFF)
-			b := uint8(color >> 8 & 0xFF)
-			//a := uint8(color & 0xFF)
-			sprite.Set(pe.canvas, pixel.R(float64(r*g*b), 0, float64(r*g*b+1), 1))
-			// //canvas.SetBounds(pixel.R(0, 0, pe.particles[i].size, pe.particles[i].size))
-			// sprite.Clear(pixel.RGBA{
-			// 	float64((pe.particles[i].color >> 24 & 0xFF)) / 255.0,
-			// 	float64((pe.particles[i].color >> 16 & 0xFF)) / 255.0,
-			// 	float64((pe.particles[i].color >> 8 & 0xFF)) / 255.0,
-			// 	float64((pe.particles[i].color & 0xFF)) / 255.0,
-			// })
+			r := color >> 24 & 0xFF
+			g := color >> 16 & 0xFF
+			b := color >> 8 & 0xFF
+			//a := color & 0xFF
+
+			pos := r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF
+			sprite.Set(pe.canvas, pixel.R(float64(pe.colormap[pos]), 0, float64(pe.colormap[pos]+1), 1))
 			sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
 		}
 	}
 	pe.batch.Draw(global.gWin)
-	//pe.build()
-	//pe.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.height/2), float64(global.gWorld.width/2))))
-}
-
-//=============================================================
-// Build particle canvas
-//=============================================================
-func (pe *particleEngine) build() {
-	model := imdraw.New(nil)
-	for _, p := range pe.particles {
-		if p.active {
-			model.Color = pixel.RGB(
-				float64(p.color>>24&0xFF)/255.0,
-				float64(p.color>>16&0xFF)/255.0,
-				float64(p.color>>8&0xFF)/255.0,
-			).Mul(pixel.Alpha(float64(p.color&0xFF) / 255.0))
-
-			model.Push(
-				pixel.V(float64(p.x), float64(p.y)),
-				pixel.V(float64(p.x+p.size), float64(p.y+p.size)),
-			)
-			model.Rectangle(0)
-
-			// Shadow test
-			if !global.gWorld.IsRegular(p.x+1, p.y-1) && !global.gWorld.IsShadow(p.x+1, p.y-1) {
-				model.Color = pixel.RGB(
-					0.4,
-					0.4,
-					0.4).Mul(pixel.Alpha(0.5))
-
-				model.Push(
-					pixel.V(float64(p.x+1), float64(p.y-1)),
-					pixel.V(float64(p.x+1+p.size), float64(p.y-1+p.size)),
-				)
-			}
-			model.Rectangle(0)
-		}
-	}
-	pe.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	model.Draw(pe.canvas)
 }
