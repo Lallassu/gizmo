@@ -7,7 +7,6 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"math/rand"
 )
@@ -98,13 +97,11 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 // Add or verify that the color exists in batch canvas.
 //=============================================================
 func (pe *particleEngine) addColorToBatch(color uint32) {
-	// TBD: Optimize to just get color w/o alpha
-	r := color >> 24 & 0xFF
-	g := color >> 16 & 0xFF
-	b := color >> 8 & 0xFF
-
-	pos := r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF
+	pos := color | 0xFF
 	if _, ok := pe.colormap[pos]; !ok {
+		r := color >> 24 & 0xFF
+		g := color >> 16 & 0xFF
+		b := color >> 8 & 0xFF
 		pe.colors = append(pe.colors, uint8(r), uint8(g), uint8(b), 255.0)
 		pe.colormap[pos] = (len(pe.colors) / 4) - 1
 

@@ -65,6 +65,7 @@ func setup() {
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 2
 	global.gWin.SetSmooth(false)
+	global.gTextures.load("packed.json")
 }
 
 //=============================================================

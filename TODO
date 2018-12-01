@@ -1,7 +1,15 @@
 General
 --------
-- Batch for particleEngine
-- Batch for chunks!?
+- One StaticObject and one DynamicObject
+    - Static: Use TextureLoader
+    - Dynamic: Handle Texture self (destructable)
+
+- Fix jump
+- Fix better walk (Smoother)
+- Weapon should be rotated more accurate 
+    -> Skip mouse support? Just shoot straight?
+
+- Optimise chunks somehow
 
 - Use reflections instead of interface getType()
  
@@ -10,11 +18,7 @@ General
 - Remove from QT
     - Mobs + objects
 
-
 - Sound class
-
-- Fix jump
-- Fix better walk (Smoother)
 
 
 - Event handler for objects

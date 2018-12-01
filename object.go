@@ -17,6 +17,7 @@ import (
 )
 
 type object struct {
+	static      bool
 	textureFile string
 	img         image.Image
 	model       *imdraw.IMDraw
@@ -76,12 +77,6 @@ func (o *object) create(x_, y_ float64) {
 			o.pixels[x*o.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 		}
 	}
-
-	// Generate some CD pixel for faster CD check.
-	//rand.Seed(time.Now().UTC().UnixNano())
-	//for x := 0; x < 20; x++ {
-	//	o.cdPixels = append(o.cdPixels, [2]uint32{uint32(rand.Intn(o.width)), uint32(rand.Intn(o.height))})
-	//}
 
 	o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
 
@@ -387,7 +382,7 @@ func (o *object) shoot() {
 		global.gAmmoEngine.newAmmo(ammo{
 			x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
 			y:     o.bounds.Y + o.bounds.Height,
-			color: 0x555500FF,
+			color: 0xFFFF33FF,
 			size:  0.8,
 			life:  3.0,
 			mass:  5,

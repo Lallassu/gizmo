@@ -57,6 +57,7 @@ type Global struct {
 	gWin            *pixelgl.Window
 	gController     *controller
 	gAmmoEngine     *ammoEngine
+	gTextures       *textures
 }
 
 var global = &Global{
@@ -71,4 +72,5 @@ var global = &Global{
 	gClearColor:     pixel.RGBA{0.4, 0.4, 0.4, 1.0},
 	gWin:            &pixelgl.Window{},
 	gAmmoEngine:     &ammoEngine{},
+	gTextures:       &textures{},
 }
