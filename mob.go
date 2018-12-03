@@ -60,7 +60,7 @@ func (m *mob) create(x, y float64) {
 	m.prevPos = make([]pixel.Vec, 100)
 
 	m.animRate = 0.1
-	m.jumpPower = 55.0
+	m.jumpPower = 4
 	m.speed = 200
 	m.mass = 50
 	m.currentAnim = animIdle
@@ -253,8 +253,10 @@ func (m *mob) explode() {
 //=============================================================
 func (m *mob) move(dx, dy float64) {
 	// Add the force, movenment is handled in the physics function
-	m.force.X = dx * m.speed
-	m.force.Y = dy * m.speed
+	m.force.X += dx * m.speed
+	if !m.jumping {
+		m.force.Y = dy * m.speed
+	}
 
 	// Rotation of animation
 	if dx != 0 {
@@ -331,17 +333,26 @@ func (m *mob) physics(dt float64) {
 
 	if m.jumping {
 		// Simplified jumping
-		m.force.Y -= m.speed * dt
+		if m.force.Y > 0 {
+			m.force.Y -= m.speed / 10 * dt
+		}
+
+		if m.IsOnLadder() {
+			m.jumping = false
+		}
 		if !m.IsOnWall() {
-			m.bounds.Y += m.force.Y
+			//m.bounds.Y += m.force.Y
+			m.bounds.Y += global.gWorld.gravity*dt*m.mass + m.force.Y
 			m.bounds.X += m.force.X / 2
 			m.currentAnim = animJump
+		} else if m.IsOnGround() {
+			m.jumping = false
 		}
 	} else {
 		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && !m.jumping {
 			// Jump from ladder
 			m.jumping = true
-			m.force.Y = m.jumpPower
+			m.force.Y *= m.jumpPower
 		} else if m.IsOnLadder() {
 			// Climb
 			m.bounds.Y += m.force.Y / 2
@@ -359,7 +370,9 @@ func (m *mob) physics(dt float64) {
 	}
 
 	m.force.X = 0
-	m.force.Y = 0
+	if !m.jumping {
+		m.force.Y = 0
+	}
 
 	// Check if stuck!
 	m.unStuck(dt)

@@ -1,15 +1,18 @@
 General
 --------
+
 - One StaticObject and one DynamicObject
     - Static: Use TextureLoader
     - Dynamic: Handle Texture self (destructable)
 
-- Fix jump
 - Fix better walk (Smoother)
+    - over pixels
+
 - Weapon should be rotated more accurate 
     -> Skip mouse support? Just shoot straight?
 
 - Optimise chunks somehow
+    - Alt 1: 
 
 - Use reflections instead of interface getType()
  
@@ -20,6 +23,7 @@ General
 
 - Sound class
 
+- Rename wPixelsPerChunk (wPixelsPerChunkSide)
 
 - Event handler for objects
     -> for example if player hit, what should happen?

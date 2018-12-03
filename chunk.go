@@ -42,6 +42,19 @@ func (c *chunk) getType() entityType {
 	return entityChunk
 }
 
+func (c *chunk) getPosition() pixel.Vec {
+	return pixel.Vec{c.bounds.X, c.bounds.Y}
+}
+
+func (c *chunk) setPosition(x, y float64) {
+	c.bounds.X = x
+	c.bounds.Y = y
+}
+
+func (c *chunk) getBounds() *Bounds {
+	return c.bounds
+}
+
 //=============================================================
 // Create a new chunk
 //=============================================================
@@ -71,28 +84,6 @@ func (c *chunk) draw(dt float64) {
 		c.build()
 	}
 	c.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+(c.bounds.Width)/2, c.bounds.Y+c.bounds.Height/2)))
-}
-
-//=============================================================
-// Get chunk position
-//=============================================================
-func (c *chunk) getPosition() pixel.Vec {
-	return pixel.Vec{c.bounds.X, c.bounds.Y}
-}
-
-//=============================================================
-// Set chunk position
-//=============================================================
-func (c *chunk) setPosition(x, y float64) {
-	c.bounds.X = x
-	c.bounds.Y = y
-}
-
-//=============================================================
-// Get bounds
-//=============================================================
-func (c *chunk) getBounds() *Bounds {
-	return c.bounds
 }
 
 //=============================================================
