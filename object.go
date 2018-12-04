@@ -388,7 +388,7 @@ func (o *object) shoot() {
 			mass:  5,
 			fx:    10.0,
 			fy:    10.0,
-			power: 2,
+			power: 10,
 			vx:    10.0 * o.owner.(*mob).dir,
 			vy:    10.0 * o.rotation,
 			owner: o.owner,

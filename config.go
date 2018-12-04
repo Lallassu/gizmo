@@ -69,7 +69,7 @@ var global = &Global{
 	gCamera:         &camera{},
 	gController:     &controller{},
 	gParticleEngine: &particleEngine{},
-	gClearColor:     pixel.RGBA{0.4, 0.4, 0.4, 1.0},
+	gClearColor:     pixel.RGBA{0.0, 0.0, 0.0, 1.0},
 	gWin:            &pixelgl.Window{},
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},

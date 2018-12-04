@@ -1,6 +1,8 @@
 General
 --------
 
+- Make jump CPU unbound
+
 - One StaticObject and one DynamicObject
     - Static: Use TextureLoader
     - Dynamic: Handle Texture self (destructable)

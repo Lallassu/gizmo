@@ -352,7 +352,7 @@ func (m *mob) physics(dt float64) {
 		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && !m.jumping {
 			// Jump from ladder
 			m.jumping = true
-			m.force.Y *= m.jumpPower
+			m.force.Y *= m.jumpPower * dt
 		} else if m.IsOnLadder() {
 			// Climb
 			m.bounds.Y += m.force.Y / 2

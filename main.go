@@ -145,8 +145,8 @@ func gameLoop() {
 
 		global.gWin.Update()
 
-		// <-fps
-		// updateFPSDisplay(global.gWin, &frames, second)
+		// 	<-fps
+		// 	updateFPSDisplay(global.gWin, &frames, second)
 	}
 }
 
