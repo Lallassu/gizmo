@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	_ "strconv"
 	"time"
 )
 
@@ -63,7 +64,7 @@ func (c *chunk) create(x, y float64) {
 	//c.canvas = pixelgl.NewCanvas(pixel.R(0, 0, wPixelsPerChunk/2, wPixelsPerChunk))
 	//	c.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
 	c.dirty = true
-	c.triangles = pixel.MakeTrianglesData(wPixelsPerChunk * wPixelsPerChunk * 6)
+	c.triangles = pixel.MakeTrianglesData(500) //wPixelsPerChunk * wPixelsPerChunk * 6)
 	c.batch = pixel.NewBatch(c.triangles, nil) //c.canvas)
 	c.bounds = &Bounds{
 		X:      x,
@@ -101,10 +102,18 @@ func (c *chunk) build() {
 	g := 0.0
 	b := 0.0
 	a := 0.0
+	skip := 0
+	draw := 0
 	for x := 0.0; x < c.bounds.Width; x++ {
 		for y := 0.0; y < c.bounds.Height; y++ {
 			p := global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))]
 			if p == 0 {
+				continue
+			}
+
+			// Check if already visisted
+			if ((p & 0xFF) >> 7) == 0 {
+				skip++
 				continue
 			}
 
@@ -113,17 +122,51 @@ func (c *chunk) build() {
 			b = float64(p>>8&0xFF) / 255.0
 			a = float64(p&0xFF) / 255.0
 
-			px := (x + c.bounds.X)
+			// Greedy algorithm to check for range of colors.
+			// Use first bit in alpha to check for if it has been visited or not.
+
+			// First check how far we can go with the same pixel color
+			same_x := 1.0
+			same_y := 1.0
+			for l := x + 1; l < c.bounds.Width; l++ {
+				// Check color
+				pos := int(float64(global.gWorld.width)*(l+c.bounds.X) + (y + c.bounds.Y))
+				p2 := global.gWorld.pixels[pos]
+				if p2 == 0 {
+					break
+				}
+				r1 := float64(p2>>24&0xFF) / 255.0
+				g1 := float64(p2>>16&0xFF) / 255.0
+				b1 := float64(p2>>8&0xFF) / 255.0
+
+				if r1 == r && g1 == g && b1 == b && ((p2&0xFF)>>7) == 1 {
+					// Same color and not yet visited!
+					global.gWorld.pixels[pos] &= 0xFFFFFF7F
+					//Debug("AFTER: ", strconv.FormatInt(int64(global.gWorld.pixels[int(float64(global.gWorld.width)*(l+c.bounds.X)+(y+c.bounds.Y))]), 2))
+					same_x++
+				} else {
+					break
+				}
+
+			}
+
+			px := x + c.bounds.X
 			py := y + c.bounds.Y
 
-			// TBD: Greedy algorithm to check for range of colors.
+			draw++
 
+			// Increase length of triangles if we need to draw more than we had before.
+			if draw*6 >= len(*c.triangles) {
+				c.triangles.SetLen(draw*6 + 50)
+			}
+
+			// Size of triangle is given by how large greedy algorithm found out.
 			(*c.triangles)[i].Position = pixel.Vec{px, py}
-			(*c.triangles)[i+1].Position = pixel.Vec{px + 1, py}
-			(*c.triangles)[i+2].Position = pixel.Vec{px + 1, py + 1}
+			(*c.triangles)[i+1].Position = pixel.Vec{px + same_x, py}
+			(*c.triangles)[i+2].Position = pixel.Vec{px + same_x, py + same_y}
 			(*c.triangles)[i+3].Position = pixel.Vec{px, py}
-			(*c.triangles)[i+4].Position = pixel.Vec{px, py + 1}
-			(*c.triangles)[i+5].Position = pixel.Vec{px + 1, py + 1}
+			(*c.triangles)[i+4].Position = pixel.Vec{px, py + same_y}
+			(*c.triangles)[i+5].Position = pixel.Vec{px + same_x, py + same_y}
 			(*c.triangles)[i].Color = pixel.RGBA{r, g, b, a}
 			(*c.triangles)[i+1].Color = pixel.RGBA{r, g, b, a}
 			(*c.triangles)[i+2].Color = pixel.RGBA{r, g, b, a}
@@ -133,9 +176,17 @@ func (c *chunk) build() {
 			i += 6
 		}
 	}
+
+	// Reset the greedy bit
+	for x := 0.0; x < c.bounds.Width; x++ {
+		for y := 0.0; y < c.bounds.Height; y++ {
+			global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))] |= 0x00000080
+		}
+	}
+	c.triangles.SetLen(draw * 6)
 	c.batch.Dirty()
 	elapsed := time.Since(start)
-	Debug("Build took %s", elapsed)
+	Debug("Build took %s", elapsed, "SKIP:", skip, "Draw:", draw, "Total:", len(*c.triangles)/6)
 	c.dirty = false
 }
 
