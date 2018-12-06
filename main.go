@@ -63,7 +63,7 @@ func setup() {
 	global.gParticleEngine.create()
 	global.gAmmoEngine.create()
 	global.gCamera.setPosition(0, 0)
-	global.gCamera.zoom = 2
+	global.gCamera.zoom = 3
 	global.gWin.SetSmooth(false)
 	global.gTextures.load("packed.json")
 }
@@ -73,9 +73,9 @@ func setup() {
 //=============================================================
 func gameLoop() {
 	last := time.Now()
-	fps := time.Tick(time.Second / 1000)
-	second := time.Tick(time.Second)
-	frames := 0
+	// fps := time.Tick(time.Second / 1000)
+	// second := time.Tick(time.Second)
+	// frames := 0
 
 	// Load a bunch of weapons
 	for _, x := range []string{"ak47_weapon.png", "p90_weapon.png", "rocketlauncher_weapon.png", "shotgun_weapon.png", "crate_obj.png"} {
@@ -145,8 +145,8 @@ func gameLoop() {
 
 		global.gWin.Update()
 
-		<-fps
-		updateFPSDisplay(global.gWin, &frames, second)
+		// <-fps
+		// updateFPSDisplay(global.gWin, &frames, second)
 	}
 }
 

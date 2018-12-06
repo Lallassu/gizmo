@@ -33,7 +33,7 @@ const (
 	wLadder32            = 0xFFFFFFAF
 	wShadow8             = 0xBF
 	wShadow32            = 0xFFFFFFBF
-	wViewMax             = 400
+	wViewMax             = 500
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
 	wParticlesMax        = 10000
@@ -69,7 +69,7 @@ var global = &Global{
 	gCamera:         &camera{},
 	gController:     &controller{},
 	gParticleEngine: &particleEngine{},
-	gClearColor:     pixel.RGBA{0.0, 0.0, 0.0, 1.0},
+	gClearColor:     pixel.RGBA{0.3, 0.3, 0.3, 1.0},
 	gWin:            &pixelgl.Window{},
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},

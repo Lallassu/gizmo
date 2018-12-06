@@ -219,7 +219,11 @@ func (w *world) PixelColor(x, y float64) int32 {
 //=============================================================
 func (w *world) Draw(dt float64) {
 	// Draw those around camera position only.
-	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: global.gCamera.pos.X, Y: global.gCamera.pos.Y, Width: wViewMax, Height: wViewMax}) {
+	pos := pixel.Vec{0, 0}
+	if global.gCamera.follow != nil {
+		pos = global.gCamera.follow.getPosition()
+	}
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: pos.X - wViewMax/2, Y: pos.Y - wViewMax/2, Width: wViewMax, Height: wViewMax}) {
 		v.entity.draw(dt)
 	}
 }
@@ -242,17 +246,17 @@ func (w *world) RemovePixel(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF == wStaticColor8 ||
-			w.pixels[pos]&0xFF == wBackground8 || w.pixels[pos]&0xFF == wShadow8 {
+			w.pixels[pos]&0xFF == wBackground8 {
 			return
 		}
+
+		//		if w.pixels[pos]&0xFF == wShadow8 {
 
 		// Remove shadow
 		for i := 0; i < 5; i++ {
 			pos2 := (x+i)*w.width + y - i
 			if pos2 < w.width*w.height && pos2 >= 0 {
-				if w.pixels[pos2]&0xFF == wShadow8 {
-					w.removeShadow(x+i, y-i)
-				}
+				w.removeShadow(x+i, y-i)
 			}
 		}
 
@@ -278,7 +282,7 @@ func (w *world) RemovePixel(x, y int) {
 
 		// Set bg pixel.
 		if w.pixels[pos] != 0 {
-			v := w.coloring.getBackground()
+			v := w.coloring.getBackgroundSoft()
 			v &= wBackground32
 			w.pixels[pos] = v
 		}

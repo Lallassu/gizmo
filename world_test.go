@@ -26,6 +26,23 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+func BenchmarkWorldTestBit1(b *testing.B) {
+	p := 0xFF44F4AF
+	for i := 0; i < b.N; i++ {
+		if p&0x00000080 == 0 {
+
+		}
+	}
+}
+func BenchmarkWorldTestBit2(b *testing.B) {
+	p := 0xFF44F4AF
+	for i := 0; i < b.N; i++ {
+		if p&0xFF>>7 == 0 {
+
+		}
+	}
+}
+
 func BenchmarkWorldIsBackground(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		w.IsBackground(300.0, 200.0)

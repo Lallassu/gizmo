@@ -1,5 +1,6 @@
 General
 --------
+- Fix removal of "shadowed" backgrounds" after shot wall
 
 - Make jump CPU unbound
 
@@ -12,9 +13,6 @@ General
 
 - Weapon should be rotated more accurate 
     -> Skip mouse support? Just shoot straight?
-
-- Optimise chunks somehow
-    - Alt 1: 
 
 - Use reflections instead of interface getType()
  
