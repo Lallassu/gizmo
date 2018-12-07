@@ -1,9 +1,5 @@
 General
 --------
-- Add random utility with precalculated values
-    - randInt10(), randInt100()
-    - randFloat()
-
 - Make jump CPU unbound
 
 - One StaticObject and one DynamicObject
@@ -40,10 +36,6 @@ General
     - Controllers
     - Features (vsync etc)
 
-Prio2
--------
-- Fix so that saveMove works like a queue
-- Only saveMove when mob actually changed position
 
 Classes
 -----------

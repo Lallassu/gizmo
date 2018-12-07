@@ -162,12 +162,12 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 									x:           float64(x_),
 									y:           float64(y_),
 									size:        1,
-									restitution: -0.1 - rand.Float64()/4,
+									restitution: -0.1 - global.gRand.randFloat()/4,
 									life:        wParticleDefaultLife,
 									fx:          10,
 									fy:          10,
 									vx:          vx, //float64(5 - rand.Intn(10)),
-									vy:          float64(5 - rand.Intn(10)),
+									vy:          float64(5 - global.gRand.rand()),
 									mass:        1,
 									pType:       particleRegular,
 									color:       m.frames[i][pos],
@@ -229,12 +229,12 @@ func (m *mob) explode() {
 							x:           m.bounds.X + float64(x),
 							y:           m.bounds.Y + float64(y),
 							size:        1,
-							restitution: -0.1 - rand.Float64()/4,
+							restitution: -0.1 - global.gRand.randFloat()/4,
 							life:        wParticleDefaultLife,
 							fx:          10,
 							fy:          10,
-							vx:          float64(5 - rand.Intn(10)),
-							vy:          float64(5 - rand.Intn(20)),
+							vx:          float64(5 - global.gRand.rand()),
+							vy:          float64(5 - global.gRand.rand()),
 							mass:        1,
 							pType:       particleRegular,
 							color:       m.frames[i][pos],
@@ -305,17 +305,6 @@ func (m *mob) setPosition(x, y float64) {
 }
 
 //=============================================================
-// TBD: Fix so that it works like a queue!
-//=============================================================
-func (m *mob) saveMove() {
-	// m.prevPos = append(m.prevPos, pixel.Vec{m.bounds.X, m.bounds.Y})
-	// // TBD: Only remove every second or something
-	// if len(m.prevPos) > 100 {
-	// 	m.prevPos = m.prevPos[:100]
-	// }
-}
-
-//=============================================================
 // Physics for mob.
 // I don't want real physics, better to have a good feeling for
 // movement than accurate physic simulation.
@@ -376,9 +365,6 @@ func (m *mob) physics(dt float64) {
 
 	// Check if stuck!
 	m.unStuck(dt)
-
-	// Save move if we changed since last move.
-	//m.saveMove()
 }
 
 //=============================================================

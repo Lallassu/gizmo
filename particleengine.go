@@ -8,7 +8,6 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"math/rand"
 )
 
 type particleEngine struct {
@@ -25,24 +24,24 @@ type particleEngine struct {
 //=============================================================
 func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 	for i := 0; i < 3; i++ {
-		r := 175 + rand.Intn(50)
-		g := 10 + rand.Intn(20)
-		b := 10 + rand.Intn(20)
-		a := 100 + rand.Intn(150)
+		r := 175 + global.gRand.rand()*5
+		g := 10 + global.gRand.rand()*2
+		b := 10 + global.gRand.rand()*2
+		//a := 100 + global.gRand.rand()*15
 
 		pe.newParticle(particle{
 			x:           float64(x),
 			y:           float64(y),
-			size:        rand.Float64() * 3,
-			restitution: -0.1 - rand.Float64()/4,
+			size:        global.gRand.randFloat() * 3,
+			restitution: -0.1 - global.gRand.randFloat()/4,
 			life:        wParticleDefaultLife,
-			fx:          rand.Float64() * 5,
-			fy:          rand.Float64() * 5,
-			vx:          vx / 2, //float64(5 - rand.Intn(10)),
-			vy:          float64(5 - rand.Intn(10)),
+			fx:          global.gRand.randFloat() * 5,
+			fy:          global.gRand.randFloat() * 5,
+			vx:          vx / 2,
+			vy:          float64(5 - global.gRand.rand()),
 			mass:        2,
 			pType:       particleRegular,
-			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
+			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF),
 			static:      true,
 		})
 	}
@@ -53,19 +52,19 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	// Create fire part
 	for i := 0; i < size; i++ {
 		r := 0xF9
-		g := 50 + rand.Intn(140)
+		g := 50 + global.gRand.rand()*14
 		b := 16
-		a := 20 + rand.Intn(220)
+		//	a := 20 + global.gRand.rand()*22
 		pe.newParticle(particle{
-			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
-			size:        rand.Float64() * 2,
-			x:           x, // + float64((size/2)-rand.Intn(size)),
-			y:           y, // + float64((size/2)-rand.Intn(size)),
-			vx:          float64(5 - rand.Intn(10)),
-			vy:          float64(5 - rand.Intn(10)),
+			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF),
+			size:        global.gRand.randFloat() * 2,
+			x:           x,
+			y:           y,
+			vx:          float64(5 - global.gRand.rand()),
+			vy:          float64(5 - global.gRand.rand()),
 			fx:          10,
 			fy:          10,
-			life:        rand.Float64(),
+			life:        global.gRand.randFloat(),
 			mass:        1,
 			pType:       particleFire,
 			restitution: 0,
@@ -74,18 +73,18 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	}
 	// Create smoke
 	for i := 0; i < size*2; i++ {
-		c := 50 + rand.Intn(205)
-		a := 20 + rand.Intn(220)
+		c := 50 + global.gRand.rand()*20
+		//	a := 20 + global.gRand.rand()*22
 		pe.newParticle(particle{
-			color:       uint32(c&0xFF<<24 | c&0xFF<<16 | c&0xFF<<8 | a&0xFF),
-			size:        rand.Float64() * 2,
-			x:           x + float64(size/2-rand.Intn(size)) + rand.Float64()*2,
-			y:           y + float64(size/2-rand.Intn(size)) + rand.Float64()*2,
+			color:       uint32(c&0xFF<<24 | c&0xFF<<16 | c&0xFF<<8 | 0xFF),
+			size:        global.gRand.randFloat() * 2,
+			x:           x + float64(size/2) - global.gRand.randFloat()*float64(size) + global.gRand.randFloat()*2,
+			y:           y + float64(size/2) - global.gRand.randFloat()*float64(size) + global.gRand.randFloat()*2,
 			vx:          0,
-			vy:          rand.Float64() * 10,
-			fy:          -rand.Float64() * 10,
+			vy:          global.gRand.randFloat() * 10,
+			fy:          -global.gRand.randFloat() * 10,
 			fx:          0,
-			life:        rand.Float64() * 2.5,
+			life:        global.gRand.randFloat() * 2.5,
 			mass:        -0.1,
 			pType:       particleSmoke,
 			restitution: 0,

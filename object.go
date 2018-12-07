@@ -13,7 +13,6 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"math"
-	"math/rand"
 )
 
 type object struct {
@@ -145,12 +144,12 @@ func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
 								x:           float64(x_),
 								y:           float64(y_),
 								size:        1,
-								restitution: -0.1 - rand.Float64()/4,
+								restitution: -0.1 - global.gRand.randFloat()/4,
 								life:        wParticleDefaultLife,
 								fx:          10,
 								fy:          10,
-								vx:          vx, //float64(5 - rand.Intn(10)),
-								vy:          float64(5 - rand.Intn(10)),
+								vx:          vx,
+								vy:          float64(5 - global.gRand.rand()),
 								mass:        1,
 								pType:       particleRegular,
 								color:       o.pixels[pos],
@@ -193,12 +192,12 @@ func (o *object) explode() {
 						x:           o.bounds.X + float64(x),
 						y:           o.bounds.Y + float64(y),
 						size:        1,
-						restitution: -0.1 - rand.Float64()/4,
+						restitution: -0.1 - global.gRand.randFloat()/4,
 						life:        wParticleDefaultLife,
 						fx:          10,
 						fy:          10,
-						vx:          float64(5 - rand.Intn(10)),
-						vy:          float64(5 - rand.Intn(10)),
+						vx:          float64(5 - global.gRand.rand()),
+						vy:          float64(5 - global.gRand.rand()),
 						mass:        1,
 						pType:       particleRegular,
 						color:       p,
@@ -264,17 +263,6 @@ func (o *object) getBounds() *Bounds {
 }
 
 //=============================================================
-//
-//=============================================================
-func (o *object) saveMove() {
-	//o.prevPos = append(o.prevPos, pixel.Vec{o.bounds.X, o.bounds.Y})
-	//// TBD: Only remove every second or something
-	//if len(o.prevPos) > 100 {
-	//	o.prevPos = o.prevPos[:100]
-	//}
-}
-
-//=============================================================
 // Physics
 //=============================================================
 func (o *object) physics(dt float64) {
@@ -302,7 +290,6 @@ func (o *object) physics(dt float64) {
 			o.fy = 0
 		}
 	}
-	//o.saveMove()
 	ax := o.fx * dt * o.vx * o.mass
 	ay := o.fy * dt * o.vy * o.mass
 	o.bounds.X += ax

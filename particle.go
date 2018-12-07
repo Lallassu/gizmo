@@ -97,6 +97,17 @@ func (p *particle) update(dt float64) {
 		p.y += ay
 	}
 
+	switch p.pType {
+	case particleSmoke:
+		p.size -= 0.05
+	case particleFire:
+		p.size -= 0.01
+	}
+	if p.size < 0 {
+		p.stop()
+		return
+	}
+
 	p.vy -= dt * p.fy
 
 	if p.fx > 0 {
