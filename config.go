@@ -17,6 +17,7 @@ const (
 // World constants
 const (
 	wShadowLength        = 5
+	wShadowDepth         = 1.5
 	wPixelsPerChunk      = 64
 	wPixelSize           = 1
 	wBorderSize          = 4
@@ -40,7 +41,6 @@ const (
 	wAmmoMax             = 2000
 	wDoorLen             = 30
 	wDoorHeight          = 40
-	wShadowDepth         = 1.5
 )
 
 //=============================================================
@@ -59,6 +59,7 @@ type Global struct {
 	gController     *controller
 	gAmmoEngine     *ammoEngine
 	gTextures       *textures
+	gRand           *fRand
 }
 
 var global = &Global{
@@ -74,4 +75,5 @@ var global = &Global{
 	gWin:            &pixelgl.Window{},
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},
+	gRand:           &fRand{},
 }

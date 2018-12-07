@@ -9,19 +9,15 @@ import (
 )
 
 var w world
-var rlist []int
 
 func Prepare() world {
 	w := world{}
+	global.gRand.create(100000)
 	w.Init()
 	w.pixels = make([]uint32, 500*500)
 	w.size = 500 * 500
 	for i := 0; i < 500*500; i++ {
 		w.pixels[i] = uint32(rand.Intn(0xFFFFFFFF))
-	}
-	rlist = make([]int, 100000)
-	for i := 0; i < 100000; i++ {
-		rlist = append(rlist, rand.Intn(100))
 	}
 	return w
 }
@@ -31,29 +27,19 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func BenchmarkWorldTestRand1(b *testing.B) {
-	cnt := 0
+func BenchmarkOwnRand(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		getRand(&cnt)
+		global.gRand.rand10()
 	}
 }
-func getRand(cnt *int) int {
-	(*cnt)++
-	if *cnt >= len(rlist)-1 {
-		(*cnt) = 0
-	}
-	(*cnt)++
 
-	return rlist[*cnt]
-}
-
-func BenchmarkWorldTestRand2(b *testing.B) {
+func BenchmarkMathRand2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		getRand2()
 	}
 }
 func getRand2() int {
-	return rand.Intn(100)
+	return rand.Intn(10)
 }
 
 func BenchmarkWorldIsBackground(b *testing.B) {

@@ -55,7 +55,7 @@ func run() {
 // Setup map, world, player etc.
 //=============================================================
 func setup() {
-	// Camera setup
+	global.gRand.create(100000)
 	global.gCamera.create()
 	global.gController.create()
 	global.gWorld.Init()

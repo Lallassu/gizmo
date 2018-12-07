@@ -13,7 +13,6 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"math"
-	"math/rand"
 )
 
 //=============================================================
@@ -253,8 +252,6 @@ func (w *world) RemovePixel(x, y int) {
 			return
 		}
 
-		//		if w.pixels[pos]&0xFF == wShadow8 {
-
 		// Remove shadow
 		for i := 0; i < wShadowLength; i++ {
 			pos2 := (x+i)*w.width + y - i
@@ -270,12 +267,12 @@ func (w *world) RemovePixel(x, y int) {
 					x:           float64(x),
 					y:           float64(y),
 					size:        1,
-					restitution: -0.1 - rand.Float64()/4,
+					restitution: -0.1 - global.gRand.randFloat()/4, //rand.Float64()/4,
 					life:        wParticleDefaultLife,
 					fx:          10,
 					fy:          10,
-					vx:          float64(5 - rand.Intn(10)),
-					vy:          float64(5 - rand.Intn(10)),
+					vx:          float64(5 - global.gRand.rand10()),
+					vy:          float64(5 - global.gRand.rand10()),
 					mass:        1,
 					pType:       particleRegular,
 					color:       w.pixels[pos],
