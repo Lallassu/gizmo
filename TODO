@@ -1,6 +1,8 @@
 General
 --------
-- Fix removal of "shadowed" backgrounds" after shot wall
+- Add random utility with precalculated values
+    - randInt10(), randInt100()
+    - randFloat()
 
 - Make jump CPU unbound
 

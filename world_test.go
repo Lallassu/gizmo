@@ -9,6 +9,7 @@ import (
 )
 
 var w world
+var rlist []int
 
 func Prepare() world {
 	w := world{}
@@ -18,6 +19,10 @@ func Prepare() world {
 	for i := 0; i < 500*500; i++ {
 		w.pixels[i] = uint32(rand.Intn(0xFFFFFFFF))
 	}
+	rlist = make([]int, 100000)
+	for i := 0; i < 100000; i++ {
+		rlist = append(rlist, rand.Intn(100))
+	}
 	return w
 }
 
@@ -26,21 +31,29 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func BenchmarkWorldTestBit1(b *testing.B) {
-	p := 0xFF44F4AF
+func BenchmarkWorldTestRand1(b *testing.B) {
+	cnt := 0
 	for i := 0; i < b.N; i++ {
-		if p&0x00000080 == 0 {
-
-		}
+		getRand(&cnt)
 	}
 }
-func BenchmarkWorldTestBit2(b *testing.B) {
-	p := 0xFF44F4AF
-	for i := 0; i < b.N; i++ {
-		if p&0xFF>>7 == 0 {
-
-		}
+func getRand(cnt *int) int {
+	(*cnt)++
+	if *cnt >= len(rlist)-1 {
+		(*cnt) = 0
 	}
+	(*cnt)++
+
+	return rlist[*cnt]
+}
+
+func BenchmarkWorldTestRand2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		getRand2()
+	}
+}
+func getRand2() int {
+	return rand.Intn(100)
 }
 
 func BenchmarkWorldIsBackground(b *testing.B) {

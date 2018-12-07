@@ -12,6 +12,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	"math"
 	"math/rand"
 )
 
@@ -218,7 +219,7 @@ func (w *world) PixelColor(x, y float64) int32 {
 // Draw
 //=============================================================
 func (w *world) Draw(dt float64) {
-	// Draw those around camera position only.
+	// Draw objects in QT around player position only.
 	pos := pixel.Vec{0, 0}
 	if global.gCamera.follow != nil {
 		pos = global.gCamera.follow.getPosition()
@@ -246,14 +247,16 @@ func (w *world) RemovePixel(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF == wStaticColor8 ||
-			w.pixels[pos]&0xFF == wBackground8 {
+			w.pixels[pos]&0xFF == wBackground8 ||
+			w.pixels[pos]&0xFF == wLadder8 ||
+			w.pixels[pos]&0xFF == wShadow8 {
 			return
 		}
 
 		//		if w.pixels[pos]&0xFF == wShadow8 {
 
 		// Remove shadow
-		for i := 0; i < 5; i++ {
+		for i := 0; i < wShadowLength; i++ {
 			pos2 := (x+i)*w.width + y - i
 			if pos2 < w.width*w.height && pos2 >= 0 {
 				w.removeShadow(x+i, y-i)
@@ -329,7 +332,7 @@ func (w *world) Explode(x_, y_ float64, power int) {
 		pp := ffx*w.width + ffy
 		if pp >= 0 && pp < w.width*w.height {
 			if w.pixels[pp]&0xFF == 0xFF {
-				for i := 0; i < 5; i++ {
+				for i := 0; i < wShadowLength; i++ {
 					pos2 := (ffx+i)*w.width + ffy - i
 					if pos2 < w.width*w.height && pos2 >= 0 {
 						if w.pixels[pos2]&0xFF == wBackground8 {
@@ -372,9 +375,9 @@ func (w *world) removeShadow(x, y int) {
 	pos := w.width*x + y
 	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == wShadow8 {
-			r := uint32(float64(w.pixels[pos]>>24&0xFF) * 1.5)
-			g := uint32(float64(w.pixels[pos]>>16&0xFF) * 1.5)
-			b := uint32(float64(w.pixels[pos]>>8&0xFF) * 1.5)
+			r := uint32(math.Floor(float64(w.pixels[pos]>>24&0xFF) * wShadowDepth))
+			g := uint32(math.Floor(float64(w.pixels[pos]>>16&0xFF) * wShadowDepth))
+			b := uint32(math.Floor(float64(w.pixels[pos]>>8&0xFF) * wShadowDepth))
 			w.pixels[pos] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wBackground8
 			w.markChunkDirty(x, y)
 		}
@@ -388,9 +391,9 @@ func (w *world) addShadow(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != 0xFF {
-			r := uint32(float64(w.pixels[pos]>>24&0xFF) / 1.5)
-			g := uint32(float64(w.pixels[pos]>>16&0xFF) / 1.5)
-			b := uint32(float64(w.pixels[pos]>>8&0xFF) / 1.5)
+			r := uint32(math.Ceil(float64(w.pixels[pos]>>24&0xFF) / wShadowDepth))
+			g := uint32(math.Ceil(float64(w.pixels[pos]>>16&0xFF) / wShadowDepth))
+			b := uint32(math.Ceil(float64(w.pixels[pos]>>8&0xFF) / wShadowDepth))
 			w.pixels[pos] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8
 			w.markChunkDirty(x, y)
 		}
@@ -489,9 +492,9 @@ func (w *world) paintMap() {
 						for i := 1; i < wShadowLength; i++ {
 							p := w.pixels[(x+i)*w.width+y-i]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
-								r := uint32(float64(p>>24&0xFF) / 1.5)
-								g := uint32(float64(p>>16&0xFF) / 1.5)
-								b := uint32(float64(p>>8&0xFF) / 1.5)
+								r := uint32(math.Ceil(float64(p>>24&0xFF) / wShadowDepth))
+								g := uint32(math.Ceil(float64(p>>16&0xFF) / wShadowDepth))
+								b := uint32(math.Ceil(float64(p>>8&0xFF) / wShadowDepth))
 								w.pixels[(x+i)*w.width+y-i] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
 							}
 						}
@@ -500,16 +503,16 @@ func (w *world) paintMap() {
 						for i := 0; i < wShadowLength; i++ {
 							p := w.pixels[(x+i)*w.width+y-i]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
-								r := uint32(float64(p>>24&0xFF) / 1.5)
-								g := uint32(float64(p>>16&0xFF) / 1.5)
-								b := uint32(float64(p>>8&0xFF) / 1.5)
+								r := uint32(math.Ceil(float64(p>>24&0xFF) / wShadowDepth))
+								g := uint32(math.Ceil(float64(p>>16&0xFF) / wShadowDepth))
+								b := uint32(math.Ceil(float64(p>>8&0xFF) / wShadowDepth))
 								w.pixels[(x+i)*w.width+y-i] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
 							}
 							p = w.pixels[(x+i)*w.width+y-i-1]
 							if p&0xFF != wShadow8 && p&0xFF != 0xFF && i < 4 {
-								r := uint32(float64(p>>24&0xFF) / 1.5)
-								g := uint32(float64(p>>16&0xFF) / 1.5)
-								b := uint32(float64(p>>8&0xFF) / 1.5)
+								r := uint32(math.Ceil(float64(p>>24&0xFF) / wShadowDepth))
+								g := uint32(math.Ceil(float64(p>>16&0xFF) / wShadowDepth))
+								b := uint32(math.Ceil(float64(p>>8&0xFF) / wShadowDepth))
 								w.pixels[(x+i)*w.width+y-i-1] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
 							}
 						}

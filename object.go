@@ -379,6 +379,10 @@ func (o *object) shoot() {
 	switch o.objectType {
 	case objectWeapon:
 		// Check type of weapon (name?)
+		// Use mass = 5 and fx/fy = 0.5 for missile
+		// if rand.Float64() > 0.1 {
+		// 	return
+		// }
 		global.gAmmoEngine.newAmmo(ammo{
 			x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
 			y:     o.bounds.Y + o.bounds.Height,
