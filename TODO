@@ -1,6 +1,7 @@
 General
 --------
 - Make jump CPU unbound
+    - Same with particle size over time!
 
 - One StaticObject and one DynamicObject
     - Static: Use TextureLoader
@@ -15,9 +16,6 @@ General
 - Use reflections instead of interface getType()
  
 - Handle scale for objects Hit() functions
-
-- Remove from QT
-    - Mobs + objects
 
 - Sound class
 

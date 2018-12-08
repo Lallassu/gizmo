@@ -181,6 +181,10 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 	}
 
 	m.buildFrames()
+
+	// Check status of mob, if dead => remove from QT
+	global.gWorld.qt.Remove(m.bounds)
+
 	return true
 }
 
@@ -323,7 +327,10 @@ func (m *mob) physics(dt float64) {
 	if m.jumping {
 		// Simplified jumping
 		if m.force.Y > 0 {
-			m.force.Y -= m.speed / 10 * dt
+			m.force.Y -= m.jumpPower * dt
+		}
+		if m.force.Y < 0 {
+			m.force.Y = 0
 		}
 
 		if m.IsOnLadder() {
@@ -341,7 +348,7 @@ func (m *mob) physics(dt float64) {
 		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && !m.jumping {
 			// Jump from ladder
 			m.jumping = true
-			m.force.Y *= m.jumpPower * dt
+			m.force.Y += m.jumpPower
 		} else if m.IsOnLadder() {
 			// Climb
 			m.bounds.Y += m.force.Y / 2
@@ -350,7 +357,7 @@ func (m *mob) physics(dt float64) {
 			// Jump
 			if m.force.Y > 0 && !m.jumping && !m.IsOnLadder() {
 				m.jumping = true
-				m.force.Y = m.jumpPower
+				m.force.Y += m.jumpPower
 			}
 		} else {
 			m.bounds.Y += global.gWorld.gravity * dt * m.mass
@@ -429,9 +436,9 @@ func (m *mob) unStuck(dt float64) {
 
 	// Divide speed by 3 to make it smoother and not too choppy.
 	if bottom {
-		m.bounds.Y += m.speed / 3 * dt
+		m.bounds.Y += m.speed / 2 * dt
 	} else if top {
-		m.bounds.Y -= m.speed / 3 * dt
+		m.bounds.Y -= m.speed / 2 * dt
 	}
 }
 

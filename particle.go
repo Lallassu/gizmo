@@ -99,9 +99,9 @@ func (p *particle) update(dt float64) {
 
 	switch p.pType {
 	case particleSmoke:
-		p.size -= 0.05
+		p.size -= 1 * dt
 	case particleFire:
-		p.size -= 0.01
+		p.size -= 2 * dt
 	}
 	if p.size < 0 {
 		p.stop()

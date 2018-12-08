@@ -205,8 +205,8 @@ func (o *object) explode() {
 					})
 			}
 		}
-		o.build()
-		// TBD: Remove from QT
+
+		global.gWorld.qt.Remove(o.bounds)
 	}
 }
 

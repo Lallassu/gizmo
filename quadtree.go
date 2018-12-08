@@ -200,10 +200,36 @@ func (qt *Quadtree) getIndex(pRect *Bounds) int {
 
 }
 
+// Public method to remove an obj from the quadtree.
+func (qt *Quadtree) Remove(o *Bounds) {
+	qt.remove_obj(qt, o)
+}
+
+// Recusive removal of object from quadtree
+func (qt *Quadtree) remove_obj(t *Quadtree, o *Bounds) bool {
+	index := -1
+	for i, _ := range t.Objects {
+		if t.Objects[i] == o {
+			index = i
+			break
+		}
+	}
+	if index != -1 {
+		t.Objects[index] = nil
+		t.Objects = append(t.Objects[:index], t.Objects[index+1:]...)
+		return true
+	}
+	for i, _ := range t.Nodes {
+		if qt.remove_obj(&t.Nodes[i], o) == true {
+			break
+		}
+	}
+	return false
+}
+
 // Insert - Insert the object into the node. If the node exceeds the capacity,
 // it will split and add all objects to their corresponding subnodes.
 func (qt *Quadtree) Insert(pRect *Bounds) {
-
 	qt.Total++
 
 	i := 0

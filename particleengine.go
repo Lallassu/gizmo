@@ -84,7 +84,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 			vy:          global.gRand.randFloat() * 10,
 			fy:          -global.gRand.randFloat() * 10,
 			fx:          0,
-			life:        global.gRand.randFloat() * 2.5,
+			life:        global.gRand.randFloat() * 3.5,
 			mass:        -0.1,
 			pType:       particleSmoke,
 			restitution: 0,
