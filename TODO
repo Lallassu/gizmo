@@ -1,14 +1,14 @@
 General
 --------
-- Make jump CPU unbound
-    - Same with particle size over time!
+- CPU bound particle size over time -> FIX!
+
+- Fix better walk (Smoother)
+    - over pixels
 
 - One StaticObject and one DynamicObject
     - Static: Use TextureLoader
     - Dynamic: Handle Texture self (destructable)
 
-- Fix better walk (Smoother)
-    - over pixels
 
 - Weapon should be rotated more accurate 
     -> Skip mouse support? Just shoot straight?

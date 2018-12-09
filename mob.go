@@ -41,12 +41,15 @@ type mob struct {
 	img         image.Image
 	carry       *object
 
-	prevPos     []pixel.Vec
-	force       pixel.Vec
-	restitution float64
-	climbing    bool
-	jumping     bool
-	jumpPower   float64
+	prevPos      []pixel.Vec
+	force        pixel.Vec
+	velo         pixel.Vec
+	restitution  float64
+	climbing     bool
+	jumping      bool
+	jumpPower    float64
+	acceleration float64
+	keyMove      pixel.Vec
 }
 
 //=============================================================
@@ -62,7 +65,7 @@ func (m *mob) create(x, y float64) {
 	m.animRate = 0.1
 	m.jumpPower = 4
 	m.speed = 200
-	m.mass = 50
+	m.mass = 20
 	m.currentAnim = animIdle
 	m.dir = 1
 
@@ -255,16 +258,12 @@ func (m *mob) explode() {
 //=============================================================
 //
 //=============================================================
-func (m *mob) move(dx, dy float64) {
-	// Add the force, movenment is handled in the physics function
-	m.force.X += dx * m.speed
-	if !m.jumping {
-		m.force.Y = dy * m.speed
-	}
+func (m *mob) move(x, y float64) {
+	m.keyMove.X = x
+	m.keyMove.Y = y
 
-	// Rotation of animation
-	if dx != 0 {
-		if dx > 0 {
+	if x != 0 {
+		if x > 0 {
 			m.dir = 1
 		} else {
 			m.dir = -1
@@ -309,81 +308,131 @@ func (m *mob) setPosition(x, y float64) {
 }
 
 //=============================================================
+//
+//=============================================================
+func (m *mob) hitCeiling(x, y float64) bool {
+	for px := 0.0; px < m.bounds.Width; px++ {
+		if global.gWorld.IsRegular(x+px, y+m.bounds.Height+1) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) hitFloor(x, y float64) bool {
+	for px := 0.0; px < m.bounds.Width; px++ {
+		if global.gWorld.IsRegular(x+px, y+1) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) hitWallRight(x, y float64) bool {
+	for py := m.bounds.Height / 3; py < m.bounds.Height; py++ {
+		if global.gWorld.IsRegular(x-2, y+py) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) hitWallLeft(x, y float64) bool {
+	for py := m.bounds.Height / 3; py < m.bounds.Height; py++ {
+		if global.gWorld.IsRegular(x+m.bounds.Width+1, y+py) {
+			return true
+		}
+	}
+	return false
+}
+
+//=============================================================
 // Physics for mob.
 // I don't want real physics, better to have a good feeling for
 // movement than accurate physic simulation.
 //=============================================================
 func (m *mob) physics(dt float64) {
-
-	// Only move if no wall collision
-	if !m.IsOnWall() {
-		m.bounds.X += m.force.X
-		m.currentAnim = animWalk
-		if m.force.X == 0 {
-			m.currentAnim = animIdle
+	if m.keyMove.X != 0 {
+		m.velo.X = dt * m.speed * m.dir
+		m.velo.X = m.dir * math.Max(math.Abs(m.velo.X), m.speed/100)
+	} else {
+		if m.hitFloor(m.bounds.X, m.bounds.Y-5) {
+			m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/10, 0) * m.dir
+		} else {
+			m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/100, 0) * m.dir
 		}
 	}
 
-	if m.jumping {
-		// Simplified jumping
-		if m.force.Y > 0 {
-			m.force.Y -= m.jumpPower * dt
-		}
-		if m.force.Y < 0 {
-			m.force.Y = 0
-		}
-
+	m.climbing = false
+	m.velo.Y += wGravity * dt
+	m.velo.Y = math.Max(m.velo.Y, wGravity)
+	if m.keyMove.Y > 0 {
 		if m.IsOnLadder() {
-			m.jumping = false
-		}
-		if !m.IsOnWall() {
-			//m.bounds.Y += m.force.Y
-			m.bounds.Y += global.gWorld.gravity*dt*m.mass + m.force.Y
-			m.bounds.X += m.force.X / 2
-			m.currentAnim = animJump
-		} else if m.IsOnGround() {
-			m.jumping = false
-		}
-	} else {
-		if m.IsOnLadder() && m.force.Y > 0 && m.force.X != 0 && !m.jumping {
-			// Jump from ladder
-			m.jumping = true
-			m.force.Y += m.jumpPower
-		} else if m.IsOnLadder() {
-			// Climb
-			m.bounds.Y += m.force.Y / 2
-			m.currentAnim = animClimb
-		} else if m.IsOnGround() {
-			// Jump
-			if m.force.Y > 0 && !m.jumping && !m.IsOnLadder() {
+			m.velo.Y = m.speed / 2 * dt
+			m.climbing = true
+			m.velo.X = 0
+		} else {
+			if !m.jumping {
+				m.velo.Y = m.jumpPower
 				m.jumping = true
-				m.force.Y += m.jumpPower
+			}
+		}
+	}
+
+	if m.velo.Y != 0 {
+		if m.velo.Y > 0 {
+			if !m.hitCeiling(m.bounds.X, m.bounds.Y+m.velo.Y) {
+				m.bounds.Y += m.velo.Y
+			} else {
+				m.velo.Y = 0
 			}
 		} else {
-			m.bounds.Y += global.gWorld.gravity * dt * m.mass
-			m.currentAnim = animJump
+			if !m.hitFloor(m.bounds.X, m.bounds.Y+m.velo.Y) {
+				m.bounds.Y += m.velo.Y
+			} else {
+				m.velo.Y = 0
+				m.jumping = false
+			}
 		}
 	}
 
-	m.force.X = 0
-	if !m.jumping {
-		m.force.Y = 0
-	}
-
-	// Check if stuck!
-	m.unStuck(dt)
-}
-
-//=============================================================
-// Check if on ground
-//=============================================================
-func (m *mob) IsOnGround() bool {
-	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
-		if global.gWorld.IsRegular(x, m.bounds.Y) {
-			return true
+	if m.velo.X != 0 {
+		if m.velo.X > 0 {
+			if !m.hitWallLeft(m.bounds.X+m.velo.X, m.bounds.Y+m.velo.Y) {
+				m.bounds.X += m.velo.X
+			} else {
+				m.velo.X = 0
+			}
+		} else {
+			if !m.hitWallRight(m.bounds.X+m.velo.X, m.bounds.Y+m.velo.Y) {
+				m.bounds.X += m.velo.X
+			} else {
+				m.velo.X = 0
+			}
 		}
 	}
-	return false
+
+	if m.climbing {
+		m.currentAnim = animClimb
+	} else if m.jumping {
+		m.currentAnim = animJump
+	} else if m.velo.X != 0 {
+		m.currentAnim = animWalk
+	} else {
+		m.currentAnim = animIdle
+	}
+
+	m.keyMove.X = 0
+	m.keyMove.Y = 0
 }
 
 //=============================================================
@@ -399,50 +448,6 @@ func (m *mob) IsOnLadder() bool {
 }
 
 //=============================================================
-// Check if on wall
-//=============================================================
-func (m *mob) IsOnWall() bool {
-	offset := 3.0
-	for _, p := range m.cdPixels {
-		if global.gWorld.IsRegular(m.bounds.X+float64(p[0])+m.force.X, m.bounds.Y+float64(p[1])+m.force.Y+offset) {
-			return true
-		}
-	}
-	return false
-}
-
-//=============================================================
-// Unstuck the mob if stuck.
-//=============================================================
-func (m *mob) unStuck(dt float64) {
-	bottom := false
-	top := false
-	offset := 1.0
-	// Check bottom pixels
-	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
-		if global.gWorld.IsRegular(x, m.bounds.Y+offset) {
-			bottom = true
-			break
-		}
-	}
-
-	//Check top pixels
-	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
-		if global.gWorld.IsRegular(x, m.bounds.Y+m.bounds.Height-offset) {
-			top = true
-			break
-		}
-	}
-
-	// Divide speed by 3 to make it smoother and not too choppy.
-	if bottom {
-		m.bounds.Y += m.speed / 2 * dt
-	} else if top {
-		m.bounds.Y -= m.speed / 2 * dt
-	}
-}
-
-//=============================================================
 //
 //=============================================================
 func (m *mob) draw(dt float64) {
@@ -452,6 +457,7 @@ func (m *mob) draw(dt float64) {
 	}
 	// Update physics
 	m.physics(dt)
+
 	if shooting {
 		m.currentAnim = animShoot
 	}
