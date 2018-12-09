@@ -366,7 +366,8 @@ func (m *mob) physics(dt float64) {
 		m.velo.X = m.dir * math.Max(math.Abs(m.velo.X), m.speed/100)
 	} else {
 		if m.hitFloor(m.bounds.X, m.bounds.Y-5) {
-			m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/10, 0) * m.dir
+			//m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/10, 0) * m.dir
+			m.velo.X = 0
 		} else {
 			m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/100, 0) * m.dir
 		}
