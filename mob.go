@@ -63,7 +63,7 @@ func (m *mob) create(x, y float64) {
 	m.prevPos = make([]pixel.Vec, 100)
 
 	m.animRate = 0.1
-	m.jumpPower = 4
+	m.jumpPower = 200
 	m.speed = 200
 	m.mass = 20
 	m.currentAnim = animIdle
@@ -363,13 +363,12 @@ func (m *mob) hitWallLeft(x, y float64) bool {
 func (m *mob) physics(dt float64) {
 	if m.keyMove.X != 0 {
 		m.velo.X = dt * m.speed * m.dir
-		m.velo.X = m.dir * math.Max(math.Abs(m.velo.X), m.speed/100)
 	} else {
 		if m.hitFloor(m.bounds.X, m.bounds.Y-5) {
 			//m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/10, 0) * m.dir
 			m.velo.X = 0
 		} else {
-			m.velo.X = math.Max(math.Abs(m.velo.X)-dt*m.speed/100, 0) * m.dir
+			m.velo.X = math.Min(math.Abs(m.velo.X)-dt*m.speed/100, 0) * m.dir
 		}
 	}
 
@@ -383,7 +382,7 @@ func (m *mob) physics(dt float64) {
 			m.velo.X = 0
 		} else {
 			if !m.jumping {
-				m.velo.Y = m.jumpPower
+				m.velo.Y = m.jumpPower * dt
 				m.jumping = true
 			}
 		}

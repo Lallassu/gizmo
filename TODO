@@ -1,10 +1,12 @@
 General
 --------
+- Map handler
+    - Set player pos
+    - Add weapons
+
 - One StaticObject and one DynamicObject
     - Static: Use TextureLoader
     - Dynamic: Handle Texture self (destructable)
-
-- CPU bound particle size over time -> FIX!
 
 - Fix better walk (Smoother)
     - over pixels

@@ -16,6 +16,7 @@ const (
 
 // World constants
 const (
+	wMaxInvFPS           = 1 / 60.0
 	wShadowLength        = 5
 	wShadowDepth         = 1.5
 	wPixelsPerChunk      = 64

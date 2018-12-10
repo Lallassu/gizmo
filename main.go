@@ -73,6 +73,8 @@ func setup() {
 //=============================================================
 func gameLoop() {
 	last := time.Now()
+	frameDt := 0.0
+
 	//fps := time.Tick(time.Second / 1000)
 	//second := time.Tick(time.Second)
 	//frames := 0
@@ -133,17 +135,24 @@ func gameLoop() {
 
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
+		frameDt += dt
 		last = time.Now()
 
-		global.gWin.Clear(global.gClearColor)
+		for {
+			if frameDt >= wMaxInvFPS {
+				global.gWin.Clear(global.gClearColor)
+				global.gController.update(wMaxInvFPS)
+				global.gWorld.Draw(wMaxInvFPS)
+				global.gParticleEngine.update(wMaxInvFPS)
+				global.gAmmoEngine.update(wMaxInvFPS)
+				global.gCamera.update(wMaxInvFPS)
+				global.gWin.Update()
+			} else {
+				break
+			}
 
-		global.gController.update(dt)
-		global.gWorld.Draw(dt)
-		global.gParticleEngine.update(dt)
-		global.gAmmoEngine.update(dt)
-		global.gCamera.update(dt)
-
-		global.gWin.Update()
+			frameDt -= wMaxInvFPS
+		}
 
 		//  <-fps
 		//  updateFPSDisplay(global.gWin, &frames, second)
