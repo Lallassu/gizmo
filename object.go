@@ -17,7 +17,9 @@ import (
 
 type object struct {
 	static      bool
+	name        string
 	textureFile string
+	sprite      *sprite
 	img         image.Image
 	model       *imdraw.IMDraw
 	canvas      *pixelgl.Canvas
@@ -57,30 +59,47 @@ func (o *object) create(x_, y_ float64) {
 	o.vy = 1
 	o.active = true
 
-	o.img, o.width, o.height, o.size = loadTexture(o.textureFile)
+	if !o.static {
+		o.img, o.width, o.height, o.size = loadTexture(o.textureFile)
 
-	// Initiate bounds for qt
-	o.bounds = &Bounds{
-		X:      x_,
-		Y:      y_,
-		Width:  float64(o.width) * o.scale,
-		Height: float64(o.height) * o.scale,
-		entity: Entity(o),
-	}
-
-	o.pixels = make([]uint32, o.size*o.size)
-
-	for x := 0; x < o.width; x++ {
-		for y := 0; y < o.height; y++ {
-			r, g, b, a := o.img.At(x, o.height-y).RGBA()
-			o.pixels[x*o.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+		// Initiate bounds for qt
+		o.bounds = &Bounds{
+			X:      x_,
+			Y:      y_,
+			Width:  float64(o.width) * o.scale,
+			Height: float64(o.height) * o.scale,
+			entity: Entity(o),
 		}
+
+		o.pixels = make([]uint32, o.size*o.size)
+
+		for x := 0; x < o.width; x++ {
+			for y := 0; y < o.height; y++ {
+				r, g, b, a := o.img.At(x, o.height-y).RGBA()
+				o.pixels[x*o.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+			}
+		}
+
+		o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
+
+		// build initial
+		o.build()
+	} else {
+		o.sprite = &sprite{name: o.name, scale: o.scale}
+		o.width, o.height = global.gTextures.spriteInfo(o.name)
+		Debug("SPRITE:", o.width, o.height)
+
+		// Load sprite included in batch
+		o.bounds = &Bounds{
+			X:      x_,
+			Y:      y_,
+			Width:  float64(o.width) * o.scale,
+			Height: float64(o.height) * o.scale,
+			entity: Entity(o),
+		}
+
+		global.gTextures.addObject(o.sprite)
 	}
-
-	o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
-
-	// build initial
-	o.build()
 
 	// Add object to QT
 	global.gWorld.AddObject(o.bounds)
@@ -90,29 +109,31 @@ func (o *object) create(x_, y_ float64) {
 // Build
 //=============================================================
 func (o *object) build() {
-	o.model = imdraw.New(nil)
-	for x := 0; x < o.width; x++ {
-		for y := 0; y < o.height; y++ {
-			p := o.pixels[x*o.size+y]
-			if p == 0 {
-				continue
+	if !o.static {
+		o.model = imdraw.New(nil)
+		for x := 0; x < o.width; x++ {
+			for y := 0; y < o.height; y++ {
+				p := o.pixels[x*o.size+y]
+				if p == 0 {
+					continue
+				}
+
+				o.model.Color = pixel.RGB(
+					float64(p>>24&0xFF)/255.0,
+					float64(p>>16&0xFF)/255.0,
+					float64(p>>8&0xFF)/255.0,
+				).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
+				o.model.Push(
+					pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
+					pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
+				)
+				o.model.Rectangle(0)
 			}
-
-			o.model.Color = pixel.RGB(
-				float64(p>>24&0xFF)/255.0,
-				float64(p>>16&0xFF)/255.0,
-				float64(p>>8&0xFF)/255.0,
-			).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
-			o.model.Push(
-				pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
-				pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
-			)
-			o.model.Rectangle(0)
 		}
-	}
 
-	o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	o.model.Draw(o.canvas)
+		o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+		o.model.Draw(o.canvas)
+	}
 }
 
 //=============================================================
@@ -124,45 +145,49 @@ func (o *object) build() {
 //
 //=============================================================
 func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
-	x := int(math.Abs(float64(o.bounds.X - x_)))
-	y := int(math.Abs(float64(o.bounds.Y - y_)))
+	if !o.static {
+		x := int(math.Abs(float64(o.bounds.X - x_)))
+		y := int(math.Abs(float64(o.bounds.Y - y_)))
 
-	pow := power * power
-	for rx := x - power; rx <= x+power; rx++ {
-		xx := (rx - x) * (rx - x)
-		for ry := y - power; ry <= y+power; ry++ {
-			if ry < 0 {
-				continue
-			}
-			val := (ry-y)*(ry-y) + xx
-			if val < pow {
-				pos := o.size*rx + ry
-				if pos >= 0 && pos < o.size*o.size {
-					if o.pixels[pos] != 0 {
-						global.gParticleEngine.newParticle(
-							particle{
-								x:           float64(x_),
-								y:           float64(y_),
-								size:        1,
-								restitution: -0.1 - global.gRand.randFloat()/4,
-								life:        wParticleDefaultLife,
-								fx:          10,
-								fy:          10,
-								vx:          vx,
-								vy:          float64(5 - global.gRand.rand()),
-								mass:        1,
-								pType:       particleRegular,
-								color:       o.pixels[pos],
-								static:      true,
-							})
-						o.pixels[pos] = 0
+		pow := power * power
+		for rx := x - power; rx <= x+power; rx++ {
+			xx := (rx - x) * (rx - x)
+			for ry := y - power; ry <= y+power; ry++ {
+				if ry < 0 {
+					continue
+				}
+				val := (ry-y)*(ry-y) + xx
+				if val < pow {
+					pos := o.size*rx + ry
+					if pos >= 0 && pos < o.size*o.size {
+						if o.pixels[pos] != 0 {
+							global.gParticleEngine.newParticle(
+								particle{
+									x:           float64(x_),
+									y:           float64(y_),
+									size:        1,
+									restitution: -0.1 - global.gRand.randFloat()/4,
+									life:        wParticleDefaultLife,
+									fx:          10,
+									fy:          10,
+									vx:          vx,
+									vy:          float64(5 - global.gRand.rand()),
+									mass:        1,
+									pType:       particleRegular,
+									color:       o.pixels[pos],
+									static:      true,
+								})
+							o.pixels[pos] = 0
+						}
 					}
 				}
 			}
 		}
+		o.build()
+	} else {
+		// TBD: Keep track on hits before explode?
+		o.explode()
 	}
-
-	o.build()
 	return true
 }
 
@@ -180,34 +205,37 @@ func (o *object) isFree() bool {
 //
 //=============================================================
 func (o *object) explode() {
-	if o.objectType == objectCrate {
-		o.active = false
-		for x := 0; x < o.width; x++ {
-			for y := 0; y < o.height; y++ {
-				p := o.pixels[x*o.size+y]
-				o.pixels[x*o.size+y] = 0
+	if !o.static {
+		if o.objectType == objectCrate {
+			o.active = false
+			for x := 0; x < o.width; x++ {
+				for y := 0; y < o.height; y++ {
+					p := o.pixels[x*o.size+y]
+					o.pixels[x*o.size+y] = 0
 
-				global.gParticleEngine.newParticle(
-					particle{
-						x:           o.bounds.X + float64(x),
-						y:           o.bounds.Y + float64(y),
-						size:        1,
-						restitution: -0.1 - global.gRand.randFloat()/4,
-						life:        wParticleDefaultLife,
-						fx:          10,
-						fy:          10,
-						vx:          float64(5 - global.gRand.rand()),
-						vy:          float64(5 - global.gRand.rand()),
-						mass:        1,
-						pType:       particleRegular,
-						color:       p,
-						static:      true,
-					})
+					global.gParticleEngine.newParticle(
+						particle{
+							x:           o.bounds.X + float64(x),
+							y:           o.bounds.Y + float64(y),
+							size:        1,
+							restitution: -0.1 - global.gRand.randFloat()/4,
+							life:        wParticleDefaultLife,
+							fx:          10,
+							fy:          10,
+							vx:          float64(5 - global.gRand.rand()),
+							vy:          float64(5 - global.gRand.rand()),
+							mass:        1,
+							pType:       particleRegular,
+							color:       p,
+							static:      true,
+						})
+				}
 			}
 		}
+	} else {
 
-		global.gWorld.qt.Remove(o.bounds)
 	}
+	global.gWorld.qt.Remove(o.bounds)
 }
 
 //=============================================================
@@ -318,8 +346,12 @@ func (o *object) draw(dt float64) {
 
 	if o.owner == nil {
 		o.physics(dt)
-		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
-		o.unStuck(dt)
+		if !o.static {
+			o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
+		} else {
+			o.sprite.pos = pixel.Vec{o.bounds.X, o.bounds.Y}
+		}
+		//o.unStuck(dt)
 	} else {
 		mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 		mouse.X = math.Abs(mouse.X - o.bounds.X)

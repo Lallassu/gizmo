@@ -75,17 +75,60 @@ func gameLoop() {
 	last := time.Now()
 	frameDt := 0.0
 
+	var fragmentShader = `
+	 #version 330 core
+	
+	 in vec2  vTexCoords;
+	 in vec2 vVertex;
+	 in vec4 vColor;
+	
+	 out vec4 fragColor;
+	
+	 uniform float uPosX;
+	 uniform float uPosY;
+	 uniform vec4 uTexBounds;
+	 uniform sampler2D uTexture;
+	
+	 void main() {
+	 	// Get our current screen coordinate
+	 	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+	
+	 	// Sum our 3 color channels
+	 	float sum  = texture(uTexture, t).r;
+	 	      sum += texture(uTexture, t).g;
+	 	      sum += texture(uTexture, t).b;
+	
+	 	// Divide by 3, and set the output to the result
+	    vec4 color = vec4(0.0,0.0,0.0,1.0);
+	   if (texture(uTexture,t).r == 0 && texture(uTexture,t).g == 0 && texture(uTexture,t).b == 0) {
+	         int val = int(vColor.a*255) & 0xFF;
+
+	   	     float distance = sqrt(pow(vVertex.x-uPosX, 2) + pow(vVertex.y-uPosY, 2))/50;
+	   //if(val == 0xFF ||val == 0xAF || val == 0x8F || val == 0xFE || val == 0xBF || val == 0xBF) {
+	        if (val == 0x8F) {
+		   		    color = vec4(vColor.r/distance, vColor.g/distance, vColor.b/distance, vColor.a);
+		     } else {
+		   		 color = vec4(vColor.r/2, vColor.g/2, vColor.b/2, vColor.a);
+			 }
+		} else {
+		    color = vec4(texture(uTexture,t).r, texture(uTexture,t).g, texture(uTexture,t).b, 1.0); //texture(uTexture,t).a);
+		}
+	 	fragColor = color;
+	 }
+	 `
 	//fps := time.Tick(time.Second / 1000)
 	//second := time.Tick(time.Second)
 	//frames := 0
 
 	// Load a bunch of weapons
-	for _, x := range []string{"ak47_weapon.png", "p90_weapon.png", "rocketlauncher_weapon.png", "shotgun_weapon.png", "crate_obj.png"} {
+	for _, x := range []string{"ak47_weapon"} { // , "p90_weapon", "rocketlauncher_weapon", "shotgun_weapon", "crate_obj"} {
 		var otype objectType
 		scale := 0.15
 
+		static := false
 		if strings.Contains(x, "_weapon") {
 			otype = objectWeapon
+			static = false
 		} else if strings.Contains(x, "_obj") {
 			otype = objectCrate
 			scale = 1
@@ -93,7 +136,9 @@ func gameLoop() {
 
 		for i := 0; i < 5; i++ {
 			objTest := object{
-				textureFile: fmt.Sprintf("assets/objects/%v", x),
+				textureFile: fmt.Sprintf("assets/objects/%v.png", x),
+				name:        x,
+				static:      static,
 				entityType:  entityObject,
 				objectType:  otype,
 				scale:       scale,
@@ -133,6 +178,12 @@ func gameLoop() {
 	global.gController.setActiveEntity(&test)
 	global.gCamera.setFollow(&test)
 
+	var uPosX, uPosY float32
+	// global.gWin.Canvas().SetUniform("uTime", &uTime)
+	global.gWin.Canvas().SetUniform("uPosX", &uPosX)
+	global.gWin.Canvas().SetUniform("uPosY", &uPosY)
+	global.gWin.Canvas().SetFragmentShader(fragmentShader)
+
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
 		frameDt += dt
@@ -143,10 +194,13 @@ func gameLoop() {
 				global.gWin.Clear(global.gClearColor)
 				global.gController.update(wMaxInvFPS)
 				global.gWorld.Draw(wMaxInvFPS)
+				global.gTextures.update(wMaxInvFPS)
 				global.gParticleEngine.update(wMaxInvFPS)
 				global.gAmmoEngine.update(wMaxInvFPS)
 				global.gCamera.update(wMaxInvFPS)
 				global.gWin.Update()
+				uPosX = float32(test.bounds.X)
+				uPosY = float32(test.bounds.Y)
 			} else {
 				break
 			}

@@ -15,7 +15,7 @@ type textures struct {
 	batch   *pixel.Batch
 	image   *pixel.PictureData
 	sprites map[string]*pixel.Sprite
-	objects []sprite
+	objects []*sprite
 }
 
 //=============================================================
@@ -100,6 +100,7 @@ func (t *textures) load(jsonfile string) {
 	reg := regexp.MustCompile(`\..*`)
 	for _, f := range result.Frames {
 		name := reg.ReplaceAllString(f.Filename, "${1}")
+		Debug("F:", f.Filename, pixel.R(f.Frame.X, f.Frame.Y, f.Frame.X+f.Frame.W, f.Frame.Y+f.Frame.H))
 		t.sprites[name] = pixel.NewSprite(t.image, pixel.R(f.Frame.X, f.Frame.Y, f.Frame.X+f.Frame.W, f.Frame.Y+f.Frame.H))
 	}
 }
@@ -107,7 +108,7 @@ func (t *textures) load(jsonfile string) {
 //=============================================================
 // Add new sprite object to draw
 //=============================================================
-func (t *textures) addObject(o sprite) {
+func (t *textures) addObject(o *sprite) {
 	t.objects = append(t.objects, o)
 }
 
@@ -119,9 +120,17 @@ func (t *textures) removeObject(o sprite) {
 }
 
 //=============================================================
+// Get info for sprite
+//=============================================================
+func (t *textures) spriteInfo(name string) (int, int) {
+	f := t.sprites[name].Frame()
+	return int(f.Max.X - f.Min.X), int(f.Max.Y - f.Min.Y)
+}
+
+//=============================================================
 // Draw the batch based on the packed texture atlas
 //=============================================================
-func (t *textures) draw(dt float64) {
+func (t *textures) update(dt float64) {
 	t.batch.Clear()
 	for _, o := range t.objects {
 		t.sprites[o.name].Draw(t.batch, pixel.IM.Scaled(pixel.ZV, o.scale).Moved(o.pos))
