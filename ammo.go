@@ -86,7 +86,7 @@ func (pe *ammoEngine) update(dt float64) {
 				float64((pe.bullets[i].color >> 24 & 0xFF)) / 255.0,
 				float64((pe.bullets[i].color >> 16 & 0xFF)) / 255.0,
 				float64((pe.bullets[i].color >> 8 & 0xFF)) / 255.0,
-				1})
+				1.0})
 			pe.canvas.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, 1).Moved(pixel.V(pe.bullets[i].x, pe.bullets[i].y)))
 		}
 	}

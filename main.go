@@ -76,46 +76,40 @@ func gameLoop() {
 	frameDt := 0.0
 
 	var fragmentShader = `
-	 #version 330 core
+	  #version 330 core
 	
-	 in vec2  vTexCoords;
-	 in vec2 vPosition;
-	 in vec4 vColor;
+	  in vec2  vTexCoords;
+	  in vec2 vPosition;
+	  in vec4 vColor;
 	
-	 out vec4 fragColor;
+	  out vec4 fragColor;
 	
-	 uniform float uPosX;
-	 uniform float uPosY;
-	 uniform vec4 uTexBounds;
-	 uniform sampler2D uTexture;
+	  uniform float uPosX;
+	  uniform float uPosY;
+	  uniform vec4 uTexBounds;
+	  uniform sampler2D uTexture;
 	
-	 void main() {
-	 	// Get our current screen coordinate
-	 	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+	  void main() {
+	  	// Get our current screen coordinate
+	  	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
 	
-	 	// Sum our 3 color channels
-	 	float sum  = texture(uTexture, t).r;
-	 	      sum += texture(uTexture, t).g;
-	 	      sum += texture(uTexture, t).b;
-	
-	 	// Divide by 3, and set the output to the result
-	    vec4 color = vec4(0.0,0.0,0.0,1.0);
-	   if (texture(uTexture,t).r == 0 && texture(uTexture,t).g == 0 && texture(uTexture,t).b == 0) {
+	     vec4 color = vec4(0.0,0.0,0.0,1.0);
+		 if (vColor.r == 1.0 && vColor.g == 1.0 && vColor.b == 1.0 && vColor.a == 1.0 ){
+	        color = vec4(texture(uTexture,t).r, texture(uTexture,t).g, texture(uTexture,t).b, texture(uTexture,t).a);
+	    } else {
 	         int val = int(vColor.a*255) & 0xFF;
-			  
-	   	     float distance = sqrt(pow(vPosition.x-uPosX, 2) + pow(vPosition.y-uPosY, 2))/50;
-	   //if(val == 0xFF ||val == 0xAF || val == 0x8F || val == 0xFE || val == 0xBF || val == 0xBF) {
-	        if (val == 0x8F) {
-		   		    color = vec4(vColor.r/distance, vColor.g/distance, vColor.b/distance, vColor.a);
-		     } else {
-		   		 color = vec4(vColor.r/2, vColor.g/2, vColor.b/2, vColor.a);
-			 }
-		} else {
-		    color = vec4(texture(uTexture,t).r, texture(uTexture,t).g, texture(uTexture,t).b, 1.0); //texture(uTexture,t).a);
-		}
-	 	fragColor = color;
-	 }
-	 `
+			 	
+	         float distance = sqrt(pow(vPosition.x-uPosX+cos(uPosX/10)*10, 2) + pow(vPosition.y-(uPosY+10)+cos(uPosY/10)*10, 2))/5;
+
+	         if (val == 0x8F) {
+	       		    color = vec4(vColor.r/(distance/2), vColor.g/distance, vColor.b/distance, vColor.a);
+	         } else {
+	       		 color = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
+	    	 }
+	    }
+	  	fragColor = color;
+	  }
+	  `
 	//fps := time.Tick(time.Second / 1000)
 	//second := time.Tick(time.Second)
 	//frames := 0
@@ -179,7 +173,6 @@ func gameLoop() {
 	global.gCamera.setFollow(&test)
 
 	var uPosX, uPosY float32
-	// global.gWin.Canvas().SetUniform("uTime", &uTime)
 	global.gWin.Canvas().SetUniform("uPosX", &uPosX)
 	global.gWin.Canvas().SetUniform("uPosY", &uPosY)
 	global.gWin.Canvas().SetFragmentShader(fragmentShader)

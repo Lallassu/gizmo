@@ -7,7 +7,6 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"math"
@@ -21,9 +20,9 @@ type mob struct {
 	climbFrames []int
 	shootFrames []int
 	idleFrames  []int
-	frameWidth  int
-	frameHeight int
-	size        int
+	frameWidth  float64
+	frameHeight float64
+	size        float64
 	currentAnim animationType
 	mobType     entityType
 	animCounter float64
@@ -37,11 +36,13 @@ type mob struct {
 	jumping     bool
 	jumpPower   float64
 	keyMove     pixel.Vec
-	models      map[int]*imdraw.IMDraw
-	canvas      *pixelgl.Canvas
-	frames      map[int][]uint32
-	bounds      *Bounds
-	img         image.Image
+
+	batches   map[int]*pixel.Batch
+	triangles map[int]*pixel.TrianglesData
+	frames    map[int][]uint32
+	bounds    *Bounds
+	img       image.Image
+	canvas    *pixelgl.Canvas
 }
 
 //=============================================================
@@ -49,8 +50,9 @@ type mob struct {
 // - load animation sheet
 //=============================================================
 func (m *mob) create(x, y float64) {
-	m.models = make(map[int]*imdraw.IMDraw)
 	m.frames = make(map[int][]uint32)
+	m.batches = make(map[int]*pixel.Batch)
+	m.triangles = make(map[int]*pixel.TrianglesData)
 
 	m.animRate = 0.1
 	m.jumpPower = 200
@@ -59,7 +61,7 @@ func (m *mob) create(x, y float64) {
 	m.currentAnim = animIdle
 	m.dir = 1
 
-	fullWidth := 0
+	fullWidth := 0.0
 
 	m.img, fullWidth, m.frameHeight, m.size = loadTexture(m.sheetFile)
 
@@ -73,14 +75,16 @@ func (m *mob) create(x, y float64) {
 	}
 
 	f := 0
-	for w := 0; w < fullWidth; w += m.frameWidth {
-		m.frames[f] = make([]uint32, m.size*m.size)
-		for x := 0; x <= m.frameWidth; x++ {
-			for y := 0; y <= m.frameHeight; y++ {
-				r, g, b, a := m.img.At(w+x, m.frameHeight-y).RGBA()
-				m.frames[f][x*m.size+y] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+	for w := 0.0; w < fullWidth; w += m.frameWidth {
+		m.frames[f] = make([]uint32, int(m.size)*int(m.size))
+		for x := 0.0; x <= m.frameWidth; x++ {
+			for y := 0.0; y <= m.frameHeight; y++ {
+				r, g, b, a := m.img.At(int(w+x), int(m.frameHeight-y)).RGBA()
+				m.frames[f][int(x*m.size+y)] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}
+		m.triangles[f] = pixel.MakeTrianglesData(100)
+		m.batches[f] = pixel.NewBatch(m.triangles[f], nil)
 		f++
 	}
 
@@ -97,27 +101,109 @@ func (m *mob) create(x, y float64) {
 // Build each frame
 //=============================================================
 func (m *mob) buildFrames() {
+	v := 0
+	rc := uint32(0)
+	gc := uint32(0)
+	bc := uint32(0)
+	p2 := uint32(0)
+	r1 := uint32(0)
+	g1 := uint32(0)
+	b1 := uint32(0)
+	draw := 0
+	same_x := 1.0
+	same_y := 1.0
+	pos := 0
+
+	// Build batch for each frame.
 	for i := 0; i < len(m.frames); i++ {
-		m.models[i] = imdraw.New(nil)
-		for x := 0; x < m.frameWidth; x++ {
-			for y := 0; y < m.frameHeight; y++ {
-				p := m.frames[i][x*m.size+y]
-				if p == 0 {
+		for x := 0.0; x < float64(m.frameWidth); x++ {
+			for y := 0.0; y < float64(m.frameHeight); y++ {
+				p := m.frames[i][int(x*m.size+y)]
+				if p == 0 || p&0xFF>>7 == 0 {
 					continue
 				}
+				rc = p >> 24 & 0xFF
+				gc = p >> 16 & 0xFF
+				bc = p >> 8 & 0xFF
+				same_x = 1.0
+				same_y = 1.0
 
-				m.models[i].Color = pixel.RGB(
-					float64(p>>24&0xFF)/255.0,
-					float64(p>>16&0xFF)/255.0,
-					float64(p>>8&0xFF)/255.0,
-				).Mul(pixel.Alpha(float64(p&0xFF) / 255.0))
-				m.models[i].Push(
-					pixel.V(float64(x*wPixelSize), float64(y*wPixelSize)),
-					pixel.V(float64(x*wPixelSize+wPixelSize), float64(y*wPixelSize+wPixelSize)),
-				)
-				m.models[i].Rectangle(0)
+				for l := x + 1; l < m.bounds.Width; l++ {
+					// Check color
+					pos = int(l*m.size + y)
+					p2 = m.frames[i][pos]
+					if p2 == 0 {
+						break
+					}
+					r1 = p2 >> 24 & 0xFF
+					g1 = p2 >> 16 & 0xFF
+					b1 = p2 >> 8 & 0xFF
+
+					if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
+						// Same color and not yet visited!
+						m.frames[i][pos] &= 0xFFFFFF7F
+						same_x++
+						new_y := 1.0
+						for k := y; k < m.bounds.Height; k++ {
+							pos = int(l*m.size + k)
+							p2 = m.frames[i][pos]
+							r1 = p2 >> 24 & 0xFF
+							g1 = p2 >> 16 & 0xFF
+							b1 = p2 >> 8 & 0xFF
+
+							if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
+								m.frames[i][pos] &= 0xFFFFFF7F
+								new_y++
+							} else {
+								break
+							}
+						}
+						if new_y < same_y {
+							break
+						} else {
+							same_y = new_y
+						}
+					} else {
+						break
+					}
+				}
+
+				draw++
+
+				// Convert to decimal
+				r := float64(p>>24&0xFF) / 255.0
+				g := float64(p>>16&0xFF) / 255.0
+				b := float64(p>>8&0xFF) / 255.0
+				a := float64(p&0xFF) / 255.0
+
+				// Increase length of triangles if we need to draw more than we had before.
+				if draw*6 >= len(*m.triangles[i]) {
+					m.triangles[i].SetLen(draw*6 + 10)
+				}
+
+				// Size of triangle is given by how large the greedy algorithm found out.
+				(*m.triangles[i])[v].Position = pixel.Vec{x, y}
+				(*m.triangles[i])[v+1].Position = pixel.Vec{x + same_x, y}
+				(*m.triangles[i])[v+2].Position = pixel.Vec{x + same_x, y + same_y}
+				(*m.triangles[i])[v+3].Position = pixel.Vec{x, y}
+				(*m.triangles[i])[v+4].Position = pixel.Vec{x, y + same_y}
+				(*m.triangles[i])[v+5].Position = pixel.Vec{x + same_x, y + same_y}
+				for n := 0; n < 6; n++ {
+					(*m.triangles[i])[v+n].Color = pixel.RGBA{r, g, b, a}
+				}
+
+				v += 6
+
 			}
 		}
+		// Reset the greedy bit
+		for x := 0.0; x < m.bounds.Width; x++ {
+			for y := 0.0; y < m.bounds.Height; y++ {
+				m.frames[i][int(x*m.size+y)] |= 0x00000080
+			}
+		}
+		m.triangles[i].SetLen(draw * 6)
+		m.batches[i].Dirty()
 	}
 }
 
@@ -140,8 +226,8 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 			val := (ry-y)*(ry-y) + xx
 			if val < pow {
 				for i := 0; i < len(m.frames); i++ {
-					pos := m.size*rx + ry
-					if pos >= 0 && pos < m.size*m.size {
+					pos := int(m.size)*rx + ry
+					if pos >= 0 && pos < int(m.size*m.size) {
 						if m.frames[i][pos] != 0 {
 							m.frames[i][pos] = 0
 							global.gParticleEngine.newParticle(
@@ -210,9 +296,9 @@ func (m *mob) throw() {
 //=============================================================
 func (m *mob) explode() {
 	for i := 0; i < len(m.frames); i++ {
-		for x := 0; x < m.frameWidth; x++ {
-			for y := 0; y < m.frameHeight; y++ {
-				pos := m.size*x + y
+		for x := 0.0; x < m.frameWidth; x++ {
+			for y := 0.0; y < m.frameHeight; y++ {
+				pos := int(m.size*x + y)
 				if m.frames[i][pos] != 0 {
 					// Remove part
 					global.gParticleEngine.newParticle(
@@ -472,18 +558,18 @@ func (m *mob) draw(dt float64) {
 		m.currentAnim = animIdle
 	}
 
-	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	m.models[idx].Draw(m.canvas)
-
-	m.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
+	//m.batches[idx].SetMatrix(pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
+	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0xF1 / 255})
+	m.batches[idx].Draw(m.canvas)
+	m.canvas.Draw(global.gWin, (pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2))))
 
 	// Draw any object attached.
-	if m.carry != nil {
-		m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).
-			Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)).
-			Rotated(pixel.Vec{m.carry.bounds.X + m.carry.bounds.Width/2, m.carry.bounds.Y + m.carry.bounds.Height/2}, m.carry.rotation*m.dir))
-		// Update object positions based on mob
-		m.carry.bounds.X = m.bounds.X
-		m.carry.bounds.Y = m.bounds.Y
-	}
+	// if m.carry != nil {
+	// 	m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).
+	// 		Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)).
+	// 		Rotated(pixel.Vec{m.carry.bounds.X + m.carry.bounds.Width/2, m.carry.bounds.Y + m.carry.bounds.Height/2}, m.carry.rotation*m.dir))
+	// 	// Update object positions based on mob
+	// 	m.carry.bounds.X = m.bounds.X
+	// 	m.carry.bounds.Y = m.bounds.Y
+	// }
 }

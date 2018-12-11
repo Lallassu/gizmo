@@ -20,10 +20,10 @@ import (
 // Load texture file (could also be spritesheets) (png format)
 // Size is the largest of height/width used for 1D pixel arrays
 //=============================================================
-func loadTexture(file string) (img image.Image, width, height, size int) {
-	width = 0
-	height = 0
-	size = 0
+func loadTexture(file string) (img image.Image, width, height, size float64) {
+	width = 0.0
+	height = 0.0
+	size = 0.0
 	img = nil
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
@@ -44,8 +44,8 @@ func loadTexture(file string) (img image.Image, width, height, size int) {
 	imgfile.Seek(0, 0)
 	img, _, _ = image.Decode(imgfile)
 
-	height = imgCfg.Height
-	width = imgCfg.Width
+	height = float64(imgCfg.Height)
+	width = float64(imgCfg.Width)
 	size = width
 	if width < height {
 		size = height

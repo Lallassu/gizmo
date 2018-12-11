@@ -60,7 +60,14 @@ func (o *object) create(x_, y_ float64) {
 	o.active = true
 
 	if !o.static {
-		o.img, o.width, o.height, o.size = loadTexture(o.textureFile)
+		tmp_w := 0.0
+		tmp_h := 0.0
+		tmp_s := 0.0
+
+		o.img, tmp_w, tmp_h, tmp_s = loadTexture(o.textureFile)
+		o.width = int(tmp_w)
+		o.height = int(tmp_h)
+		o.size = int(tmp_s)
 
 		// Initiate bounds for qt
 		o.bounds = &Bounds{
