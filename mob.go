@@ -11,8 +11,6 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"math"
-	"math/rand"
-	"time"
 )
 
 type mob struct {
@@ -27,29 +25,23 @@ type mob struct {
 	frameHeight int
 	size        int
 	currentAnim animationType
-	models      map[int]*imdraw.IMDraw
-	canvas      *pixelgl.Canvas
-	frames      map[int][]uint32
-	bounds      *Bounds
 	mobType     entityType
 	animCounter float64
 	animRate    float64
 	speed       float64
 	dir         float64
 	mass        float64
-	cdPixels    [][2]uint32
-	img         image.Image
 	carry       *object
-
-	prevPos      []pixel.Vec
-	force        pixel.Vec
-	velo         pixel.Vec
-	restitution  float64
-	climbing     bool
-	jumping      bool
-	jumpPower    float64
-	acceleration float64
-	keyMove      pixel.Vec
+	velo        pixel.Vec
+	climbing    bool
+	jumping     bool
+	jumpPower   float64
+	keyMove     pixel.Vec
+	models      map[int]*imdraw.IMDraw
+	canvas      *pixelgl.Canvas
+	frames      map[int][]uint32
+	bounds      *Bounds
+	img         image.Image
 }
 
 //=============================================================
@@ -59,8 +51,6 @@ type mob struct {
 func (m *mob) create(x, y float64) {
 	m.models = make(map[int]*imdraw.IMDraw)
 	m.frames = make(map[int][]uint32)
-	m.cdPixels = make([][2]uint32, 10)
-	m.prevPos = make([]pixel.Vec, 100)
 
 	m.animRate = 0.1
 	m.jumpPower = 200
@@ -92,12 +82,6 @@ func (m *mob) create(x, y float64) {
 			}
 		}
 		f++
-	}
-
-	// Generate some CD pixel for faster CD check.
-	rand.Seed(time.Now().UTC().UnixNano())
-	for x := 0; x < 20; x++ {
-		m.cdPixels = append(m.cdPixels, [2]uint32{uint32(rand.Intn(m.frameWidth)), uint32(rand.Intn(m.frameHeight))})
 	}
 
 	m.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(m.frameWidth), float64(m.frameHeight)))
@@ -356,6 +340,20 @@ func (m *mob) hitWallLeft(x, y float64) bool {
 }
 
 //=============================================================
+// Check if on ladder
+//=============================================================
+func (m *mob) IsOnLadder() bool {
+	for px := m.bounds.Width / 3; px < m.bounds.Width-m.bounds.Width/3; px += 2 {
+		for py := 0.0; py < m.bounds.Height; py += 2 {
+			if global.gWorld.IsLadder(m.bounds.X+px, m.bounds.Y+py) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+//=============================================================
 // Physics for mob.
 // I don't want real physics, better to have a good feeling for
 // movement than accurate physic simulation.
@@ -433,18 +431,6 @@ func (m *mob) physics(dt float64) {
 
 	m.keyMove.X = 0
 	m.keyMove.Y = 0
-}
-
-//=============================================================
-// Check if on ladder
-//=============================================================
-func (m *mob) IsOnLadder() bool {
-	for _, p := range m.cdPixels {
-		if global.gWorld.IsLadder(m.bounds.X+float64(p[0]), m.bounds.Y+float64(p[1])) {
-			return true
-		}
-	}
-	return false
 }
 
 //=============================================================

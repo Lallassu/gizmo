@@ -1,12 +1,10 @@
 General
 --------
+- Rewrite mobs + objects as batches (just as chunks)
+
 - Map handler
     - Set player pos
     - Add weapons
-
-- One StaticObject and one DynamicObject
-    - Static: Use TextureLoader
-    - Dynamic: Handle Texture self (destructable)
 
 - Fix better walk (Smoother)
     - over pixels

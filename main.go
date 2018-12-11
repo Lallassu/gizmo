@@ -79,7 +79,7 @@ func gameLoop() {
 	 #version 330 core
 	
 	 in vec2  vTexCoords;
-	 in vec2 vVertex;
+	 in vec2 vPosition;
 	 in vec4 vColor;
 	
 	 out vec4 fragColor;
@@ -102,8 +102,8 @@ func gameLoop() {
 	    vec4 color = vec4(0.0,0.0,0.0,1.0);
 	   if (texture(uTexture,t).r == 0 && texture(uTexture,t).g == 0 && texture(uTexture,t).b == 0) {
 	         int val = int(vColor.a*255) & 0xFF;
-
-	   	     float distance = sqrt(pow(vVertex.x-uPosX, 2) + pow(vVertex.y-uPosY, 2))/50;
+			  
+	   	     float distance = sqrt(pow(vPosition.x-uPosX, 2) + pow(vPosition.y-uPosY, 2))/50;
 	   //if(val == 0xFF ||val == 0xAF || val == 0x8F || val == 0xFE || val == 0xBF || val == 0xBF) {
 	        if (val == 0x8F) {
 		   		    color = vec4(vColor.r/distance, vColor.g/distance, vColor.b/distance, vColor.a);
