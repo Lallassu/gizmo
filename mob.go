@@ -256,7 +256,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 	m.buildFrames()
 
 	// Check status of mob, if dead => remove from QT
-	global.gWorld.qt.Remove(m.bounds)
+	//	global.gWorld.qt.Remove(m.bounds)
 
 	return true
 }
@@ -440,6 +440,36 @@ func (m *mob) IsOnLadder() bool {
 }
 
 //=============================================================
+// Unstuck the objet if stuck.
+//=============================================================
+func (m *mob) unStuck(dt float64) {
+	bottom := false
+	top := false
+	offset := 1.0
+	// Check bottom pixels
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, m.bounds.Y+offset) {
+			bottom = true
+			break
+		}
+	}
+
+	//Check top pixels
+	for x := m.bounds.X; x < m.bounds.X+m.bounds.Width; x += 2 {
+		if global.gWorld.IsRegular(x, m.bounds.Y+m.bounds.Height-offset) {
+			top = true
+			break
+		}
+	}
+
+	if bottom {
+		m.bounds.Y += 10 * m.mass * dt
+	} else if top {
+		m.bounds.Y -= 10 * m.mass * dt
+	}
+}
+
+//=============================================================
 // Physics for mob.
 // I don't want real physics, better to have a good feeling for
 // movement than accurate physic simulation.
@@ -517,12 +547,13 @@ func (m *mob) physics(dt float64) {
 
 	m.keyMove.X = 0
 	m.keyMove.Y = 0
+	m.unStuck(dt)
 }
 
 //=============================================================
 //
 //=============================================================
-func (m *mob) draw(dt float64) {
+func (m *mob) draw(dt, elapsed float64) {
 	shooting := false
 	if m.currentAnim == animShoot {
 		shooting = true
@@ -559,17 +590,17 @@ func (m *mob) draw(dt float64) {
 	}
 
 	//m.batches[idx].SetMatrix(pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
-	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0xF1 / 255})
+	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 	m.batches[idx].Draw(m.canvas)
 	m.canvas.Draw(global.gWin, (pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2))))
 
 	// Draw any object attached.
-	// if m.carry != nil {
-	// 	m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).
-	// 		Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)).
-	// 		Rotated(pixel.Vec{m.carry.bounds.X + m.carry.bounds.Width/2, m.carry.bounds.Y + m.carry.bounds.Height/2}, m.carry.rotation*m.dir))
-	// 	// Update object positions based on mob
-	// 	m.carry.bounds.X = m.bounds.X
-	// 	m.carry.bounds.Y = m.bounds.Y
-	// }
+	if m.carry != nil {
+		m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).
+			Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)).
+			Rotated(pixel.Vec{m.carry.bounds.X + m.carry.bounds.Width/2, m.carry.bounds.Y + m.carry.bounds.Height/2}, m.carry.rotation*m.dir))
+		// Update object positions based on mob
+		m.carry.bounds.X = m.bounds.X
+		m.carry.bounds.Y = m.bounds.Y
+	}
 }

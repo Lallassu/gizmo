@@ -72,7 +72,7 @@ func (c *chunk) create(x, y float64) {
 //=============================================================
 // Draw the chunk
 //=============================================================
-func (c *chunk) draw(dt float64) {
+func (c *chunk) draw(dt, elapsed float64) {
 	if c.dirty {
 		c.build()
 	}

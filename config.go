@@ -66,7 +66,7 @@ type Global struct {
 var global = &Global{
 	gWindowHeight:   768,
 	gWindowWidth:    1024,
-	gVsync:          true,
+	gVsync:          false,
 	gUndecorated:    false,
 	gWorld:          &world{},
 	gCamera:         &camera{},

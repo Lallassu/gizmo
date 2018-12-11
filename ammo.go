@@ -48,6 +48,25 @@ func (pe *ammoEngine) create() {
 	pe.bullets = make([]ammo, wAmmoMax)
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
 	pe.canvas.Clear(pixel.RGBA{0, 0, 0, 1})
+	// var fragmentShader = `
+	//    #version 330 core
+	//
+	//    in vec2  vTexCoords;
+	//    in vec2 vPosition;
+	//    in vec4 vColor;
+	//
+	//    out vec4 fragColor;
+	//
+	//    uniform vec4 uTexBounds;
+	//    uniform sampler2D uTexture;
+	//
+	//    void main() {
+	//       vec4 color = vec4(0.0,0.0,0.0,1.0);
+	// 	  color = vec4(1.0, 0.1,0.1,0.5);
+	//    	  fragColor = color;
+	//    }
+	//	   `
+	//	pe.canvas.SetFragmentShader(fragmentShader)
 	//pe.canvas.SetSmooth(true)
 	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 

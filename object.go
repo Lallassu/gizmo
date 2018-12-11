@@ -88,24 +88,43 @@ func (o *object) create(x_, y_ float64) {
 		}
 
 		o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
+		var fragmentShader = `
+	    #version 330 core
+	
+	    in vec2  vTexCoords;
+	    in vec2 vPosition;
+	    in vec4 vColor;
+	
+	    out vec4 fragColor;
+	
+	    uniform vec4 uTexBounds;
+	    uniform sampler2D uTexture;
+	
+	    void main() {
+	       vec4 color = vec4(0.0,0.0,0.0,1.0);
+	 	   color = vec4(vColor.g, vColor.g, vColor.b, vColor.a);
+	    	  fragColor = color;
+	    }
+		   `
+		o.canvas.SetFragmentShader(fragmentShader)
 
 		// build initial
 		o.build()
 	} else {
-		o.sprite = &sprite{name: o.name, scale: o.scale}
-		o.width, o.height = global.gTextures.spriteInfo(o.name)
-		Debug("SPRITE:", o.width, o.height)
+		// o.sprite = &sprite{name: o.name, scale: o.scale}
+		// o.width, o.height = global.gTextures.spriteInfo(o.name)
+		// Debug("SPRITE:", o.width, o.height)
 
-		// Load sprite included in batch
-		o.bounds = &Bounds{
-			X:      x_,
-			Y:      y_,
-			Width:  float64(o.width) * o.scale,
-			Height: float64(o.height) * o.scale,
-			entity: Entity(o),
-		}
+		// // Load sprite included in batch
+		// o.bounds = &Bounds{
+		// 	X:      x_,
+		// 	Y:      y_,
+		// 	Width:  float64(o.width) * o.scale,
+		// 	Height: float64(o.height) * o.scale,
+		// 	entity: Entity(o),
+		// }
 
-		global.gTextures.addObject(o.sprite)
+		// global.gTextures.addObject(o.sprite)
 	}
 
 	// Add object to QT
@@ -346,11 +365,10 @@ func (o *object) physics(dt float64) {
 //=============================================================
 //
 //=============================================================
-func (o *object) draw(dt float64) {
+func (o *object) draw(dt, elapsed float64) {
 	if !o.active {
 		return
 	}
-
 	if o.owner == nil {
 		o.physics(dt)
 		if !o.static {
@@ -358,7 +376,7 @@ func (o *object) draw(dt float64) {
 		} else {
 			o.sprite.pos = pixel.Vec{o.bounds.X, o.bounds.Y}
 		}
-		//o.unStuck(dt)
+		o.unStuck(dt)
 	} else {
 		mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 		mouse.X = math.Abs(mouse.X - o.bounds.X)

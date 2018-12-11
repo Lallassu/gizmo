@@ -14,7 +14,7 @@ type Entity interface {
 	explode()
 	getMass() float64
 	getType() entityType
-	draw(dt float64)
+	draw(dt, elapsed float64)
 	move(x, y float64)
 	getPosition() pixel.Vec
 	setPosition(x, y float64)

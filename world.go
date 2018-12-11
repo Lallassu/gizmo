@@ -99,7 +99,7 @@ func (w *world) NewMap(maptype mapType) {
 
 	// Build all chunks first time.
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
-		v.entity.draw(-1)
+		v.entity.draw(-1, 0)
 	}
 
 	Debug("Tree Size:", w.qt.Total)
@@ -217,14 +217,14 @@ func (w *world) PixelColor(x, y float64) int32 {
 //=============================================================
 // Draw
 //=============================================================
-func (w *world) Draw(dt float64) {
+func (w *world) Draw(dt, elapsed float64) {
 	// Draw objects in QT around player position only.
 	pos := pixel.Vec{0, 0}
 	if global.gCamera.follow != nil {
 		pos = global.gCamera.follow.getPosition()
 	}
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: pos.X - wViewMax/2, Y: pos.Y - wViewMax/2, Width: wViewMax, Height: wViewMax}) {
-		v.entity.draw(dt)
+		v.entity.draw(dt, elapsed)
 	}
 }
 

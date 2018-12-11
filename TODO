@@ -1,13 +1,34 @@
 General
 --------
-- Rewrite mobs + objects as batches (just as chunks)
+- Hit -> Build frames for Mob doesn't work as intended.
+
+- Fix better walk (Smoother)
+    - over pixels
+
+- Enemy walk (AI-controller)
+    -> Change weapons
+    -> drop weapons
+    -> Climb
+    -> Jump
+
+- Generic events for explode/hit for objects
+    -> so a box can explode etc.
+
+- UI
+    -> Life
+    -> Ammo
+    -> Deaths
+    -> Life left.
+    -> Map
 
 - Map handler
     - Set player pos
     - Add weapons
 
-- Fix better walk (Smoother)
-    - over pixels
+
+- Special-effects
+    -> Lightning
+    -> Shaders
 
 - Death by fall
 
