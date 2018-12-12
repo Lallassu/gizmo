@@ -140,10 +140,10 @@ func (pe *particleEngine) newParticle(p particle) {
 	pe.addColorToBatch(p.color)
 
 	// Make a shallow copy, no pointers in particle so we're fine.
-	newp = p
 	if p.size <= 0 {
 		p.size = 1
 	}
+	newp = p
 	newp.active = true
 	newp.bounces = 0
 	pe.particles[pe.idx : pe.idx+1][0] = newp

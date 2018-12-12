@@ -42,6 +42,7 @@ const (
 	wAmmoMax             = 2000
 	wDoorLen             = 30
 	wDoorHeight          = 40
+	wLightsMax           = 10
 )
 
 //=============================================================

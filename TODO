@@ -1,12 +1,15 @@
 General
 --------
-- Move pickup weapon to mob?
-
 - Hit -> Build frames for Mob doesn't work as intended.
 
 - Enemy walk (AI-controller)
     -> Change weapons
     -> drop weapons
+
+- Lights
+    - Generic light
+    - Lightning around ammo
+    - Lightning around explosion fragments
 
 - Generic events for explode/hit for objects
     -> so a box can explode etc.
