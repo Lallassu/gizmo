@@ -65,6 +65,9 @@ func setup() {
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 3
 	global.gWin.SetSmooth(false)
+	global.gPlayer.create(100, 320)
+	global.gController.setActiveEntity(global.gPlayer)
+	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
 }
 
@@ -153,25 +156,10 @@ func gameLoop() {
 			frameWidth:  12.0,
 			life:        100.0,
 			mobType:     entityEnemy,
+			ai:          &AI{},
 		}
 		test.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
 	}
-
-	// Load a player
-	test := mob{
-		sheetFile:   "assets/mobs/player.png",
-		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
-		idleFrames:  []int{0, 2, 3, 4, 5, 6},
-		shootFrames: []int{26},
-		jumpFrames:  []int{15, 16, 17, 18, 19, 20},
-		climbFrames: []int{1, 7},
-		frameWidth:  12.0,
-		life:        100.0,
-		mobType:     entityPlayer,
-	}
-	test.create(100, 320)
-	global.gController.setActiveEntity(&test)
-	global.gCamera.setFollow(&test)
 
 	// var uPosX, uPosY float32
 	// global.gWin.Canvas().SetUniform("uPosX", &uPosX)

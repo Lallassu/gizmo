@@ -1,15 +1,12 @@
 General
 --------
-- Hit -> Build frames for Mob doesn't work as intended.
+- Move pickup weapon to mob?
 
-- Fix better walk (Smoother)
-    - over pixels
+- Hit -> Build frames for Mob doesn't work as intended.
 
 - Enemy walk (AI-controller)
     -> Change weapons
     -> drop weapons
-    -> Climb
-    -> Jump
 
 - Generic events for explode/hit for objects
     -> so a box can explode etc.
@@ -20,6 +17,13 @@ General
     -> Deaths
     -> Life left.
     -> Map
+    -> Add text to screen (e.g. "Fell to death")
+
+- Menu
+    - New Game
+    - Continue
+    - About
+    - Quit
 
 - Map handler
     - Set player pos
@@ -30,7 +34,14 @@ General
     -> Lightning
     -> Shaders
 
-- Death by fall
+- Pickaxe to dig through world to pass enemies
+    -> Show "radar" for enemy vision
+    -> Goal to reach something?
+    -> Bankrobber?
+
+- Enemies:
+    - pickup weapons
+    - pickup bombs and run towards player
 
 - Weapon should be rotated more accurate 
     -> Skip mouse support? Just shoot straight?

@@ -41,21 +41,34 @@ func (c *controller) create() {
 // Handle input for both mouse and keyboard
 //=============================================================
 func (c *controller) update(dt float64) {
-	// Handle controllers
+	// Global not bound to entity
+	if global.gWin.Pressed(pixelgl.KeyM) {
+		PrintMemoryUsage()
+	}
+	if global.gWin.Pressed(pixelgl.KeyQ) {
+		c.quit = true
+	}
+	if global.gWin.Pressed(pixelgl.KeyP) {
+		global.gCamera.setFollow(nil)
+	}
+	if global.gWin.Pressed(pixelgl.KeyG) {
+		global.gWorld.gravity += 0.1
+	}
+	if global.gWin.Pressed(pixelgl.KeyH) {
+		global.gWorld.gravity -= 0.1
+	}
+
+	// Controllers for entity
+	if c.entity == nil {
+		return
+	}
 
 	move := pixel.Vec{0, 0}
+
 	// Test pickup
 	if global.gWin.Pressed(pixelgl.KeyB) {
 		if c.entity.getType() == entityPlayer {
-			// Check if anything to pickup?
-			for _, v := range global.gWorld.qt.RetrieveIntersections(c.entity.getBounds()) {
-				if v.entity.getType() == entityObject {
-					if v.entity.(*object).isFree() {
-						c.entity.(*mob).attach(v.entity.(*object))
-						break
-					}
-				}
-			}
+			c.entity.(*mob).pickup()
 		}
 	}
 
@@ -91,21 +104,6 @@ func (c *controller) update(dt float64) {
 		//	global.gCamera.pos.Y -= 2.1
 		//c.entity.move(0, -dt)
 		move.Y = -dt
-	}
-	if global.gWin.Pressed(pixelgl.KeyM) {
-		PrintMemoryUsage()
-	}
-	if global.gWin.Pressed(pixelgl.KeyQ) {
-		c.quit = true
-	}
-	if global.gWin.Pressed(pixelgl.KeyP) {
-		global.gCamera.setFollow(nil)
-	}
-	if global.gWin.Pressed(pixelgl.KeyG) {
-		global.gWorld.gravity += 0.1
-	}
-	if global.gWin.Pressed(pixelgl.KeyH) {
-		global.gWorld.gravity -= 0.1
 	}
 	if global.gWin.Pressed(pixelgl.KeyL) {
 		c.entity.setPosition(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))

@@ -37,12 +37,15 @@ type mob struct {
 	jumpPower   float64
 	keyMove     pixel.Vec
 
-	batches   map[int]*pixel.Batch
-	triangles map[int]*pixel.TrianglesData
-	frames    map[int][]uint32
-	bounds    *Bounds
-	img       image.Image
-	canvas    *pixelgl.Canvas
+	batches      map[int]*pixel.Batch
+	triangles    map[int]*pixel.TrianglesData
+	frames       map[int][]uint32
+	bounds       *Bounds
+	img          image.Image
+	canvas       *pixelgl.Canvas
+	ai           *AI
+	hitLeftWall  bool
+	hitRightWall bool
 }
 
 //=============================================================
@@ -53,6 +56,10 @@ func (m *mob) create(x, y float64) {
 	m.frames = make(map[int][]uint32)
 	m.batches = make(map[int]*pixel.Batch)
 	m.triangles = make(map[int]*pixel.TrianglesData)
+
+	if m.ai != nil {
+		m.ai.create(m)
+	}
 
 	m.animRate = 0.1
 	m.jumpPower = 200
@@ -282,6 +289,21 @@ func (m *mob) attach(o *object) {
 }
 
 //=============================================================
+//
+//=============================================================
+func (m *mob) pickup() {
+	// Check if anything to pickup?
+	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
+		if v.entity.getType() == entityObject {
+			if v.entity.(*object).isFree() {
+				m.attach(v.entity.(*object))
+				break
+			}
+		}
+	}
+}
+
+//=============================================================
 // Throw/drop object
 //=============================================================
 func (m *mob) throw() {
@@ -301,22 +323,25 @@ func (m *mob) explode() {
 				pos := int(m.size*x + y)
 				if m.frames[i][pos] != 0 {
 					// Remove part
-					global.gParticleEngine.newParticle(
-						particle{
-							x:           m.bounds.X + float64(x),
-							y:           m.bounds.Y + float64(y),
-							size:        1,
-							restitution: -0.1 - global.gRand.randFloat()/4,
-							life:        wParticleDefaultLife,
-							fx:          10,
-							fy:          10,
-							vx:          float64(5 - global.gRand.rand()),
-							vy:          float64(5 - global.gRand.rand()),
-							mass:        1,
-							pType:       particleRegular,
-							color:       m.frames[i][pos],
-							static:      true,
-						})
+					if global.gRand.rand() < 1 {
+						global.gParticleEngine.effectBlood(m.bounds.X+float64(x), m.bounds.Y+float64(y), float64(5-global.gRand.rand()), float64(5-global.gRand.rand()), global.gRand.rand()/10)
+						global.gParticleEngine.newParticle(
+							particle{
+								x:           m.bounds.X + float64(x),
+								y:           m.bounds.Y + float64(y),
+								size:        1,
+								restitution: -0.1 - global.gRand.randFloat()/4,
+								life:        wParticleDefaultLife,
+								fx:          float64(15 - global.gRand.rand()),
+								fy:          float64(15 - global.gRand.rand()),
+								vx:          float64(5 - global.gRand.rand()),
+								vy:          float64(5 - global.gRand.rand()),
+								mass:        1,
+								pType:       particleRegular,
+								color:       m.frames[i][pos],
+								static:      true,
+							})
+					}
 				}
 				m.frames[i][pos] = 0
 			}
@@ -404,24 +429,28 @@ func (m *mob) hitFloor(x, y float64) bool {
 //=============================================================
 //
 //=============================================================
-func (m *mob) hitWallRight(x, y float64) bool {
-	for py := m.bounds.Height / 3; py < m.bounds.Height; py++ {
+func (m *mob) hitWallLeft(x, y float64) bool {
+	for py := m.bounds.Height / 2; py < m.bounds.Height; py++ {
 		if global.gWorld.IsRegular(x-2, y+py) {
+			m.hitRightWall = true
 			return true
 		}
 	}
+	m.hitRightWall = false
 	return false
 }
 
 //=============================================================
 //
 //=============================================================
-func (m *mob) hitWallLeft(x, y float64) bool {
-	for py := m.bounds.Height / 3; py < m.bounds.Height; py++ {
+func (m *mob) hitWallRight(x, y float64) bool {
+	for py := m.bounds.Height / 2; py < m.bounds.Height; py++ {
 		if global.gWorld.IsRegular(x+m.bounds.Width+1, y+py) {
+			m.hitLeftWall = true
 			return true
 		}
 	}
+	m.hitLeftWall = false
 	return false
 }
 
@@ -513,6 +542,9 @@ func (m *mob) physics(dt float64) {
 			if !m.hitFloor(m.bounds.X, m.bounds.Y+m.velo.Y) {
 				m.bounds.Y += m.velo.Y
 			} else {
+				if m.velo.Y < -6 {
+					m.explode()
+				}
 				m.velo.Y = 0
 				m.jumping = false
 			}
@@ -521,13 +553,13 @@ func (m *mob) physics(dt float64) {
 
 	if m.velo.X != 0 {
 		if m.velo.X > 0 {
-			if !m.hitWallLeft(m.bounds.X+m.velo.X, m.bounds.Y+m.velo.Y) {
+			if !m.hitWallRight(m.bounds.X+m.velo.X, m.bounds.Y+m.velo.Y) {
 				m.bounds.X += m.velo.X
 			} else {
 				m.velo.X = 0
 			}
 		} else {
-			if !m.hitWallRight(m.bounds.X+m.velo.X, m.bounds.Y+m.velo.Y) {
+			if !m.hitWallLeft(m.bounds.X+m.velo.X, m.bounds.Y+m.velo.Y) {
 				m.bounds.X += m.velo.X
 			} else {
 				m.velo.X = 0
@@ -558,8 +590,14 @@ func (m *mob) draw(dt, elapsed float64) {
 	if m.currentAnim == animShoot {
 		shooting = true
 	}
-	// Update physics
+
+	// Update physics & AI
 	m.physics(dt)
+	if m.ai != nil {
+		m.ai.update(dt, elapsed)
+		m.hitRightWall = false
+		m.hitLeftWall = false
+	}
 
 	if shooting {
 		m.currentAnim = animShoot

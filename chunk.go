@@ -40,6 +40,9 @@ func (c *chunk) getType() entityType {
 	return entityChunk
 }
 
+func (c *chunk) pickup() {
+}
+
 func (c *chunk) getPosition() pixel.Vec {
 	return pixel.Vec{c.bounds.X, c.bounds.Y}
 }

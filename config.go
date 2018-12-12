@@ -61,6 +61,7 @@ type Global struct {
 	gAmmoEngine     *ammoEngine
 	gTextures       *textures
 	gRand           *fRand
+	gPlayer         *mob
 }
 
 var global = &Global{
@@ -77,4 +78,15 @@ var global = &Global{
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},
 	gRand:           &fRand{},
+	gPlayer: &mob{
+		sheetFile:   "assets/mobs/player.png",
+		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
+		idleFrames:  []int{0, 2, 3, 4, 5, 6},
+		shootFrames: []int{26},
+		jumpFrames:  []int{15, 16, 17, 18, 19, 20},
+		climbFrames: []int{1, 7},
+		frameWidth:  12.0,
+		life:        100.0,
+		mobType:     entityPlayer,
+	},
 }
