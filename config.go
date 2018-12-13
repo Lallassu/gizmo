@@ -63,6 +63,7 @@ type Global struct {
 	gTextures       *textures
 	gRand           *fRand
 	gPlayer         *mob
+	gLights         *lights
 }
 
 var global = &Global{
@@ -79,6 +80,7 @@ var global = &Global{
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},
 	gRand:           &fRand{},
+	gLights:         &lights{},
 	gPlayer: &mob{
 		sheetFile:   "assets/mobs/player.png",
 		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},

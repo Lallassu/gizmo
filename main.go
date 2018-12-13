@@ -66,6 +66,7 @@ func setup() {
 	global.gCamera.zoom = 3
 	global.gWin.SetSmooth(false)
 	global.gPlayer.create(100, 50)
+	global.gLights.create()
 	global.gController.setActiveEntity(global.gPlayer)
 	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
@@ -177,12 +178,24 @@ func gameLoop() {
 		for {
 			if frameDt >= wMaxInvFPS {
 				global.gWin.Clear(global.gClearColor)
+
+				global.gWin.SetComposeMethod(pixel.ComposeOver)
+
 				global.gController.update(wMaxInvFPS)
 				global.gWorld.Draw(wMaxInvFPS, elapsed)
 				global.gTextures.update(wMaxInvFPS)
+
 				global.gParticleEngine.update(wMaxInvFPS)
+
+				global.gWin.SetComposeMethod(pixel.ComposePlus)
 				global.gAmmoEngine.update(wMaxInvFPS)
 				global.gCamera.update(wMaxInvFPS)
+
+				global.gWin.SetColorMask(pixel.Alpha(0.4))
+				global.gWin.SetComposeMethod(pixel.ComposePlus)
+				global.gLights.update(wMaxInvFPS, elapsed)
+				global.gWin.SetColorMask(pixel.Alpha(1))
+
 				global.gWin.Update()
 				//uPosX = float32(test.bounds.X)
 				//uPosY = float32(test.bounds.Y)

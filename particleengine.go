@@ -166,7 +166,8 @@ func (pe *particleEngine) update(dt float64) {
 
 			pos := r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF
 			sprite.Set(pe.canvas, pixel.R(float64(pe.colormap[pos]), 0, float64(pe.colormap[pos]+1), 1))
-			sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
+			//sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
+			sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.8})
 		}
 	}
 	pe.batch.Draw(global.gWin)

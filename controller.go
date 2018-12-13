@@ -44,8 +44,6 @@ func (c *controller) update(dt float64) {
 	// Global not bound to entity
 	if global.gWin.Pressed(pixelgl.KeyM) {
 		PrintMemoryUsage()
-		// TEST
-		c.entity.(*mob).buildFrames()
 	}
 	if global.gWin.Pressed(pixelgl.KeyQ) {
 		c.quit = true

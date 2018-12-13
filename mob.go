@@ -651,6 +651,8 @@ func (m *mob) draw(dt, elapsed float64) {
 
 	//m.batches[idx].SetMatrix(pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
 	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	//m.canvas.SetComposeMethod(pixel.ComposeOver)
+	//m.canvas.SetColorMask(pixel.Alpha(1))
 	m.batches[idx].Draw(m.canvas)
 	m.canvas.Draw(global.gWin, (pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2))))
 

@@ -8,14 +8,17 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
+	"github.com/faiface/pixel/pixelgl"
+	"math"
 )
 
 //=============================================================
 // Light pool
 //=============================================================
 type lights struct {
-	pool []light
-	idx  int
+	pool   []light
+	idx    int
+	canvas *pixelgl.Canvas
 }
 
 //=============================================================
@@ -26,6 +29,7 @@ type light struct {
 	color  pixel.RGBA
 	spread float64
 	imd    *imdraw.IMDraw
+	canvas *pixelgl.Canvas
 	angle  float64
 	radius float64
 	active bool
@@ -41,15 +45,23 @@ type light struct {
 //=============================================================
 // Init light pool
 //=============================================================
-func (l *lights) init() {
+func (l *lights) create() {
 	l.pool = make([]light, wLightsMax)
+	l.canvas = pixelgl.NewCanvas(global.gWin.Bounds())
 
 	for i := 0; i < wLightsMax; i++ {
-		nl := light{active: false}
+		nl := light{active: true}
+		nl.canvas = pixelgl.NewCanvas(global.gWin.Bounds())
+		nl.pos = pixel.Vec{100.0, 100.0 + float64(i)*10.0}
 		nl.imd = imdraw.New(nil)
-		nl.imd.Color = pixel.Alpha(1)
+		nl.imd.Color = pixel.RGBA{1, 0, 0, 1}
 		nl.imd.Push(pixel.ZV)
-		nl.imd.Color = pixel.Alpha(0)
+		nl.imd.Color = pixel.RGBA{0, 0, 0, 0}
+		nl.spread = 10
+		nl.radius = math.Pi
+		for angle := -nl.spread / 2; angle <= nl.spread/2; angle += nl.spread / 64 {
+			nl.imd.Push(pixel.V(1, 0).Rotated(angle))
+		}
 		nl.imd.Polygon(0)
 		l.pool = append(l.pool, nl)
 	}
@@ -75,11 +87,17 @@ func (l *lights) newLight(newl light) {
 // Update all active lights
 //=============================================================
 func (l *lights) update(dt, time float64) {
+	l.canvas.Clear(pixel.Alpha(0))
+	l.canvas.SetComposeMethod(pixel.ComposePlus)
+
 	for i, _ := range l.pool {
 		if l.pool[i].active {
 			l.pool[i].update(dt, time)
+			l.pool[i].canvas.Draw(l.canvas, pixel.IM.Moved(l.canvas.Bounds().Center()))
 		}
 	}
+	global.gWin.SetColorMask(pixel.Alpha(1))
+	l.canvas.Draw(global.gWin, pixel.IM.Moved(global.gWin.Bounds().Center()))
 }
 
 //=============================================================
@@ -92,5 +110,10 @@ func (l *lights) update(dt, time float64) {
 // Update light
 //=============================================================
 func (l *light) update(dt, time float64) {
-
+	l.canvas.Clear(pixel.Alpha(0))
+	l.pos.X = l.pos.X + math.Sin(time/2)
+	l.canvas.SetMatrix(pixel.IM.Scaled(pixel.ZV, l.radius).Rotated(pixel.ZV, l.angle).Moved(l.pos))
+	l.canvas.SetColorMask(pixel.Alpha(1))
+	l.canvas.SetComposeMethod(pixel.ComposePlus)
+	l.imd.Draw(l.canvas)
 }
