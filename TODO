@@ -1,9 +1,10 @@
 General
 --------
-- Hit -> Build frames for Mob doesn't work as intended.
+- Performance issues?
+    -> AI loads high?
+    -> Enemy physics?
 
 - Enemy walk (AI-controller)
-    -> Change weapons
     -> drop weapons
 
 - Lights
@@ -43,7 +44,6 @@ General
     -> Bankrobber?
 
 - Enemies:
-    - pickup weapons
     - pickup bombs and run towards player
 
 - Weapon should be rotated more accurate 

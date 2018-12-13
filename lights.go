@@ -5,14 +5,17 @@
 //=============================================================
 package main
 
-import ()
+import (
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
+)
 
 //=============================================================
 // Light pool
 //=============================================================
 type lights struct {
 	pool []light
-	max  int
+	idx  int
 }
 
 //=============================================================
@@ -39,7 +42,6 @@ type light struct {
 // Init light pool
 //=============================================================
 func (l *lights) init() {
-	l.max = max
 	l.pool = make([]light, wLightsMax)
 
 	for i := 0; i < wLightsMax; i++ {
@@ -48,13 +50,10 @@ func (l *lights) init() {
 		nl.imd.Color = pixel.Alpha(1)
 		nl.imd.Push(pixel.ZV)
 		nl.imd.Color = pixel.Alpha(0)
-		for angle := -cl.spread / 2; angle <= cl.spread/2; angle += cl.spread / 64 {
-			nl.imd.Push(pixel.V(1, 0).Rotated(angle))
-		}
 		nl.imd.Polygon(0)
-		l.pool = append(l.pool, newl)
+		l.pool = append(l.pool, nl)
 	}
-	pe.idx = 0
+	l.idx = 0
 }
 
 //=============================================================
@@ -68,9 +67,6 @@ func (l *lights) newLight(newl light) {
 	newLight := l.pool[l.idx : l.idx+1][0]
 
 	newLight = newl
-	if newLight.size <= 0 {
-		newLight.size = 1
-	}
 	newLight.active = true
 	l.pool[l.idx : l.idx+1][0] = newLight
 }

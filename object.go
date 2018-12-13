@@ -50,7 +50,7 @@ type object struct {
 //=============================================================
 func (o *object) create(x_, y_ float64) {
 	o.prevPos = make([]pixel.Vec, 100)
-
+	o.rotation = 0.2
 	o.mass = 5
 	o.restitution = -0.3
 	o.fx = 1
@@ -88,25 +88,25 @@ func (o *object) create(x_, y_ float64) {
 		}
 
 		o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
-		var fragmentShader = `
-	    #version 330 core
-	
-	    in vec2  vTexCoords;
-	    in vec2 vPosition;
-	    in vec4 vColor;
-	
-	    out vec4 fragColor;
-	
-	    uniform vec4 uTexBounds;
-	    uniform sampler2D uTexture;
-	
-	    void main() {
-	       vec4 color = vec4(0.0,0.0,0.0,1.0);
-	 	   color = vec4(vColor.g, vColor.g, vColor.b, vColor.a);
-	    	  fragColor = color;
-	    }
-		   `
-		o.canvas.SetFragmentShader(fragmentShader)
+		// var fragmentShader = `
+		// #version 330 core
+
+		// in vec2  vTexCoords;
+		// in vec2 vPosition;
+		// in vec4 vColor;
+
+		// out vec4 fragColor;
+
+		// uniform vec4 uTexBounds;
+		// uniform sampler2D uTexture;
+
+		// void main() {
+		//    vec4 color = vec4(0.0,0.0,0.0,1.0);
+		//    color = vec4(vColor.g, vColor.g, vColor.b, vColor.a);
+		// 	  fragColor = color;
+		// }
+		//    `
+		// o.canvas.SetFragmentShader(fragmentShader)
 
 		// build initial
 		o.build()
@@ -384,10 +384,12 @@ func (o *object) draw(dt, elapsed float64) {
 		}
 		o.unStuck(dt)
 	} else {
-		mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
-		mouse.X = math.Abs(mouse.X - o.bounds.X)
-		mouse.Y = mouse.Y - o.bounds.Y
-		o.rotation = math.Atan2(mouse.Y, mouse.X)
+		if o.owner.(*mob).ai == nil {
+			mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
+			mouse.X = math.Abs(mouse.X - o.bounds.X)
+			mouse.Y = mouse.Y - o.bounds.Y
+			o.rotation = math.Atan2(mouse.Y, mouse.X)
+		}
 	}
 }
 
@@ -439,7 +441,7 @@ func (o *object) shoot() {
 			mass:  5,
 			fx:    10.0,
 			fy:    10.0,
-			power: 10,
+			power: 2,
 			vx:    10.0 * o.owner.(*mob).dir,
 			vy:    10.0 * o.rotation,
 			owner: o.owner,

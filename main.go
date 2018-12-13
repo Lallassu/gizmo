@@ -65,7 +65,7 @@ func setup() {
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 3
 	global.gWin.SetSmooth(false)
-	global.gPlayer.create(100, 320)
+	global.gPlayer.create(100, 50)
 	global.gController.setActiveEntity(global.gPlayer)
 	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
@@ -119,7 +119,7 @@ func gameLoop() {
 	//frames := 0
 
 	// Load a bunch of weapons
-	for _, x := range []string{"ak47_weapon"} { // , "p90_weapon", "rocketlauncher_weapon", "shotgun_weapon", "crate_obj"} {
+	for _, x := range []string{"ak47_weapon", "p90_weapon", "rocketlauncher_weapon"} { // "shotgun_weapon", "crate_obj"} {
 		var otype objectType
 		scale := 0.15
 
@@ -155,6 +155,7 @@ func gameLoop() {
 			climbFrames: []int{1, 7},
 			frameWidth:  12.0,
 			life:        100.0,
+			speed:       100,
 			mobType:     entityEnemy,
 			ai:          &AI{},
 		}

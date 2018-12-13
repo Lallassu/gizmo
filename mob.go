@@ -63,7 +63,9 @@ func (m *mob) create(x, y float64) {
 
 	m.animRate = 0.1
 	m.jumpPower = 200
-	m.speed = 200
+	if m.speed == 0 {
+		m.speed = 200
+	}
 	m.mass = 20
 	m.currentAnim = animIdle
 	m.dir = 1
@@ -154,6 +156,9 @@ func (m *mob) buildFrames() {
 						for k := y; k < m.bounds.Height; k++ {
 							pos = int(l*m.size + k)
 							p2 = m.frames[i][pos]
+							if p2 == 0 {
+								break
+							}
 							r1 = p2 >> 24 & 0xFF
 							g1 = p2 >> 16 & 0xFF
 							b1 = p2 >> 8 & 0xFF
@@ -204,9 +209,13 @@ func (m *mob) buildFrames() {
 			}
 		}
 		// Reset the greedy bit
+
 		for x := 0.0; x < m.bounds.Width; x++ {
 			for y := 0.0; y < m.bounds.Height; y++ {
-				m.frames[i][int(x*m.size+y)] |= 0x00000080
+				pos = int(x*m.size + y)
+				if m.frames[i][pos] != 0 {
+					m.frames[i][pos] |= 0x00000080
+				}
 			}
 		}
 		m.triangles[i].SetLen(draw * 6)
@@ -218,7 +227,6 @@ func (m *mob) buildFrames() {
 //
 //=============================================================
 func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
-	global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 
 	x := int(math.Abs(float64(m.bounds.X - x_)))
 	y := int(math.Abs(float64(m.bounds.Y - y_)))
@@ -236,6 +244,9 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 					pos := int(m.size)*rx + ry
 					if pos >= 0 && pos < int(m.size*m.size) {
 						if m.frames[i][pos] != 0 {
+							if global.gRand.rand() < 1 {
+								global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
+							}
 							m.frames[i][pos] = 0
 							global.gParticleEngine.newParticle(
 								particle{
@@ -314,6 +325,16 @@ func (m *mob) throw() {
 }
 
 //=============================================================
+// Die
+//=============================================================
+func (m *mob) die() {
+	// Drop weapon
+	m.throw()
+	m.life = 0
+	global.gWorld.qt.Remove(m.bounds)
+}
+
+//=============================================================
 //
 //=============================================================
 func (m *mob) explode() {
@@ -347,7 +368,8 @@ func (m *mob) explode() {
 			}
 		}
 	}
-	m.buildFrames()
+	m.die()
+	//	m.buildFrames()
 }
 
 //=============================================================
