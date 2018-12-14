@@ -227,7 +227,6 @@ func (m *mob) buildFrames() {
 //
 //=============================================================
 func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
-
 	x := int(math.Abs(float64(m.bounds.X - x_)))
 	y := int(math.Abs(float64(m.bounds.Y - y_)))
 
@@ -244,6 +243,11 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 					pos := int(m.size)*rx + ry
 					if pos >= 0 && pos < int(m.size*m.size) {
 						if m.frames[i][pos] != 0 {
+							m.life -= 0.1
+							if m.life <= 0 {
+								m.explode()
+								return true
+							}
 							if global.gRand.rand() < 1 {
 								global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 							}
@@ -601,7 +605,7 @@ func (m *mob) physics(dt float64) {
 
 	m.keyMove.X = 0
 	m.keyMove.Y = 0
-	m.unStuck(dt)
+	go m.unStuck(dt)
 }
 
 //=============================================================
@@ -616,9 +620,11 @@ func (m *mob) draw(dt, elapsed float64) {
 	// Update physics & AI
 	m.physics(dt)
 	if m.ai != nil {
-		m.ai.update(dt, elapsed)
-		m.hitRightWall = false
-		m.hitLeftWall = false
+		go func() {
+			m.ai.update(dt, elapsed)
+			m.hitRightWall = false
+			m.hitLeftWall = false
+		}()
 	}
 
 	if shooting {

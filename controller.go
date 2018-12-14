@@ -98,6 +98,7 @@ func (c *controller) update(dt float64) {
 	if global.gWin.Pressed(pixelgl.KeyUp) {
 		//	global.gCamera.pos.Y += 2.1
 		//	c.entity.move(0, dt)
+		//	global.gSounds.play("jump")
 		move.Y = dt
 	}
 	if global.gWin.Pressed(pixelgl.KeyDown) {
@@ -112,12 +113,13 @@ func (c *controller) update(dt float64) {
 	c.entity.move(move.X, move.Y)
 
 	// Handle mouse
-	if global.gWin.Pressed(pixelgl.MouseButtonLeft) {
+	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftControl) {
 		//mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 		// global.gWorld.Explode(mouse.X, mouse.Y, 10)
 		// global.gParticleEngine.effectExplosion(mouse.X, mouse.Y, 10)
 		if c.entity.getType() == entityPlayer {
 			c.entity.(*mob).shoot()
+			//global.gSounds.play("shot")
 		}
 	}
 }

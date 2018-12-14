@@ -14,6 +14,11 @@ const (
 	GameVersion = "0.0"
 )
 
+var gSoundFiles = []string{
+	"jump.wav",
+	"shot.mp3",
+}
+
 // World constants
 const (
 	wMaxInvFPS           = 1 / 60.0
@@ -64,12 +69,14 @@ type Global struct {
 	gRand           *fRand
 	gPlayer         *mob
 	gLights         *lights
+	gSounds         *sound
+	gUI             *UI
 }
 
 var global = &Global{
 	gWindowHeight:   768,
 	gWindowWidth:    1024,
-	gVsync:          false,
+	gVsync:          true,
 	gUndecorated:    false,
 	gWorld:          &world{},
 	gCamera:         &camera{},
@@ -81,6 +88,8 @@ var global = &Global{
 	gTextures:       &textures{},
 	gRand:           &fRand{},
 	gLights:         &lights{},
+	gSounds:         &sound{},
+	gUI:             &UI{},
 	gPlayer: &mob{
 		sheetFile:   "assets/mobs/player.png",
 		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},

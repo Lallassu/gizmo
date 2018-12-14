@@ -1,11 +1,14 @@
 General
 --------
+- Add larger bloodsplatter to walls.
+
+- Special-effects
+    -> Lightning
+    -> Shaders
+
 - Performance issues?
     -> AI loads high?
     -> Enemy physics?
-
-- Enemy walk (AI-controller)
-    -> drop weapons
 
 - Lights
     - Generic light
@@ -14,6 +17,9 @@ General
 
 - Generic events for explode/hit for objects
     -> so a box can explode etc.
+
+- Sounds
+    -> repeatable
 
 - UI
     -> Life
@@ -33,10 +39,6 @@ General
     - Set player pos
     - Add weapons
 
-
-- Special-effects
-    -> Lightning
-    -> Shaders
 
 - Pickaxe to dig through world to pass enemies
     -> Show "radar" for enemy vision

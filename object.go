@@ -50,7 +50,7 @@ type object struct {
 //=============================================================
 func (o *object) create(x_, y_ float64) {
 	o.prevPos = make([]pixel.Vec, 100)
-	o.rotation = 0.2
+	o.rotation = 0.1
 	o.mass = 5
 	o.restitution = -0.3
 	o.fx = 1
@@ -88,7 +88,7 @@ func (o *object) create(x_, y_ float64) {
 		}
 
 		o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
-		// var fragmentShader = `
+		//var fragmentShader = `
 		// #version 330 core
 
 		// in vec2  vTexCoords;
@@ -97,16 +97,23 @@ func (o *object) create(x_, y_ float64) {
 
 		// out vec4 fragColor;
 
+		// uniform float uCenterX;
+		// uniform float uCenterY;
+
 		// uniform vec4 uTexBounds;
 		// uniform sampler2D uTexture;
 
 		// void main() {
-		//    vec4 color = vec4(0.0,0.0,0.0,1.0);
-		//    color = vec4(vColor.g, vColor.g, vColor.b, vColor.a);
-		// 	  fragColor = color;
+		//    vec4 color = vec4(0.0,0.0,0.0,0.0);
+		//    float d = sqrt(pow(vPosition.x-uCenterX, 2) + pow(vPosition.y-uCenterY, 2));
+		//	if (d <= 0) {
+		//		d = 1;
+		//	}
+		//    color = vec4(vColor.g*(uCenterX/100), vColor.g, vColor.b, vColor.a/d);
+		//    fragColor = color;
 		// }
 		//    `
-		// o.canvas.SetFragmentShader(fragmentShader)
+		//o.canvas.SetFragmentShader(fragmentShader)
 
 		// build initial
 		o.build()
@@ -375,6 +382,7 @@ func (o *object) draw(dt, elapsed float64) {
 	if !o.active {
 		return
 	}
+
 	if o.owner == nil {
 		o.physics(dt)
 		if !o.static {
@@ -383,14 +391,14 @@ func (o *object) draw(dt, elapsed float64) {
 			o.sprite.pos = pixel.Vec{o.bounds.X, o.bounds.Y}
 		}
 		o.unStuck(dt)
-	} else {
-		if o.owner.(*mob).ai == nil {
-			mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
-			mouse.X = math.Abs(mouse.X - o.bounds.X)
-			mouse.Y = mouse.Y - o.bounds.Y
-			o.rotation = math.Atan2(mouse.Y, mouse.X)
-		}
-	}
+	} //else {
+	//if o.owner.(*mob).ai == nil {
+	//    mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
+	//    mouse.X = math.Abs(mouse.X - o.bounds.X)
+	//    mouse.Y = mouse.Y - o.bounds.Y
+	//    o.rotation = math.Atan2(mouse.Y, mouse.X)
+	//}
+	//}
 }
 
 //=============================================================
@@ -438,10 +446,10 @@ func (o *object) shoot() {
 			color: 0xFFFF33FF,
 			size:  0.8,
 			life:  3.0,
-			mass:  5,
+			mass:  10,
 			fx:    10.0,
 			fy:    10.0,
-			power: 2,
+			power: 3,
 			vx:    10.0 * o.owner.(*mob).dir,
 			vy:    10.0 * o.rotation,
 			owner: o.owner,

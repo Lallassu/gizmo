@@ -35,6 +35,7 @@ func run() {
 		//	Monitor:     pixelgl.PrimaryMonitor(), // Fullscreen
 	}
 	gWin, err := pixelgl.NewWindow(cfg)
+	//gWin.SetBounds(pixel.R(0, 0, 800, 600))
 
 	if err != nil {
 		panic(err)
@@ -55,7 +56,9 @@ func run() {
 // Setup map, world, player etc.
 //=============================================================
 func setup() {
+	global.gUI.create()
 	global.gRand.create(100000)
+	global.gSounds.create()
 	global.gCamera.create()
 	global.gController.create()
 	global.gWorld.Init()
@@ -81,43 +84,47 @@ func gameLoop() {
 	startTime := time.Now()
 
 	// var fragmentShader = `
-	//   #version 330 core
+	//    #version 330 core
 	//
-	//   in vec2  vTexCoords;
-	//   in vec2 vPosition;
-	//   in vec4 vColor;
+	//    in vec2  vTexCoords;
+	//    in vec2 vPosition;
+	//    in vec4 vColor;
 	//
-	//   out vec4 fragColor;
+	//    out vec4 fragColor;
 	//
-	//   uniform float uPosX;
-	//   uniform float uPosY;
-	//   uniform vec4 uTexBounds;
-	//   uniform sampler2D uTexture;
+	//    uniform float uPosX[10];
+	//    uniform float uPosY[10];
+	//    uniform vec4 uTexBounds;
+	//    uniform sampler2D uTexture;
 	//
-	//   void main() {
-	//   	// Get our current screen coordinate
-	//   	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+	//    void main() {
+	//    	// Get our current screen coordinate
+	//    	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
 	//
-	//      vec4 color = vec4(0.0,0.0,0.0,1.0);
-	// 	 if (vColor.r == 1.0 && vColor.g == 1.0 && vColor.b == 1.0 && vColor.a == 1.0 ){
-	//         color = vec4(texture(uTexture,t).r, texture(uTexture,t).g, texture(uTexture,t).b, texture(uTexture,t).a);
-	//     } else {
-	//          int val = int(vColor.a*255) & 0xFF;
+	//       vec4 color = vec4(0.0,0.0,0.0,1.0);
+	//  	 if (vColor.r == 1.0 && vColor.g == 1.0 && vColor.b == 1.0 && vColor.a == 1.0 ){
+	//          color = vec4(texture(uTexture,t).r, texture(uTexture,t).g, texture(uTexture,t).b, texture(uTexture,t).a);
+	//      } else {
+	// 		  for ( int i = 0; i < 10; i++ {
+	// 	          int val = int(vColor.a*255) & 0xFF;
 	//
-	//          float distance = sqrt(pow(vPosition.x-uPosX+cos(uPosX/10)*10, 2) + pow(vPosition.y-(uPosY+10)+cos(uPosY/10)*10, 2))/5;
+	//         	  float distance = sqrt(pow(vPosition.x-uPosX[i], 2) + pow(vPosition.y-uPosY[i], 2))/5;
+	// 			  color = vec4(vColor.r/(distance/2), vColor.g/distance, vColor.b/distance, vColor.a);
+	// 	      }
+	// 	 }
 
-	//          if (val == 0x8F) {
-	//        		    color = vec4(vColor.r/(distance/2), vColor.g/distance, vColor.b/distance, vColor.a);
-	//          } else {
-	//        		 color = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
-	//     	 }
-	//     }
-	//   	fragColor = color;
-	//   }
-	//   `
-	//fps := time.Tick(time.Second / 1000)
-	//second := time.Tick(time.Second)
-	//frames := 0
+	//      //     if (val == 0x8F) {
+	//      //   		    color = vec4(vColor.r/(distance/2), vColor.g/distance, vColor.b/distance, vColor.a);
+	//      //     } else {
+	//      //   		 color = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
+	//      //	 }
+	//      }
+	//    	fragColor = color;
+	//    }
+	//    `
+	fps := time.Tick(time.Second / 1000)
+	second := time.Tick(time.Second)
+	frames := 0
 
 	// Load a bunch of weapons
 	for _, x := range []string{"ak47_weapon", "p90_weapon", "rocketlauncher_weapon"} { // "shotgun_weapon", "crate_obj"} {
@@ -164,9 +171,8 @@ func gameLoop() {
 	}
 
 	// var uPosX, uPosY float32
-	// global.gWin.Canvas().SetUniform("uPosX", &uPosX)
-	// global.gWin.Canvas().SetUniform("uPosY", &uPosY)
-	// global.gWin.Canvas().SetFragmentShader(fragmentShader)
+	//global.gWin.Canvas().SetUniform("uPos", &pos)
+	//global.gWin.Canvas().SetFragmentShader(fragmentShader)
 	elapsed := 0.0
 
 	for !global.gWin.Closed() && !global.gController.quit {
@@ -179,22 +185,24 @@ func gameLoop() {
 			if frameDt >= wMaxInvFPS {
 				global.gWin.Clear(global.gClearColor)
 
-				global.gWin.SetComposeMethod(pixel.ComposeOver)
+				//	global.gWin.SetComposeMethod(pixel.ComposeOver)
 
-				global.gController.update(wMaxInvFPS)
+				go global.gController.update(wMaxInvFPS)
 				global.gWorld.Draw(wMaxInvFPS, elapsed)
-				global.gTextures.update(wMaxInvFPS)
+				go global.gTextures.update(wMaxInvFPS)
 
 				global.gParticleEngine.update(wMaxInvFPS)
-
-				global.gWin.SetComposeMethod(pixel.ComposePlus)
 				global.gAmmoEngine.update(wMaxInvFPS)
-				global.gCamera.update(wMaxInvFPS)
 
-				global.gWin.SetColorMask(pixel.Alpha(0.4))
-				global.gWin.SetComposeMethod(pixel.ComposePlus)
-				global.gLights.update(wMaxInvFPS, elapsed)
-				global.gWin.SetColorMask(pixel.Alpha(1))
+				//	global.gWin.SetComposeMethod(pixel.ComposePlus)
+				go global.gCamera.update(wMaxInvFPS)
+
+				//	global.gWin.SetColorMask(pixel.Alpha(0.4))
+				//	global.gWin.SetComposeMethod(pixel.ComposePlus)
+				//	global.gLights.update(wMaxInvFPS, elapsed)
+				//	global.gWin.SetColorMask(pixel.Alpha(1))
+
+				global.gUI.draw(wMaxInvFPS)
 
 				global.gWin.Update()
 				//uPosX = float32(test.bounds.X)
@@ -202,12 +210,11 @@ func gameLoop() {
 			} else {
 				break
 			}
-
+			<-fps
+			updateFPSDisplay(global.gWin, &frames, second)
 			frameDt -= wMaxInvFPS
 		}
 
-		//  <-fps
-		//  updateFPSDisplay(global.gWin, &frames, second)
 	}
 }
 
@@ -215,7 +222,8 @@ func updateFPSDisplay(win *pixelgl.Window, frames *int, second <-chan time.Time)
 	*frames++
 	select {
 	case <-second:
-		win.SetTitle(fmt.Sprintf("%s (FPS: %d)", GameTitle, *frames))
+		//	win.SetTitle(fmt.Sprintf("%s (FPS: %d)", GameTitle, *frames))
+		global.gUI.updateFPS(*frames)
 		*frames = 0
 	default:
 	}

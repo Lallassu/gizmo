@@ -27,7 +27,7 @@ func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 		r := 175 + global.gRand.rand()*5
 		g := 10 + global.gRand.rand()*2
 		b := 10 + global.gRand.rand()*2
-		//a := 100 + global.gRand.rand()*15
+		a := global.gRand.rand() * 255
 
 		pe.newParticle(particle{
 			x:           float64(x),
@@ -40,8 +40,8 @@ func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 			vx:          vx / 2,
 			vy:          float64(5 - global.gRand.rand()),
 			mass:        2,
-			pType:       particleRegular,
-			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF),
+			pType:       particleBlood,
+			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
 			static:      true,
 		})
 	}
@@ -54,9 +54,10 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 		r := 0xF9
 		g := 50 + global.gRand.rand()*14
 		b := 16
-		//	a := 20 + global.gRand.rand()*22
+		a := 20 + global.gRand.rand()*22
+
 		pe.newParticle(particle{
-			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF),
+			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
 			size:        global.gRand.randFloat() * 2,
 			x:           x,
 			y:           y,
@@ -74,10 +75,10 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	// Create smoke
 	for i := 0; i < size*2; i++ {
 		c := 50 + global.gRand.rand()*20
-		//	a := 20 + global.gRand.rand()*22
+		a := 20 + global.gRand.rand()*200
 		pe.newParticle(particle{
-			color:       uint32(c&0xFF<<24 | c&0xFF<<16 | c&0xFF<<8 | 0xFF),
-			size:        global.gRand.randFloat() * 2,
+			color:       uint32(c&0xFF<<24 | c&0xFF<<16 | c&0xFF<<8 | a&0xFF),
+			size:        global.gRand.randFloat() * 2.5,
 			x:           x + float64(size/2) - global.gRand.randFloat()*float64(size) + global.gRand.randFloat()*2,
 			y:           y + float64(size/2) - global.gRand.randFloat()*float64(size) + global.gRand.randFloat()*2,
 			vx:          0,
@@ -162,12 +163,15 @@ func (pe *particleEngine) update(dt float64) {
 			r := color >> 24 & 0xFF
 			g := color >> 16 & 0xFF
 			b := color >> 8 & 0xFF
-			//a := color & 0xFF
+			a := color & 0xFF
 
 			pos := r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | 0xFF
 			sprite.Set(pe.canvas, pixel.R(float64(pe.colormap[pos]), 0, float64(pe.colormap[pos]+1), 1))
-			//sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
-			sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.8})
+			if pe.particles[i].pType == particleRegular {
+				sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
+			} else {
+				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, float64(a) / 255.0})
+			}
 		}
 	}
 	pe.batch.Draw(global.gWin)
