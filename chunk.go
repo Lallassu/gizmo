@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 )
 
 //=============================================================
@@ -18,6 +19,7 @@ type chunk struct {
 	triangles *pixel.TrianglesData
 	bounds    *Bounds
 	cType     chunkType
+	sprite    *pixel.Sprite
 }
 
 //=============================================================
@@ -31,6 +33,7 @@ func (c *chunk) explode() {
 }
 
 func (c *chunk) move(x, y float64) {
+
 }
 
 func (c *chunk) getMass() float64 {
@@ -60,15 +63,15 @@ func (c *chunk) getBounds() *Bounds {
 //=============================================================
 // Create a new chunk
 //=============================================================
-func (c *chunk) create(x, y float64) {
+func (c *chunk) create(x, y float64, pixels int) {
 	c.dirty = true
 	c.triangles = pixel.MakeTrianglesData(400) // Init with some suitable value
 	c.batch = pixel.NewBatch(c.triangles, nil)
 	c.bounds = &Bounds{
 		X:      x,
 		Y:      y,
-		Width:  wPixelsPerChunk,
-		Height: wPixelsPerChunk,
+		Width:  float64(pixels),
+		Height: float64(pixels),
 		entity: Entity(c),
 	}
 }
@@ -77,10 +80,14 @@ func (c *chunk) create(x, y float64) {
 // Draw the chunk
 //=============================================================
 func (c *chunk) draw(dt, elapsed float64) {
-	if c.dirty {
-		c.build()
+	if c.cType == fgChunk {
+		if c.dirty {
+			c.build()
+		}
+		c.batch.Draw(global.gWin)
+	} else {
+		c.sprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+c.bounds.Width/2, c.bounds.Y+c.bounds.Height/2)))
 	}
-	c.batch.Draw(global.gWin)
 }
 
 //=============================================================
@@ -111,7 +118,13 @@ func (c *chunk) build() {
 			if p == 0 || p&0xFF>>7 == 0 {
 				continue
 			}
+			if p&0xFF != wBackground8 && c.cType == bgChunk {
+				continue
+			}
 
+			if p&0xFF == wBackground8 && c.cType == fgChunk {
+				continue
+			}
 			rc = p >> 24 & 0xFF
 			gc = p >> 16 & 0xFF
 			bc = p >> 8 & 0xFF
@@ -137,6 +150,9 @@ func (c *chunk) build() {
 				b1 = p2 >> 8 & 0xFF
 
 				if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
+					if p2&0xFF != wBackground8 && c.cType == bgChunk {
+						break
+					}
 					// Same color and not yet visited!
 					global.gWorld.pixels[pos] &= 0xFFFFFF7F
 					same_x++
@@ -149,6 +165,9 @@ func (c *chunk) build() {
 						b1 = p2 >> 8 & 0xFF
 
 						if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
+							if p2&0xFF != wBackground8 && c.cType == bgChunk {
+								break
+							}
 							global.gWorld.pixels[pos] &= 0xFFFFFF7F
 							new_y++
 						} else {
@@ -208,4 +227,11 @@ func (c *chunk) build() {
 	c.triangles.SetLen(draw * 6)
 	c.batch.Dirty()
 	c.dirty = false
+	if c.cType == bgChunk {
+		canvas := pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.width), float64(global.gWorld.height)))
+		c.batch.Draw(canvas)
+		c.sprite = pixel.NewSprite(canvas, pixel.R(c.bounds.X, c.bounds.Y, c.bounds.X+c.bounds.Width, c.bounds.Y+c.bounds.Height))
+		c.triangles.SetLen(0)
+		c.batch = nil
+	}
 }

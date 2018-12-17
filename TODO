@@ -1,11 +1,10 @@
 General
 --------
-- Use two layers of chunks
-    - Background chunks (one large chunk? or divided into double size?)
-    - Foreground chunks (multiple)
-
 - Weapon types with different kind of ammo and power.
     - Flamethrower?
+
+- If carrying item, item is hit before.
+    -> When exploding, drop and then player can be touched again
 
 - Animated weapons when idle
 

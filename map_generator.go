@@ -22,7 +22,7 @@ type generator struct {
 
 func (g *generator) NewWorld(size_x, size_z int) []uint32 {
 	rand.Seed(time.Now().Unix())
-	g.cell_size = 40
+	g.cell_size = 20
 	g.wide = size_x / g.cell_size
 	g.deep = size_z / g.cell_size
 	g.minx, g.minz = 1, 1
@@ -35,7 +35,7 @@ func (g *generator) NewWorld(size_x, size_z int) []uint32 {
 		g.cell[x] = make([]uint32, g.deep)
 	}
 
-	num_steps := 50
+	num_steps := 100
 	step_length := 10
 
 	g.randomWalk(num_steps, step_length)

@@ -12,7 +12,9 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	"image"
 	"math"
+	"os"
 )
 
 //=============================================================
@@ -27,6 +29,7 @@ type world struct {
 	pixels     []uint32
 	currentMap mapType
 	gravity    float64
+	bgSprite   *pixel.Sprite
 }
 
 //=============================================================
@@ -89,13 +92,37 @@ func (w *world) NewMap(maptype mapType) {
 	w.paintMap()
 
 	// Initialize pixel pointers in the chunks
+	// FG Chunks
 	for x := 0; x < w.width; x += wPixelsPerChunk {
 		for y := 0; y < w.height; y += wPixelsPerChunk {
-			c := &chunk{}
-			c.create(float64(x), float64(y))
+			c := &chunk{cType: fgChunk}
+			c.create(float64(x), float64(y), wPixelsPerChunk)
 			w.qt.Insert(c.bounds)
 		}
 	}
+
+	//pic, err := loadPicture("bg.png")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//w.sprite = pixel.NewSprite(pic, pic.Bounds())
+
+	// BG Chunks
+	// for x := 0; x < w.width; x += wPixelsPerChunkBG {
+	// 	for y := 0; y < w.height; y += wPixelsPerChunkBG {
+	// 		c := &chunk{cType: bgChunk}
+	// 		c.create(float64(x), float64(y), wPixelsPerChunkBG)
+	// 		c.build()
+	// 		w.qt.Insert(c.bounds)
+	// 	}
+	// }
+
+	// One sprite for whole bg
+	c := &chunk{cType: bgChunk}
+	c.create(float64(0), float64(0), 1024)
+	c.build()
+	w.bgSprite = c.sprite
+	//w.qt.Insert(c.bounds)
 
 	// Build all chunks first time.
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
@@ -104,6 +131,19 @@ func (w *world) NewMap(maptype mapType) {
 
 	Debug("Tree Size:", w.qt.Total)
 	Debug("World generation complete.")
+}
+
+func loadPicture(path string) (pixel.Picture, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+	return pixel.PictureDataFromImage(img), nil
 }
 
 //=============================================================
@@ -128,7 +168,8 @@ func (w *world) IsBackground(x_, y_ float64) bool {
 	y := int(y_)
 	pos := w.width*x + y
 	if pos < w.size && pos >= 0 {
-		if w.pixels[pos]&0xFF == wBackground8 {
+		if w.pixels[pos]&0xFF == wBackground8 ||
+			w.pixels[pos]&0xFF == wBackgroundNew8 {
 			return true
 		}
 	}
@@ -173,7 +214,7 @@ func (w *world) IsWall(x_, y_ float64) bool {
 	y := int(y_)
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
-		if w.pixels[pos] != 0 && w.pixels[pos]&0xFF != wBackground8 && w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != wLadder8 {
+		if w.pixels[pos] != 0 && w.pixels[pos]&0xFF != wBackgroundNew8 && w.pixels[pos]&0xFF != wBackground8 && w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != wLadder8 {
 			return true
 		}
 	}
@@ -218,6 +259,8 @@ func (w *world) PixelColor(x, y float64) int32 {
 // Draw
 //=============================================================
 func (w *world) Draw(dt, elapsed float64) {
+	w.bgSprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(w.width)/2, float64(w.height)/2)))
+
 	// Draw objects in QT around player position only.
 	pos := pixel.Vec{0, 0}
 	if global.gCamera.follow != nil {
@@ -247,6 +290,7 @@ func (w *world) RemovePixel(x, y int) {
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF == wStaticColor8 ||
 			w.pixels[pos]&0xFF == wBackground8 ||
+			w.pixels[pos]&0xFF == wBackgroundNew8 ||
 			w.pixels[pos]&0xFF == wLadder8 ||
 			w.pixels[pos]&0xFF == wShadow8 {
 			return
@@ -283,7 +327,7 @@ func (w *world) RemovePixel(x, y int) {
 		// Set bg pixel.
 		if w.pixels[pos] != 0 {
 			v := w.coloring.getBackgroundSoft()
-			v &= wBackground32
+			v &= wBackgroundNew32
 			w.pixels[pos] = v
 		}
 		w.markChunkDirty(x, y)
@@ -332,7 +376,8 @@ func (w *world) Explode(x_, y_ float64, power int) {
 				for i := 0; i < wShadowLength; i++ {
 					pos2 := (ffx+i)*w.width + ffy - i
 					if pos2 < w.width*w.height && pos2 >= 0 {
-						if w.pixels[pos2]&0xFF == wBackground8 {
+						if w.pixels[pos2]&0xFF == wBackground8 ||
+							w.pixels[pos2]&0xFF == wBackgroundNew8 {
 							w.addShadow(ffx+i, ffy-i)
 						}
 					}
@@ -375,7 +420,7 @@ func (w *world) removeShadow(x, y int) {
 			r := uint32(math.Floor(float64(w.pixels[pos]>>24&0xFF) * wShadowDepth))
 			g := uint32(math.Floor(float64(w.pixels[pos]>>16&0xFF) * wShadowDepth))
 			b := uint32(math.Floor(float64(w.pixels[pos]>>8&0xFF) * wShadowDepth))
-			w.pixels[pos] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wBackground8
+			w.pixels[pos] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wBackgroundNew8
 			w.markChunkDirty(x, y)
 		}
 	}

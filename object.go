@@ -453,7 +453,7 @@ func (o *object) shoot() {
 				mass:  6 + global.gRand.randFloat()*4,
 				fx:    10.0,
 				fy:    10.0,
-				power: 2,
+				power: 5,
 				vx:    10.0 * o.owner.(*mob).dir,
 				vy:    10.0 * o.rotation,
 				owner: o.owner,
