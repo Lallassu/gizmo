@@ -43,6 +43,7 @@ type object struct {
 	owner       Entity
 	rotation    float64
 	active      bool
+	reloadTime  float64
 }
 
 //=============================================================
@@ -383,6 +384,8 @@ func (o *object) draw(dt, elapsed float64) {
 		return
 	}
 
+	o.reloadTime += dt
+
 	if o.owner == nil {
 		o.physics(dt)
 		if !o.static {
@@ -438,22 +441,30 @@ func (o *object) shoot() {
 	// Check weapon type and create appropriate ammo.
 	switch o.objectType {
 	case objectWeapon:
-		// Check type of weapon (name?)
-		// Use mass = 5 and fx/fy = 0.5 for missile
-		global.gAmmoEngine.newAmmo(ammo{
-			x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
-			y:     o.bounds.Y + o.bounds.Height,
-			color: 0xFFFF33FF,
-			size:  0.8,
-			life:  3.0,
-			mass:  10,
-			fx:    10.0,
-			fy:    10.0,
-			power: 3,
-			vx:    10.0 * o.owner.(*mob).dir,
-			vy:    10.0 * o.rotation,
-			owner: o.owner,
-		})
+		if o.reloadTime > 0.05 {
+			// Check type of weapon (name?)
+			// Use mass = 5 and fx/fy = 0.5 for missile
+			global.gAmmoEngine.newAmmo(ammo{
+				x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
+				y:     o.bounds.Y + o.bounds.Height,
+				color: 0xFFFF33FF,
+				size:  0.5,
+				life:  3.0,
+				mass:  6 + global.gRand.randFloat()*4,
+				fx:    10.0,
+				fy:    10.0,
+				power: 2,
+				vx:    10.0 * o.owner.(*mob).dir,
+				vy:    10.0 * o.rotation,
+				owner: o.owner,
+			})
+			global.gParticleEngine.ammoShell(
+				o.bounds.X+o.bounds.Width/2+o.owner.(*mob).dir*3,
+				o.bounds.Y+o.bounds.Height,
+				o.owner.(*mob).dir,
+				0.5)
+			o.reloadTime = 0
+		}
 	default:
 	}
 }

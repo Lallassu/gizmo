@@ -34,6 +34,13 @@ const (
 	particleSmoke
 )
 
+type chunkType int
+
+const (
+	bgChunk chunkType = iota
+	fgChunk
+)
+
 type entityType int
 
 const (

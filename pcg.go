@@ -492,11 +492,11 @@ func (p *pcg) GenerateLamp(x, y int) {
 		}
 	}
 
-	for j := 5; j < 80; j++ {
+	for j := 5; j < 60; j++ {
 		for i := -j * 2 / 2; i < j*2/2; i++ {
 			c := global.gWorld.PixelColor(float64(x+i), float64(y-j))
-			r := c>>24&0xFF + int32(80-j)
-			g := c>>16&0xFF + int32(80-j)
+			r := c>>24&0xFF + int32(60-j)
+			g := c>>16&0xFF + int32(60-j)
 			b := c >> 8 & 0xFF
 			a := c & 0xFF
 

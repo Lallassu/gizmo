@@ -18,8 +18,7 @@ import (
 // Main
 //=============================================================
 func main() {
-	//defer profile.Start().Stop()
-	//defer profile.Start(profile.MemProfile).Stop()
+	//defer profile.Start(profile.CPUProfile).Stop()
 	pixelgl.Run(run)
 }
 
@@ -127,7 +126,7 @@ func gameLoop() {
 	frames := 0
 
 	// Load a bunch of weapons
-	for _, x := range []string{"ak47_weapon", "p90_weapon", "rocketlauncher_weapon"} { // "shotgun_weapon", "crate_obj"} {
+	for _, x := range []string{"ak47_weapon", "crate_obj"} { // "shotgun_weapon", "crate_obj"} {
 		var otype objectType
 		scale := 0.15
 
@@ -140,7 +139,7 @@ func gameLoop() {
 			scale = 1
 		}
 
-		for i := 0; i < 15; i++ {
+		for i := 0; i < 10; i++ {
 			objTest := object{
 				textureFile: fmt.Sprintf("assets/objects/%v.png", x),
 				name:        x,
@@ -167,7 +166,18 @@ func gameLoop() {
 			mobType:     entityEnemy,
 			ai:          &AI{},
 		}
+		weapon := &object{
+			textureFile: "assets/objects/ak47_weapon.png",
+			name:        "ak47_weapon",
+			static:      false,
+			entityType:  entityObject,
+			objectType:  objectWeapon,
+			scale:       0.15,
+		}
+
+		weapon.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
 		test.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
+		test.attach(weapon)
 	}
 
 	// var uPosX, uPosY float32
@@ -210,9 +220,9 @@ func gameLoop() {
 			} else {
 				break
 			}
+			frameDt -= wMaxInvFPS
 			<-fps
 			updateFPSDisplay(global.gWin, &frames, second)
-			frameDt -= wMaxInvFPS
 		}
 
 	}

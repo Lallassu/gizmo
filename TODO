@@ -1,5 +1,25 @@
 General
 --------
+- Use two layers of chunks
+    - Background chunks (one large chunk? or divided into double size?)
+    - Foreground chunks (multiple)
+
+- Weapon types with different kind of ammo and power.
+    - Flamethrower?
+
+- Animated weapons when idle
+
+- Map generation
+    - More objects
+    - Better spread of lights
+    - effects such as smoke
+        -> map.go with Draw() function
+
+- Screen shake effect
+
+- Power ups
+    - Helmet
+
 - Add larger bloodsplatter to walls.
 
 - Special-effects
@@ -9,6 +29,7 @@ General
 - Performance issues?
     -> AI loads high?
     -> Enemy physics?
+    -> triangle count?
 
 - Lights
     - Generic light
@@ -38,6 +59,8 @@ General
 - Map handler
     - Set player pos
     - Add weapons
+    - Add powerups
+    - Add coins?
 
 
 - Pickaxe to dig through world to pass enemies

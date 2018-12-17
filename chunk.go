@@ -17,6 +17,7 @@ type chunk struct {
 	batch     *pixel.Batch
 	triangles *pixel.TrianglesData
 	bounds    *Bounds
+	cType     chunkType
 }
 
 //=============================================================
@@ -176,8 +177,9 @@ func (c *chunk) build() {
 			a := float64(p&0xFF) / 255.0
 
 			// Increase length of triangles if we need to draw more than we had before.
+			// Add a buffer so we can skip a few increments.
 			if draw*6 >= len(*c.triangles) {
-				c.triangles.SetLen(draw*6 + 10)
+				c.triangles.SetLen(draw*6 + 60)
 			}
 
 			// Size of triangle is given by how large the greedy algorithm found out.

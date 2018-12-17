@@ -251,23 +251,29 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 							if global.gRand.rand() < 1 {
 								global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 							}
-							m.frames[i][pos] = 0
-							global.gParticleEngine.newParticle(
-								particle{
-									x:           float64(x_),
-									y:           float64(y_),
-									size:        1,
-									restitution: -0.1 - global.gRand.randFloat()/4,
-									life:        wParticleDefaultLife,
-									fx:          10,
-									fy:          10,
-									vx:          vx, //float64(5 - rand.Intn(10)),
-									vy:          float64(5 - global.gRand.rand()),
-									mass:        1,
-									pType:       particleRegular,
-									color:       m.frames[i][pos],
-									static:      true,
-								})
+							// Blood
+							r := 175 + global.gRand.rand()*5
+							g := 10 + global.gRand.rand()*2
+							b := 10 + global.gRand.rand()*2
+							a := global.gRand.rand() * 255
+							m.frames[i][pos] = uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF)
+
+							//global.gParticleEngine.newParticle(
+							//	particle{
+							//		x:           float64(x_) + global.gRand.randFloat(),
+							//		y:           float64(y_) + global.gRand.randFloat(),
+							//		size:        global.gRand.randFloat(),
+							//		restitution: -0.1 - global.gRand.randFloat()/4,
+							//		life:        wParticleDefaultLife,
+							//		fx:          10,
+							//		fy:          10,
+							//		vx:          vx + global.gRand.randFloat(), //float64(5 - rand.Intn(10)),
+							//		vy:          float64(5 - global.gRand.rand()),
+							//		mass:        1,
+							//		pType:       particleRegular,
+							//		color:       m.frames[i][pos],
+							//		static:      true,
+							//	})
 						}
 					}
 				}

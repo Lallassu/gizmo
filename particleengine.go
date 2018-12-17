@@ -47,6 +47,27 @@ func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 	}
 
 }
+func (pe *particleEngine) ammoShell(x, y, dir, size float64) {
+	r := 0xFF
+	g := 0xD7
+	b := 0
+	a := 255
+
+	pe.newParticle(particle{
+		color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
+		size:        size,
+		x:           x,
+		y:           y,
+		vx:          -global.gRand.randFloat() * 3 * dir,
+		vy:          2,
+		fx:          5,
+		fy:          5,
+		life:        5,
+		mass:        1,
+		pType:       particleRegular,
+		restitution: -0.3,
+	})
+}
 
 func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	// Create fire part
