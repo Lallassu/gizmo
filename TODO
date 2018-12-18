@@ -1,8 +1,5 @@
 General
 --------
-- Animated weapons when idle
-    -> If on ground, animate. Else physics.
-
 - Map generation
     - More objects
     - Better spread of lights

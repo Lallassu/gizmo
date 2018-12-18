@@ -1,5 +1,13 @@
+//=============================================================
+// weapon.go
+//-------------------------------------------------------------
+// Implements different types of weapons
+//=============================================================
 package main
 
+//=============================================================
+//
+//=============================================================
 type weapon struct {
 	object
 	shot    ammo
@@ -9,6 +17,9 @@ type weapon struct {
 	reload  float64
 }
 
+//=============================================================
+//
+//=============================================================
 func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 	w.reloadTime = 0
 	w.wType = wType
@@ -26,7 +37,7 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 			fy:    10.0,
 			power: 2,
 		}
-		w.spread = 1
+		w.spread = 0.5
 		w.bullets = 1
 		w.reload = 0.05
 	case shotgun:
@@ -43,23 +54,29 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 			power: 1,
 		}
 		w.bullets = 10
-		w.spread = 10
+		w.spread = 5
 		w.reload = 0.5
 	}
 	w.create(x, y)
+
+	// Animate up/down when idle
+	w.animateIdle = true
 
 	// Must change entity type in bounds for QT lookup
 	w.bounds.entity = Entity(w)
 }
 
+//=============================================================
+//
+//=============================================================
 func (w *weapon) shoot() {
 	if w.reloadTime > w.reload {
 		// Use mass = 5 and fx/fy = 0.5 for missile
 		for i := 0; i < w.bullets; i++ {
 			w.shot.x = w.bounds.X + w.bounds.Width/2 + w.owner.(*mob).dir*3
-			w.shot.y = w.bounds.Y + w.bounds.Height + (w.spread - global.gRand.randFloat()*w.spread*2)
+			w.shot.y = w.bounds.Y + w.bounds.Height
 			w.shot.vx = 10.0 * w.owner.(*mob).dir
-			w.shot.vy = 10.0 * w.rotation
+			w.shot.vy = 10.0*w.rotation + (w.spread - global.gRand.randFloat()*w.spread*2)
 			w.shot.mass = 6 + global.gRand.randFloat()*4
 			w.shot.owner = w.owner
 			global.gAmmoEngine.newAmmo(w.shot)

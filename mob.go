@@ -344,9 +344,9 @@ func (m *mob) throw() {
 	if m.carry != nil {
 		switch item := m.carry.(type) {
 		case *object:
-			item.owner = nil
+			item.removeOwner()
 		case *weapon:
-			item.owner = nil
+			item.removeOwner()
 		}
 	}
 	m.carry = nil

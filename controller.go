@@ -109,7 +109,7 @@ func (c *controller) update(dt float64) {
 	c.entity.move(move.X, move.Y)
 
 	// Handle mouse
-	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftControl) {
+	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftShift) {
 		//mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 		// global.gWorld.Explode(mouse.X, mouse.Y, 10)
 		// global.gParticleEngine.effectExplosion(mouse.X, mouse.Y, 10)

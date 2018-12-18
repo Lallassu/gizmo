@@ -42,6 +42,8 @@ type object struct {
 	rotation    float64
 	active      bool
 	reloadTime  float64
+	falling     bool
+	animateIdle bool
 }
 
 //=============================================================
@@ -57,6 +59,7 @@ func (o *object) create(x_, y_ float64) {
 	o.vx = 1
 	o.vy = 1
 	o.active = true
+	o.animateIdle = false
 
 	if !o.static {
 		tmp_w := 0.0
@@ -315,6 +318,16 @@ func (o *object) setOwner(e Entity) {
 }
 
 //=============================================================
+//
+//=============================================================
+func (o *object) removeOwner() {
+	o.owner = nil
+	o.fx = 1
+	o.fy = 1
+	o.bounces = 4
+}
+
+//=============================================================
 // Get bounds
 //=============================================================
 func (o *object) getBounds() *Bounds {
@@ -361,8 +374,10 @@ func (o *object) physics(dt float64) {
 	} else {
 		o.fx = 0
 	}
+	o.falling = false
 	if o.fy > 0 {
 		o.fy -= dt * global.gWorld.gravity * o.mass
+		o.falling = true
 	}
 
 }
@@ -380,7 +395,13 @@ func (o *object) draw(dt, elapsed float64) {
 	if o.owner == nil {
 		o.physics(dt)
 		if !o.static {
-			o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
+			if o.falling || !o.animateIdle {
+				o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
+			} else {
+				// Animate up/down
+				offset := 5 + math.Sin(o.reloadTime)*3
+				o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)))
+			}
 		} else {
 			o.sprite.pos = pixel.Vec{o.bounds.X, o.bounds.Y}
 		}
@@ -395,13 +416,6 @@ func (o *object) draw(dt, elapsed float64) {
 		o.bounds.Y = owner.bounds.Y
 
 	}
-	//if o.owner.(*mob).ai == nil {
-	//    mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
-	//    mouse.X = math.Abs(mouse.X - o.bounds.X)
-	//    mouse.Y = mouse.Y - o.bounds.Y
-	//    o.rotation = math.Atan2(mouse.Y, mouse.X)
-	//}
-	//}
 }
 
 //=============================================================
@@ -411,6 +425,7 @@ func (o *object) unStuck(dt float64) {
 	bottom := false
 	top := false
 	offset := 1.0
+
 	// Check bottom pixels
 	for x := o.bounds.X; x < o.bounds.X+o.bounds.Width; x += 2 {
 		if global.gWorld.IsRegular(x, o.bounds.Y+offset) {
