@@ -27,7 +27,6 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 	case ak47:
 		w.textureFile = "assets/objects/ak47_weapon.png"
 		w.name = "ak47"
-		w.static = false
 		w.scale = 0.15
 		w.shot = ammo{
 			color: 0xFFFF33FF,
@@ -43,7 +42,6 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 	case shotgun:
 		w.textureFile = "assets/objects/shotgun_weapon.png"
 		w.name = "Shotgun"
-		w.static = false
 		w.scale = 0.15
 		w.shot = ammo{
 			color: 0xFFFF33FF,

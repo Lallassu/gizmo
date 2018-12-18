@@ -223,6 +223,8 @@ func (c *chunk) build() {
 	c.triangles.SetLen(draw * 6)
 	c.batch.Dirty()
 	c.dirty = false
+
+	// If background we build our sprite
 	if c.cType == bgChunk {
 		canvas := pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.width), float64(global.gWorld.height)))
 		c.batch.Draw(canvas)

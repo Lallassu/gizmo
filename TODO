@@ -1,5 +1,7 @@
 General
 --------
+- Hit should not return anything?
+
 - Map generation
     - More objects
     - Better spread of lights
@@ -16,6 +18,7 @@ General
     -> May be attachable
 
 - Attach smoke/fire/fuse to objects
+    - For boms/fire etc.
  
 - If carrying item, item is hit before.
     -> When exploding, drop and then player can be touched again

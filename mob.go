@@ -88,6 +88,9 @@ func (m *mob) create(x, y float64) {
 		for x := 0.0; x <= m.frameWidth; x++ {
 			for y := 0.0; y <= m.frameHeight; y++ {
 				r, g, b, a := m.img.At(int(w+x), int(m.frameHeight-y)).RGBA()
+				if r == 0 && g == 0 && b == 0 && a == 0 {
+					continue
+				}
 				m.frames[f][int(x*m.size+y)] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}
@@ -226,6 +229,18 @@ func (m *mob) buildFrames() {
 //
 //=============================================================
 func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
+	// If carry somerhing, hit that first!
+	if m.carry != nil {
+		switch item := m.carry.(type) {
+		case *weapon:
+			item.hit(x_, y_, vx, vy, power)
+			return true
+		case *object:
+			item.hit(x_, y_, vx, vy, power)
+			return true
+		}
+	}
+
 	x := int(math.Abs(float64(m.bounds.X - x_)))
 	y := int(math.Abs(float64(m.bounds.Y - y_)))
 

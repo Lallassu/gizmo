@@ -124,10 +124,10 @@ func gameLoop() {
 	frames := 0
 
 	// Load a bunch of weapons
-	// for i := 0; i < 20; i++ {
-	// 	w := &weapon{}
-	// 	w.newWeapon(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)), ak47)
-	// }
+	for i := 0; i < 20; i++ {
+		w := &weapon{}
+		w.newWeapon(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)), ak47)
+	}
 
 	// Load a bunch of enemies
 	for i := 0; i < 10; i++ {
