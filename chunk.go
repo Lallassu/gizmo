@@ -40,10 +40,6 @@ func (c *chunk) getMass() float64 {
 	return 1.0
 }
 
-func (c *chunk) getType() entityType {
-	return entityChunk
-}
-
 func (c *chunk) pickup() {
 }
 

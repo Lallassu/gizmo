@@ -24,8 +24,6 @@ type object struct {
 	model       *imdraw.IMDraw
 	canvas      *pixelgl.Canvas
 	bounds      *Bounds
-	entityType  entityType
-	objectType  objectType
 	mass        float64
 	restitution float64
 	height      int
@@ -239,36 +237,36 @@ func (o *object) isFree() bool {
 //
 //=============================================================
 func (o *object) explode() {
-	if !o.static {
-		if o.objectType == objectCrate {
-			o.active = false
-			for x := 0; x < o.width; x++ {
-				for y := 0; y < o.height; y++ {
-					p := o.pixels[x*o.size+y]
-					o.pixels[x*o.size+y] = 0
+	// if !o.static {
+	// 	if o.objectType == objectCrate {
+	// 		o.active = false
+	// 		for x := 0; x < o.width; x++ {
+	// 			for y := 0; y < o.height; y++ {
+	// 				p := o.pixels[x*o.size+y]
+	// 				o.pixels[x*o.size+y] = 0
 
-					global.gParticleEngine.newParticle(
-						particle{
-							x:           o.bounds.X + float64(x),
-							y:           o.bounds.Y + float64(y),
-							size:        1,
-							restitution: -0.1 - global.gRand.randFloat()/4,
-							life:        wParticleDefaultLife,
-							fx:          10,
-							fy:          10,
-							vx:          float64(5 - global.gRand.rand()),
-							vy:          float64(5 - global.gRand.rand()),
-							mass:        1,
-							pType:       particleRegular,
-							color:       p,
-							static:      true,
-						})
-				}
-			}
-		}
-	} else {
+	// 				global.gParticleEngine.newParticle(
+	// 					particle{
+	// 						x:           o.bounds.X + float64(x),
+	// 						y:           o.bounds.Y + float64(y),
+	// 						size:        1,
+	// 						restitution: -0.1 - global.gRand.randFloat()/4,
+	// 						life:        wParticleDefaultLife,
+	// 						fx:          10,
+	// 						fy:          10,
+	// 						vx:          float64(5 - global.gRand.rand()),
+	// 						vy:          float64(5 - global.gRand.rand()),
+	// 						mass:        1,
+	// 						pType:       particleRegular,
+	// 						color:       p,
+	// 						static:      true,
+	// 					})
+	// 			}
+	// 		}
+	// 	}
+	// } else {
 
-	}
+	// }
 	global.gWorld.qt.Remove(o.bounds)
 }
 
@@ -299,13 +297,6 @@ func (o *object) getPosition() pixel.Vec {
 //=============================================================
 func (o *object) getMass() float64 {
 	return o.mass
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) getType() entityType {
-	return entityObject
 }
 
 //=============================================================
@@ -394,7 +385,16 @@ func (o *object) draw(dt, elapsed float64) {
 			o.sprite.pos = pixel.Vec{o.bounds.X, o.bounds.Y}
 		}
 		o.unStuck(dt)
-	} //else {
+	} else {
+		owner := o.owner.(*mob)
+		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*owner.dir, o.scale)).
+			Moved(pixel.V(owner.bounds.X+owner.bounds.Width/2, owner.bounds.Y+owner.bounds.Height/2-2)).
+			Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*owner.dir))
+		// Update oect positions based on mob
+		o.bounds.X = owner.bounds.X
+		o.bounds.Y = owner.bounds.Y
+
+	}
 	//if o.owner.(*mob).ai == nil {
 	//    mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 	//    mouse.X = math.Abs(mouse.X - o.bounds.X)
@@ -431,40 +431,5 @@ func (o *object) unStuck(dt float64) {
 		o.bounds.Y += 10 * o.mass * dt
 	} else if top {
 		o.bounds.Y -= 10 * o.mass * dt
-	}
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) shoot() {
-	// Check weapon type and create appropriate ammo.
-	switch o.objectType {
-	case objectWeapon:
-		if o.reloadTime > 0.05 {
-			// Check type of weapon (name?)
-			// Use mass = 5 and fx/fy = 0.5 for missile
-			global.gAmmoEngine.newAmmo(ammo{
-				x:     o.bounds.X + o.bounds.Width/2 + o.owner.(*mob).dir*3,
-				y:     o.bounds.Y + o.bounds.Height,
-				color: 0xFFFF33FF,
-				size:  0.5,
-				life:  3.0,
-				mass:  6 + global.gRand.randFloat()*4,
-				fx:    10.0,
-				fy:    10.0,
-				power: 5,
-				vx:    10.0 * o.owner.(*mob).dir,
-				vy:    10.0 * o.rotation,
-				owner: o.owner,
-			})
-			global.gParticleEngine.ammoShell(
-				o.bounds.X+o.bounds.Width/2+o.owner.(*mob).dir*3,
-				o.bounds.Y+o.bounds.Height,
-				o.owner.(*mob).dir,
-				0.5)
-			o.reloadTime = 0
-		}
-	default:
 	}
 }

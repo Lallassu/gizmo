@@ -448,8 +448,9 @@ func (w *world) addShadow(x, y int) {
 func (w *world) markChunkDirty(x, y int) {
 	// Get all chunks in this area.
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: float64(x), Y: float64(y), Width: 3, Height: 3}) {
-		if v.entity.getType() == entityChunk {
-			v.entity.(*chunk).dirty = true
+		switch item := v.entity.(type) {
+		case *chunk:
+			item.dirty = true
 		}
 	}
 }

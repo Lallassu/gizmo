@@ -11,11 +11,12 @@ import (
 )
 
 type camera struct {
-	zoom   float64
-	pos    pixel.Vec
-	scale  pixel.Vec
-	follow Entity
-	cam    pixel.Matrix
+	zoom    float64
+	pos     pixel.Vec
+	scale   pixel.Vec
+	follow  Entity
+	cam     pixel.Matrix
+	shakeDt float64
 }
 
 func (c *camera) create() {
@@ -32,12 +33,24 @@ func (c *camera) setPosition(x, y float64) {
 	c.pos = pixel.Vec{x, y}
 }
 
+func (c *camera) shake() {
+	c.shakeDt = 20
+}
+
 func (c *camera) update(dt float64) {
 	pos := c.pos
 	if c.follow != nil {
 		pos = c.follow.getPosition()
 		pos.X -= float64(global.gWindowWidth) / 2 / c.zoom
 		pos.Y -= float64(global.gWindowHeight) / 2 / c.zoom
+	}
+
+	if c.shakeDt > 0 {
+		pos.Y += 50 - global.gRand.randFloat()*100
+		pos.X += 50 - global.gRand.randFloat()*100
+		c.shakeDt -= 1
+	} else {
+		c.shakeDt = 0
 	}
 
 	pos = pixel.Lerp(c.pos, pos, 1-math.Pow(1.0/128, dt))

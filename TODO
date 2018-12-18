@@ -1,12 +1,7 @@
 General
 --------
-- Weapon types with different kind of ammo and power.
-    - Flamethrower?
-
-- If carrying item, item is hit before.
-    -> When exploding, drop and then player can be touched again
-
 - Animated weapons when idle
+    -> If on ground, animate. Else physics.
 
 - Map generation
     - More objects
@@ -14,10 +9,23 @@ General
     - effects such as smoke
         -> map.go with Draw() function
 
-- Screen shake effect
-
-- Power ups
+- Items class
+    - crates
+    - Plants/pots
+    - bombs
+    - items
+    - Power ups
     - Helmet
+    -> May be attachable
+
+- Attach smoke/fire/fuse to objects
+ 
+- If carrying item, item is hit before.
+    -> When exploding, drop and then player can be touched again
+
+- Close to explosions
+    -> shake screen
+
 
 - Add larger bloodsplatter to walls.
 
@@ -38,6 +46,9 @@ General
 - Generic events for explode/hit for objects
     -> so a box can explode etc.
 
+- Minimap in HUD
+    - With current position drawn.
+
 - Sounds
     -> repeatable
 
@@ -48,6 +59,7 @@ General
     -> Life left.
     -> Map
     -> Add text to screen (e.g. "Fell to death")
+    -> Minimap
 
 - Menu
     - New Game

@@ -24,13 +24,12 @@ type mob struct {
 	frameHeight float64
 	size        float64
 	currentAnim animationType
-	mobType     entityType
 	animCounter float64
 	animRate    float64
 	speed       float64
 	dir         float64
 	mass        float64
-	carry       *object
+	carry       interface{}
 	velo        pixel.Vec
 	climbing    bool
 	jumping     bool
@@ -294,19 +293,29 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 //=============================================================
 func (m *mob) shoot() {
 	if m.carry != nil {
-		m.carry.shoot()
-		m.currentAnim = animShoot
+		switch item := m.carry.(type) {
+		case *weapon:
+			item.shoot()
+			m.currentAnim = animShoot
+		}
 	}
 }
 
 //=============================================================
 // Attach object to self
 //=============================================================
-func (m *mob) attach(o *object) {
+//func (m *mob) attach(o *object) {
+func (m *mob) attach(o interface{}) {
 	if m.carry == nil {
 		m.carry = o
-		o.setOwner(m)
 	}
+	switch item := m.carry.(type) {
+	case *weapon:
+		item.setOwner(m)
+	case *object:
+		item.setOwner(m)
+	}
+
 }
 
 //=============================================================
@@ -315,10 +324,14 @@ func (m *mob) attach(o *object) {
 func (m *mob) pickup() {
 	// Check if anything to pickup?
 	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
-		if v.entity.getType() == entityObject {
-			if v.entity.(*object).isFree() {
-				m.attach(v.entity.(*object))
-				break
+		switch item := v.entity.(type) {
+		case *object:
+			if item.isFree() {
+				m.attach(item)
+			}
+		case *weapon:
+			if item.isFree() {
+				m.attach(item)
 			}
 		}
 	}
@@ -329,9 +342,14 @@ func (m *mob) pickup() {
 //=============================================================
 func (m *mob) throw() {
 	if m.carry != nil {
-		m.carry.owner = nil
-		m.carry = nil
+		switch item := m.carry.(type) {
+		case *object:
+			item.owner = nil
+		case *weapon:
+			item.owner = nil
+		}
 	}
+	m.carry = nil
 }
 
 //=============================================================
@@ -417,13 +435,6 @@ func (m *mob) getMass() float64 {
 //=============================================================
 func (m *mob) getBounds() *Bounds {
 	return m.bounds
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) getType() entityType {
-	return m.mobType
 }
 
 //=============================================================
@@ -575,6 +586,8 @@ func (m *mob) physics(dt float64) {
 				m.bounds.Y += m.velo.Y
 			} else {
 				if m.velo.Y < -6 {
+					// TBD: Fall to death, not explode
+					// Or power?
 					m.explode()
 				}
 				m.velo.Y = 0
@@ -667,14 +680,4 @@ func (m *mob) draw(dt, elapsed float64) {
 	//m.canvas.SetColorMask(pixel.Alpha(1))
 	m.batches[idx].Draw(m.canvas)
 	m.canvas.Draw(global.gWin, (pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2))))
-
-	// Draw any object attached.
-	if m.carry != nil {
-		m.carry.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(m.carry.scale*m.dir, m.carry.scale)).
-			Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2-2)).
-			Rotated(pixel.Vec{m.carry.bounds.X + m.carry.bounds.Width/2, m.carry.bounds.Y + m.carry.bounds.Height/2}, m.carry.rotation*m.dir))
-		// Update object positions based on mob
-		m.carry.bounds.X = m.bounds.X
-		m.carry.bounds.Y = m.bounds.Y
-	}
 }

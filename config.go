@@ -101,6 +101,5 @@ var global = &Global{
 		climbFrames: []int{1, 7},
 		frameWidth:  12.0,
 		life:        100.0,
-		mobType:     entityPlayer,
 	},
 }

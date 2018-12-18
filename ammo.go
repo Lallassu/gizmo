@@ -10,7 +10,7 @@ import (
 	_ "github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"math"
-	"reflect"
+	_ "reflect"
 )
 
 type ammoEngine struct {
@@ -21,18 +21,17 @@ type ammoEngine struct {
 }
 
 type ammo struct {
-	x        float64
-	y        float64
-	size     float64
-	color    uint32
-	life     float64
-	mass     float64
-	ammoType ammoType
-	active   bool
-	fx       float64
-	fy       float64
-	power    int
-	owner    Entity
+	x      float64
+	y      float64
+	size   float64
+	color  uint32
+	life   float64
+	mass   float64
+	active bool
+	fx     float64
+	fy     float64
+	power  int
+	owner  Entity
 
 	vx    float64
 	vy    float64
@@ -87,9 +86,8 @@ func (pe *ammoEngine) newAmmo(p ammo) {
 	}
 	newp := pe.bullets[pe.idx : pe.idx+1][0]
 	newp = p
-	newp.life = 3
-	newp.active = true
 	newp.owner = p.owner
+	newp.active = true
 	pe.bullets[pe.idx : pe.idx+1][0] = newp
 }
 
@@ -174,20 +172,20 @@ func (p *ammo) update(dt float64) {
 
 	// Check if hit object.
 	for _, x := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: p.x, Y: p.y, Width: 1, Height: 1}) {
-		if x.entity.getType() != entityChunk {
-			isSelf := false
-			if reflect.TypeOf(x.entity) == reflect.TypeOf(&mob{}) {
-				if x.entity.(*mob) == p.owner.(*mob) {
-					// Don't shoot self.
-					isSelf = true
-				}
+		isSelf := false
+		isChunk := false
+		switch item := x.entity.(type) {
+		case *chunk:
+			isChunk = true
+		case *mob:
+			if item == p.owner.(*mob) {
+				isSelf = true
 			}
-			if !isSelf {
-				x.entity.hit(p.x, p.y, p.vx, p.vy, p.power)
-				//p.explode()
-				p.active = false
-				break
-			}
+		}
+		if !isSelf && !isChunk {
+			x.entity.hit(p.x, p.y, p.vx, p.vy, p.power)
+			p.active = false
+			break
 		}
 	}
 

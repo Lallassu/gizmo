@@ -10,12 +10,12 @@ const (
 	mapWtf
 )
 
-type ammoType int
+type weaponType int
 
 const (
-	ammoRegular ammoType = iota
-	ammoMissile
-	ammoShotgun
+	ak47 weaponType = iota
+	p90
+	shotgun
 )
 
 type objectType int
@@ -39,15 +39,6 @@ type chunkType int
 const (
 	bgChunk chunkType = iota
 	fgChunk
-)
-
-type entityType int
-
-const (
-	entityPlayer entityType = iota
-	entityEnemy
-	entityObject
-	entityChunk
 )
 
 type animationType int

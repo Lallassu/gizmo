@@ -5,12 +5,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	_ "github.com/pkg/profile"
 	"math/rand"
-	"strings"
 	"time"
 )
 
@@ -126,32 +124,12 @@ func gameLoop() {
 	frames := 0
 
 	// Load a bunch of weapons
-	for _, x := range []string{"ak47_weapon", "crate_obj"} { // "shotgun_weapon", "crate_obj"} {
-		var otype objectType
-		scale := 0.15
-
-		static := false
-		if strings.Contains(x, "_weapon") {
-			otype = objectWeapon
-			static = false
-		} else if strings.Contains(x, "_obj") {
-			otype = objectCrate
-			scale = 1
-		}
-
-		for i := 0; i < 10; i++ {
-			objTest := object{
-				textureFile: fmt.Sprintf("assets/objects/%v.png", x),
-				name:        x,
-				static:      static,
-				entityType:  entityObject,
-				objectType:  otype,
-				scale:       scale,
-			}
-			objTest.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
-		}
+	for i := 0; i < 20; i++ {
+		w := &weapon{}
+		w.newWeapon(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)), ak47)
 	}
 
+	// Load a bunch of enemies
 	for i := 0; i < 10; i++ {
 		test := mob{
 			sheetFile:   "assets/mobs/enemy1.png",
@@ -163,22 +141,15 @@ func gameLoop() {
 			frameWidth:  12.0,
 			life:        100.0,
 			speed:       100,
-			mobType:     entityEnemy,
 			ai:          &AI{},
 		}
-		weapon := &object{
-			textureFile: "assets/objects/ak47_weapon.png",
-			name:        "ak47_weapon",
-			static:      false,
-			entityType:  entityObject,
-			objectType:  objectWeapon,
-			scale:       0.15,
-		}
-
-		weapon.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
 		test.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
-		test.attach(weapon)
 	}
+
+	// Add player weapon
+	w := &weapon{}
+	w.newWeapon(0, 10, shotgun)
+	global.gPlayer.attach(w)
 
 	// var uPosX, uPosY float32
 	//global.gWin.Canvas().SetUniform("uPos", &pos)

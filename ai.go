@@ -38,12 +38,15 @@ func (a *AI) updateObjectList() {
 	m := a.entity.(*mob)
 	a.objList = []pixel.Vec{}
 	for _, v := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: m.bounds.X, Y: m.bounds.Y, Width: 300, Height: 300}) {
-		if v.entity.getType() == entityObject {
-			if v.entity.(*object).isFree() {
-				pos := v.entity.getPosition()
+		//if v.entity.getType() == entityObject {
+		switch item := v.entity.(type) {
+		case *weapon:
+			if item.isFree() {
+				pos := item.getPosition()
 				a.objList = append(a.objList, pos)
 			}
 		}
+		//	}
 	}
 }
 

@@ -24,9 +24,9 @@ type controller struct {
 // Set which entity to control
 //=============================================================
 func (c *controller) setActiveEntity(e Entity) {
-	if e.getType() != entityChunk {
-		c.entity = e
-		// TBD: Tell camera to follow this entity.
+	switch item := e.(type) {
+	case *mob:
+		c.entity = item
 	}
 }
 
@@ -67,16 +67,12 @@ func (c *controller) update(dt float64) {
 
 	// Test pickup
 	if global.gWin.Pressed(pixelgl.KeyB) {
-		if c.entity.getType() == entityPlayer {
-			c.entity.(*mob).pickup()
-		}
+		c.entity.(*mob).pickup()
 	}
 
 	// Throw object
 	if global.gWin.Pressed(pixelgl.KeyV) {
-		if c.entity.getType() == entityPlayer {
-			c.entity.(*mob).throw()
-		}
+		c.entity.(*mob).throw()
 	}
 
 	if global.gWin.Pressed(pixelgl.KeyS) {
@@ -117,9 +113,7 @@ func (c *controller) update(dt float64) {
 		//mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
 		// global.gWorld.Explode(mouse.X, mouse.Y, 10)
 		// global.gParticleEngine.effectExplosion(mouse.X, mouse.Y, 10)
-		if c.entity.getType() == entityPlayer {
-			c.entity.(*mob).shoot()
-			//global.gSounds.play("shot")
-		}
+		c.entity.(*mob).shoot()
+		//global.gSounds.play("shot")
 	}
 }
