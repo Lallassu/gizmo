@@ -39,6 +39,10 @@ func (c *chunk) getMass() float64 {
 	return 1.0
 }
 
+func (c *chunk) throw() {
+
+}
+
 func (c *chunk) pickup() {
 }
 

@@ -34,7 +34,7 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 			life:  3.0,
 			fx:    10.0,
 			fy:    10.0,
-			power: global.gRand.rand(), // 2
+			power: 1 + global.gRand.rand(), // 2
 		}
 		w.spread = 0.5
 		w.bullets = 1

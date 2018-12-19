@@ -369,8 +369,14 @@ func (o *object) explode() {
 			o.pixels[int(x*o.size+y)] = 0
 		}
 	}
-	o.owner = nil
+	if o.owner != nil {
+		o.owner.throw()
+	}
 	global.gWorld.qt.Remove(o.bounds)
+}
+
+func (o *object) throw() {
+
 }
 
 //=============================================================

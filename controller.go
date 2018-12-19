@@ -68,7 +68,6 @@ func (c *controller) update(dt float64) {
 	// Test pickup
 	if global.gWin.Pressed(pixelgl.KeyB) {
 		c.entity.(*mob).pickup()
-		global.gUI.setMiddleText("HEJ")
 	}
 
 	// Throw object

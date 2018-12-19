@@ -42,6 +42,9 @@ func (c *camera) shake(pos pixel.Vec, power int) {
 	if c.shakePower < 5 {
 		c.shakeDt = 0
 		c.shakePower = 0
+	} else if c.shakePower > 40 {
+		c.shakeDt = 20
+		c.shakePower = 20
 	}
 }
 

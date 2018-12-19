@@ -23,7 +23,6 @@ type particle struct {
 	fy     float64
 
 	restitution float64
-	bounces     int
 	vx          float64
 	vy          float64
 	prevX       float64
@@ -74,16 +73,12 @@ func (p *particle) update(dt float64) {
 
 		for n := 0; n < loops; n++ {
 			if global.gWorld.IsWall(p.x+lx, p.y+ly) { // || global.gWorld.IsObject(p.x+lx, p.y+ly) {
-				p.bounces++
 				if p.vy < 0 {
 					p.vy *= p.restitution
 				} else {
-					if p.vx > 0 {
-						p.vx *= -p.restitution
-						p.vy *= -p.restitution
-					} else if p.vx < 0 {
-						p.vx *= -p.restitution
-						p.vy *= -p.restitution
+					if p.vx != 0 && p.pType != particleBlood {
+						p.vx *= p.restitution
+						p.vy *= p.restitution
 					}
 				}
 				break
@@ -136,13 +131,32 @@ func (p *particle) update(dt float64) {
 func (p *particle) stop() {
 	p.life = 0
 	if p.static {
-		if global.gWorld.IsRegular(p.x, p.y-1) {
-			global.gWorld.AddPixel(int(p.x), int(p.y), p.color)
-			global.gWorld.addShadow(int(p.x+1), int(p.y-1))
-			// We could add shadow for full length, but more expensive and looks strange when adding it.
-			// for i := 0.0; i < wShadowLength; i++ {
-			// 	global.gWorld.addShadow(int(p.x+i), int(p.y-i))
-			// }
+		if p.size < 0 {
+			return
+		}
+
+		// Splatter blood
+		if p.pType == particleBlood {
+			// Don't splatter all pixels, that'll be too much.
+			if global.gRand.randFloat() < 0.1 {
+				for i := -p.size; i <= p.size; i++ {
+					for j := -p.size; j <= p.size; j++ {
+						if global.gRand.randFloat() < 0.3 {
+							if global.gWorld.IsRegular(p.x+i, p.y+j) {
+								r := 125 + global.gRand.rand()*5
+								g := 10 + global.gRand.rand()*2
+								b := 10 + global.gRand.rand()*2
+								global.gWorld.AddPixel(int(p.x+i), int(p.y+j), uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF))
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if global.gWorld.IsRegular(p.x, p.y-1) {
+				global.gWorld.AddPixel(int(p.x), int(p.y), p.color)
+				global.gWorld.addShadow(int(p.x+1), int(p.y-1))
+			}
 		}
 	}
 }

@@ -1,14 +1,10 @@
 General
 --------
-- Add larger bloodsplatter to walls.
+- UI
+    -> Life
+    -> Deaths
 
-- Map generation
-    - More objects
-    - Better spread of lights
-        -> Use shader lightning instead
-    - effects such as smoke
-        -> map.go with Draw() function
-    - Configurable map generation vars
+- Reload map (if totalt fubar)
 
 - Items class
     - crates
@@ -20,10 +16,25 @@ General
     -> May be attachable
     -> Events
 
+- Map handler
+    - Generate world
+    - Set player pos
+    - Add weapons
+    - Add powerups
+    - Add coins?
+
+
+- Map generation
+    - More objects
+    - Better spread of lights
+        -> Use shader lightning instead
+    - effects such as smoke
+        -> map.go with Draw() function
+    - Configurable map generation vars
+
 - Attach smoke/fire/fuse to objects
     - For boms/fire etc.
  
-
 - Special-effects
     -> Lightning
     -> Shaders
@@ -44,9 +55,6 @@ General
 - Sounds
     -> repeatable
 
-- UI
-    -> Life
-    -> Deaths
 
 - Menu
     - New Game
@@ -54,17 +62,7 @@ General
     - About
     - Quit
 
-- Map handler
-    - Set player pos
-    - Add weapons
-    - Add powerups
-    - Add coins?
-
-
-- Pickaxe to dig through world to pass enemies
-    -> Show "radar" for enemy vision
-    -> Goal to reach something?
-    -> Bankrobber?
+- Own animations + sprites
 
 - Enemies:
     - pickup bombs and run towards player

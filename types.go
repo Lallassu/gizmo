@@ -50,3 +50,13 @@ const (
 	animShoot
 	animIdle
 )
+
+type itemType int
+
+const (
+	itemPlant itemType = iota
+	itemBucket
+	itemVase
+	itemCrate
+	itemBarrel
+)

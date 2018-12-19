@@ -384,7 +384,7 @@ func (m *mob) explode() {
 			for y := 0.0; y < m.frameHeight; y++ {
 				pos := int(m.size*x + y)
 				if m.frames[i][pos] != 0 {
-					// Remove part
+					// Remove part (Don't create every particle)
 					if global.gRand.rand() < 1 {
 						global.gParticleEngine.effectBlood(m.bounds.X+float64(x), m.bounds.Y+float64(y), float64(5-global.gRand.rand()), float64(5-global.gRand.rand()), global.gRand.rand()/10)
 						global.gParticleEngine.newParticle(
@@ -404,8 +404,8 @@ func (m *mob) explode() {
 								static:      true,
 							})
 					}
+					m.frames[i][pos] = 0
 				}
-				m.frames[i][pos] = 0
 			}
 		}
 	}
