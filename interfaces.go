@@ -10,7 +10,7 @@ import (
 )
 
 type Entity interface {
-	hit(x, y, vx, vy float64, power int) bool
+	hit(x, y, vx, vy float64, power int)
 	explode()
 	getMass() float64
 	draw(dt, elapsed float64)

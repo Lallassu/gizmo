@@ -25,8 +25,7 @@ type chunk struct {
 //=============================================================
 // Impl. the Entity interface
 //=============================================================
-func (c *chunk) hit(x, y, vx, vy float64, power int) bool {
-	return false
+func (c *chunk) hit(x, y, vx, vy float64, power int) {
 }
 
 func (c *chunk) explode() {

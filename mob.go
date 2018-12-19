@@ -228,16 +228,16 @@ func (m *mob) buildFrames() {
 //=============================================================
 //
 //=============================================================
-func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
+func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 	// If carry somerhing, hit that first!
 	if m.carry != nil {
 		switch item := m.carry.(type) {
 		case *weapon:
 			item.hit(x_, y_, vx, vy, power)
-			return true
+			return
 		case *object:
 			item.hit(x_, y_, vx, vy, power)
-			return true
+			return
 		}
 	}
 
@@ -260,7 +260,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 							m.life -= 0.1
 							if m.life <= 0 {
 								m.explode()
-								return true
+								return
 							}
 							if global.gRand.rand() < 1 {
 								global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
@@ -299,8 +299,6 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) bool {
 
 	// Check status of mob, if dead => remove from QT
 	//	global.gWorld.qt.Remove(m.bounds)
-
-	return true
 }
 
 //=============================================================

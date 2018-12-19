@@ -279,9 +279,9 @@ func (o *object) build() {
 //=============================================================
 //
 //=============================================================
-func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
+func (o *object) hit(x_, y_, vx, vy float64, power int) {
 	o.explode()
-	return true
+	return
 
 	x := int(math.Abs(float64(o.bounds.X - x_)))
 	y := int(math.Abs(float64(o.bounds.Y - y_)))
@@ -322,7 +322,6 @@ func (o *object) hit(x_, y_, vx, vy float64, power int) bool {
 	}
 	o.dirty = true
 	//o.build()
-	return true
 }
 
 //=============================================================
