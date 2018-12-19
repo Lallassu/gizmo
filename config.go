@@ -50,6 +50,9 @@ const (
 	wDoorLen             = 30
 	wDoorHeight          = 40
 	wLightsMax           = 10
+	wMiddleTextSize      = 22
+	wFPSTextSize         = 8
+	wDeathScreenText     = "You Are Dead!"
 )
 
 //=============================================================

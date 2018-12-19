@@ -34,7 +34,7 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 			life:  3.0,
 			fx:    10.0,
 			fy:    10.0,
-			power: 2,
+			power: global.gRand.rand(), // 2
 		}
 		w.spread = 0.5
 		w.bullets = 1
@@ -68,6 +68,9 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 //
 //=============================================================
 func (w *weapon) shoot() {
+	if w.owner == nil {
+		return
+	}
 	if w.reloadTime > w.reload {
 		// Use mass = 5 and fx/fy = 0.5 for missile
 		for i := 0; i < w.bullets; i++ {

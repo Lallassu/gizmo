@@ -1,5 +1,7 @@
 General
 --------
+- Add larger bloodsplatter to walls.
+
 - Map generation
     - More objects
     - Better spread of lights
@@ -16,14 +18,11 @@ General
     - Power ups
     - Helmet
     -> May be attachable
+    -> Events
 
 - Attach smoke/fire/fuse to objects
     - For boms/fire etc.
  
-- Close to explosions
-    -> shake screen
-
-- Add larger bloodsplatter to walls.
 
 - Special-effects
     -> Lightning
@@ -47,13 +46,7 @@ General
 
 - UI
     -> Life
-    -> Ammo
     -> Deaths
-    -> Life left.
-    -> Map
-    -> Add text to screen (e.g. "Fell to death")
-        -> Temporary text
-        -> UI -> fade to red
 
 - Menu
     - New Game
@@ -76,51 +69,13 @@ General
 - Enemies:
     - pickup bombs and run towards player
 
-- Weapon should be rotated more accurate 
-    -> Skip mouse support? Just shoot straight?
-
-- Use reflections instead of interface getType()
- 
 - Handle scale for objects Hit() functions
-
-- Sound class
 
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
 
-- Event handler for objects
-    -> for example if player hit, what should happen?
-    -> trampoline effect etc.
-
-- GLSL for lights
-- More details in maps
-- Different color layouts for map
 - Configuration support
     - Json file -> struct
     - Add fullscreen support
     - Controllers
     - Features (vsync etc)
-
-
-Classes
------------
-- Camera
-    - SetPosition()
-    - Follow(genericIf)
-    - Zoom control
-    - Lerp
-- Controller
-    - Handle inputs or generate inputs
-    - Player
-    - AI
-- Entity
-    - Moveable entity with animation or other.
-    - Can be character or other
-    - Implements phys
-- Utils
-    - floodfill
-    - Load sprites
-    - Load Textures
-- Weapons
-    - Type
-
 

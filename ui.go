@@ -20,11 +20,12 @@ import (
 //
 //=============================================================
 type UI struct {
-	fps           *text.Text
-	middleText    *text.Text
-	canvas        *pixelgl.Canvas
-	miniMapScale  float64
-	middleTextStr string
+	fps              *text.Text
+	middleText       *text.Text
+	canvas           *pixelgl.Canvas
+	miniMapScale     float64
+	middleTextStr    string
+	deathScreenTimer float64
 }
 
 //=============================================================
@@ -40,12 +41,12 @@ func (u *UI) create() {
 		panic(err)
 	}
 	fface := truetype.NewFace(ttf, &truetype.Options{
-		Size:              8,
+		Size:              wFPSTextSize,
 		GlyphCacheEntries: 1,
 	})
 
 	ffaceMiddle := truetype.NewFace(ttf, &truetype.Options{
-		Size:              30,
+		Size:              wMiddleTextSize,
 		GlyphCacheEntries: 1,
 	})
 
@@ -62,7 +63,7 @@ func (u *UI) create() {
 	u.fps.Color = pixel.RGBA{1, 0, 1, 1}
 
 	u.middleText = text.New(pixel.ZV, regularMiddle)
-	u.middleText.Color = pixel.RGBA{1, 0, 0, 1}
+	u.middleText.Color = pixel.RGBA{1, 1, 1, 1}
 }
 
 //=============================================================
@@ -99,10 +100,22 @@ func (u *UI) updateFPS(fps int) {
 //
 //=============================================================
 func (u *UI) draw(dt float64) {
-	u.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+
+	// Draw death screen
+	if global.gPlayer.life == 0 {
+		u.deathScreenTimer += dt
+		u.setMiddleText(wDeathScreenText)
+	} else {
+		u.deathScreenTimer = 0
+	}
+	u.canvas.Clear(pixel.RGBA{u.deathScreenTimer, 0, 0, 0})
+
 	u.updateMiniMap()
+
 	u.fps.Draw(u.canvas, pixel.IM.Moved(pixel.V(1, wViewMax/2+22)))
+
+	u.middleText.Draw(u.canvas, pixel.IM.Moved(pixel.V(float64(wViewMax/2-((len(u.middleTextStr)/3)*wMiddleTextSize)), wViewMax/3)))
+
 	u.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))
 
-	u.middleText.Draw(u.canvas, pixel.IM.Moved(pixel.V(float64(wViewMax/2-len(u.middleTextStr)/2), wViewMax/2+22)))
 }
