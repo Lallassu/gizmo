@@ -1,10 +1,23 @@
 General
 --------
+
+- Skip UnStuck and make CD better.
+    -> Do same CD as Mob in Object?
+
+- Random weapons/enemies of different types based on map type
+
 - UI
     -> Life
     -> Deaths
 
-- Reload map (if totalt fubar)
+- Teleport through doors
+    -> Random doors
+    -> Save door positions
+
+- Jump on items
+- Landa på item -> inte dö, item explode (ifall högt fall).
+
+- Reload map (if totaly fubar)
 
 - Items class
     - crates
@@ -15,13 +28,7 @@ General
     - Helmet
     -> May be attachable
     -> Events
-
-- Map handler
-    - Generate world
-    - Set player pos
-    - Add weapons
-    - Add powerups
-    - Add coins?
+    -> Explode -> Drop item
 
 
 - Map generation
@@ -44,6 +51,12 @@ General
     -> Enemy physics?
     -> triangle count?
 
+
+- AI
+    - Follow player
+    - Pickup weapons if seen
+        -> Distance to < X pickup()
+
 - Lights
     - Generic light
     - Lightning around ammo
@@ -55,10 +68,10 @@ General
 - Sounds
     -> repeatable
 
-
 - Menu
     - New Game
     - Continue
+    - Configuration
     - About
     - Quit
 
@@ -71,9 +84,15 @@ General
 
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
 
+- Elevators
+    -> Object
+    -> Moving certain path
+
 - Configuration support
     - Json file -> struct
     - Add fullscreen support
     - Controllers
     - Features (vsync etc)
+    - Number of particles
+        -> Explode of objects/mobs
 

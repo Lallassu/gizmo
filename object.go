@@ -33,16 +33,14 @@ type object struct {
 	fy          float64
 	scale       float64
 	owner       Entity
-	rotation    float64
 	active      bool
 	reloadTime  float64
 	falling     bool
 	animateIdle bool
 	sprite      *sprite
-	//  img         image.Image
-	//  model       *imdraw.IMDraw
-	canvas *pixelgl.Canvas
-	bounds *Bounds
+	canvas      *pixelgl.Canvas
+	bounds      *Bounds
+	rotation    float64
 
 	batch     *pixel.Batch
 	triangles *pixel.TrianglesData
@@ -93,32 +91,6 @@ func (o *object) create(x_, y_ float64) {
 	}
 
 	o.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(o.width), float64(o.height)))
-	//var fragmentShader = `
-	// #version 330 core
-
-	// in vec2  vTexCoords;
-	// in vec2 vPosition;
-	// in vec4 vColor;
-
-	// out vec4 fragColor;
-
-	// uniform float uCenterX;
-	// uniform float uCenterY;
-
-	// uniform vec4 uTexBounds;
-	// uniform sampler2D uTexture;
-
-	// void main() {
-	//    vec4 color = vec4(0.0,0.0,0.0,0.0);
-	//    float d = sqrt(pow(vPosition.x-uCenterX, 2) + pow(vPosition.y-uCenterY, 2));
-	//	if (d <= 0) {
-	//		d = 1;
-	//	}
-	//    color = vec4(vColor.g*(uCenterX/100), vColor.g, vColor.b, vColor.a/d);
-	//    fragColor = color;
-	// }
-	//    `
-	//o.canvas.SetFragmentShader(fragmentShader)
 
 	// build initial
 	o.build()
@@ -269,6 +241,51 @@ func (o *object) build() {
 	o.dirty = false
 	o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 	o.batch.Draw(o.canvas)
+	var fragmentShader = `
+	    #version 330 core
+// in vec4 v_colour;
+// in vec2 tex_coord;
+	    in vec2  vTexCoords;
+	    in vec2 vPosition;
+	    in vec4 vColor;
+ out vec4 fragColor;
+
+uniform sampler2D t0;
+uniform float glow_size = .5;
+uniform vec3 glow_colour = vec3(0.1, 0, 0);
+uniform float glow_intensity = 1;
+uniform float glow_threshold = .5;
+
+void main() {
+//    fragColor = texture(t0, vTexCoords);
+	fragColor = vColor;
+    if (fragColor.a <= glow_threshold) {
+        ivec2 size = textureSize(t0, 0);
+	
+        float uv_x = vTexCoords.x * size.x;
+        float uv_y = vTexCoords.y * size.y;
+
+        float sum = 0.0;
+        for (int n = 0; n < 9; ++n) {
+            uv_y = (vTexCoords.y * size.y) + (glow_size * float(n - 4.5));
+            float h_sum = 0.0;
+            h_sum += texelFetch(t0, ivec2(uv_x - (4.0 * glow_size), uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x - (3.0 * glow_size), uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x - (2.0 * glow_size), uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x - glow_size, uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x, uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x + glow_size, uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x + (2.0 * glow_size), uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x + (3.0 * glow_size), uv_y), 0).a;
+            h_sum += texelFetch(t0, ivec2(uv_x + (4.0 * glow_size), uv_y), 0).a;
+            sum += h_sum / 9.0;
+        }
+
+        fragColor = vec4(glow_colour, (sum / 9.0) * glow_intensity);
+    }
+}
+`
+	o.canvas.SetFragmentShader(fragmentShader)
 }
 
 //=============================================================
@@ -346,27 +363,29 @@ func (o *object) explode() {
 				continue
 			}
 
-			size := o.scale
-			if o.scale < 0.5 {
-				size = 0.5
+			if global.gRand.randFloat() < 0.1 {
+				size := o.scale
+				if o.scale < 0.5 {
+					size = 0.5
+				}
+				global.gParticleEngine.newParticle(
+					particle{
+						x:           o.bounds.X + float64(x)*o.scale,
+						y:           o.bounds.Y + float64(y)*o.scale,
+						size:        size,
+						restitution: -0.1 - global.gRand.randFloat()/4,
+						life:        wParticleDefaultLife,
+						fx:          float64(10 - global.gRand.rand()),
+						fy:          float64(10 - global.gRand.rand()),
+						vx:          float64(5 - global.gRand.rand()),
+						vy:          float64(5 - global.gRand.rand()),
+						mass:        1,
+						pType:       particleRegular,
+						color:       p,
+						static:      true,
+					})
+				o.pixels[int(x*o.size+y)] = 0
 			}
-			global.gParticleEngine.newParticle(
-				particle{
-					x:           o.bounds.X + float64(x)*o.scale,
-					y:           o.bounds.Y + float64(y)*o.scale,
-					size:        size,
-					restitution: -0.1 - global.gRand.randFloat()/4,
-					life:        wParticleDefaultLife,
-					fx:          float64(10 - global.gRand.rand()),
-					fy:          float64(10 - global.gRand.rand()),
-					vx:          float64(5 - global.gRand.rand()),
-					vy:          float64(5 - global.gRand.rand()),
-					mass:        1,
-					pType:       particleRegular,
-					color:       p,
-					static:      true,
-				})
-			o.pixels[int(x*o.size+y)] = 0
 		}
 	}
 	if o.owner != nil {
@@ -427,10 +446,15 @@ func (o *object) setOwner(e Entity) {
 //
 //=============================================================
 func (o *object) removeOwner() {
+	//o.fx += o.owner.(*mob).dir * 10
+	//o.vx += o.owner.(*mob).dir * 10
+
+	o.fx = math.Abs(o.owner.(*mob).velo.X)
+	o.fy = 5
+	o.vy = 5
+	o.vx = o.owner.(*mob).velo.X / 2
 	o.owner = nil
-	o.fx = 1
-	o.fy = 1
-	o.bounces = 4
+	o.bounces = 0
 }
 
 //=============================================================
@@ -448,6 +472,8 @@ func (o *object) physics(dt float64) {
 	if o.owner != nil {
 		return
 	}
+
+	grav_dt := dt * global.gWorld.gravity * o.mass
 
 	if global.gWorld.IsWall(o.bounds.X, o.bounds.Y) {
 		o.bounces++
@@ -476,14 +502,17 @@ func (o *object) physics(dt float64) {
 	o.vy -= dt * o.fy
 
 	if o.fx > 0 {
-		o.fx -= dt * global.gWorld.gravity * o.mass
+		o.fx -= grav_dt
 	} else {
 		o.fx = 0
 	}
 	o.falling = false
 	if o.fy > 0 {
-		o.fy -= dt * global.gWorld.gravity * o.mass
+		o.rotation += grav_dt / o.mass
+		o.fy -= grav_dt
 		o.falling = true
+	} else {
+		o.rotation = 0
 	}
 
 }
@@ -511,12 +540,17 @@ func (o *object) draw(dt, elapsed float64) {
 			// Animate up/down
 			offset = 5 + math.Sin(o.reloadTime)*3
 		}
-		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)))
+		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 		o.unStuck(dt)
 	} else {
 		owner := o.owner.(*mob)
+		offset := 0.0
+		switch o.bounds.entity.(type) {
+		case *item:
+			offset = 10.0
+		}
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*owner.dir, o.scale)).
-			Moved(pixel.V(owner.bounds.X+owner.bounds.Width/2, owner.bounds.Y+owner.bounds.Height/2-2)).
+			Moved(pixel.V(owner.bounds.X+owner.bounds.Width/2, offset+owner.bounds.Y+owner.bounds.Height/2-2)).
 			Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*owner.dir))
 		// Update oect positions based on mob
 		o.bounds.X = owner.bounds.X

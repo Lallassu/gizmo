@@ -102,13 +102,20 @@ func (u *UI) updateFPS(fps int) {
 func (u *UI) draw(dt float64) {
 
 	// Draw death screen
+	color := pixel.RGBA{}
 	if global.gPlayer.life == 0 {
 		u.deathScreenTimer += dt
 		u.setMiddleText(wDeathScreenText)
+
+		red := u.deathScreenTimer / 10
+		if red > 0.5 {
+			red = 0.5
+		}
+		color = pixel.RGBA{red, 0, 0, u.deathScreenTimer / 10}
 	} else {
 		u.deathScreenTimer = 0
 	}
-	u.canvas.Clear(pixel.RGBA{u.deathScreenTimer, 0, 0, 0})
+	u.canvas.Clear(color)
 
 	u.updateMiniMap()
 

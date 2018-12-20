@@ -14,6 +14,7 @@ import (
 	"github.com/faiface/pixel"
 	"image"
 	"math"
+	"math/rand"
 	"os"
 )
 
@@ -54,34 +55,19 @@ func (w *world) Init() {
 //=============================================================
 // New Map
 //=============================================================
-func (w *world) NewMap(maptype mapType) {
-	// Generate map based on maptype
-	w.currentMap = maptype
+func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapType) {
 	w.qt.Clear()
 
-	switch maptype {
-	case mapEasy:
-		w.width = 1024
-		w.height = 1024
-	case mapNormal:
-		w.width = 1535
-		w.height = 1536
-	case mapHard:
-		w.width = 2048
-		w.height = 2048
-	case mapHell:
-	case mapWtf:
-	}
+	w.width = width
+	w.height = height
 
 	w.coloring = GenerateMapColor(maptype)
-
 	w.size = w.width * w.height
 
 	w.pixels = make([]uint32, w.size)
 
-	Debug("Generating world", w.width, w.height)
 	g := generator{}
-	pixels := g.NewWorld(w.width, w.height)
+	pixels := g.NewWorld(w.width, w.height, num_steps, step_length)
 
 	// Add all pixels as red before coloring
 	for i := 0; i < len(pixels); i += 2 {
@@ -91,7 +77,6 @@ func (w *world) NewMap(maptype mapType) {
 	// Paint the map with colors
 	w.paintMap()
 
-	// Initialize pixel pointers in the chunks
 	// FG Chunks
 	for x := 0; x < w.width; x += wPixelsPerChunk {
 		for y := 0; y < w.height; y += wPixelsPerChunk {
@@ -101,11 +86,7 @@ func (w *world) NewMap(maptype mapType) {
 		}
 	}
 
-	//pic, err := loadPicture("bg.png")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//w.sprite = pixel.NewSprite(pic, pic.Bounds())
+	// Place enemies
 
 	// BG Chunks
 	// for x := 0; x < w.width; x += wPixelsPerChunkBG {
@@ -131,6 +112,23 @@ func (w *world) NewMap(maptype mapType) {
 
 	Debug("Tree Size:", w.qt.Total)
 	Debug("World generation complete.")
+}
+
+func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
+	x_ := rand.Intn(w.width - 1)
+	y_ := rand.Intn(w.height - 1)
+	for x := x_ - size/2; x < x_+size/2; x++ {
+		for y := y_ - size/2; y < y_+size/2; y++ {
+			pos := x*w.width + y
+			if pos < len(w.pixels) && pos >= 0 {
+				p := w.pixels[pos]
+				if p&0xFF != wBackground8 {
+					return pixel.Vec{}, false
+				}
+			}
+		}
+	}
+	return pixel.Vec{float64(x_), float64(y_)}, true
 }
 
 func loadPicture(path string) (pixel.Picture, error) {

@@ -8,7 +8,6 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	_ "github.com/pkg/profile"
-	"math/rand"
 	"time"
 )
 
@@ -16,7 +15,7 @@ import (
 // Main
 //=============================================================
 func main() {
-	//defer profile.Start(profile.CPUProfile).Stop()
+	//	defer profile.Start(profile.CPUProfile).Stop()
 	pixelgl.Run(run)
 }
 
@@ -59,17 +58,16 @@ func setup() {
 	global.gCamera.create()
 	global.gController.create()
 	global.gWorld.Init()
-	global.gWorld.NewMap(mapEasy)
 	global.gParticleEngine.create()
 	global.gAmmoEngine.create()
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 3
 	global.gWin.SetSmooth(false)
-	global.gPlayer.create(100, 50)
 	global.gLights.create()
 	global.gController.setActiveEntity(global.gPlayer)
 	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
+	global.gMap.newMap(1)
 }
 
 //=============================================================
@@ -119,37 +117,10 @@ func gameLoop() {
 	//    	fragColor = color;
 	//    }
 	//    `
-	fps := time.Tick(time.Second / 1000)
-	second := time.Tick(time.Second)
-	frames := 0
 
-	// Load a bunch of weapons
-	for i := 0; i < 20; i++ {
-		w := &weapon{}
-		w.newWeapon(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)), ak47)
-	}
-
-	// Load a bunch of enemies
-	for i := 0; i < 10; i++ {
-		test := mob{
-			sheetFile:   "assets/mobs/enemy1.png",
-			walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
-			idleFrames:  []int{0, 2, 3, 4, 5, 6},
-			shootFrames: []int{26},
-			jumpFrames:  []int{15, 16, 17, 18, 19, 20},
-			climbFrames: []int{1, 7},
-			frameWidth:  12.0,
-			life:        100.0,
-			speed:       100,
-			ai:          &AI{},
-		}
-		test.create(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
-	}
-
-	// Add player weapon
-	w := &weapon{}
-	w.newWeapon(0, 10, ak47)
-	global.gPlayer.attach(w)
+	//fps := time.Tick(time.Second / 1000)
+	//second := time.Tick(time.Second)
+	//frames := 0
 
 	// var uPosX, uPosY float32
 	//global.gWin.Canvas().SetUniform("uPos", &pos)
@@ -192,8 +163,8 @@ func gameLoop() {
 				break
 			}
 			frameDt -= wMaxInvFPS
-			<-fps
-			updateFPSDisplay(global.gWin, &frames, second)
+			//  <-fps
+			//  updateFPSDisplay(global.gWin, &frames, second)
 		}
 
 	}

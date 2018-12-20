@@ -5,6 +5,10 @@
 //=============================================================
 package main
 
+import (
+	"fmt"
+)
+
 //=============================================================
 //
 //=============================================================
@@ -25,7 +29,7 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 	w.wType = wType
 	switch wType {
 	case ak47:
-		w.textureFile = "assets/objects/ak47_weapon.png"
+		w.textureFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "ak47_weapon.png")
 		w.name = "ak47"
 		w.scale = 0.15
 		w.shot = ammo{
@@ -40,7 +44,7 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 		w.bullets = 1
 		w.reload = 0.05
 	case shotgun:
-		w.textureFile = "assets/objects/shotgun_weapon.png"
+		w.textureFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "shotgun_weapon.png")
 		w.name = "Shotgun"
 		w.scale = 0.15
 		w.shot = ammo{

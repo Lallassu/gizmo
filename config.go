@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -53,6 +54,8 @@ const (
 	wMiddleTextSize      = 22
 	wFPSTextSize         = 8
 	wDeathScreenText     = "You Are Dead!"
+	wAssetObjectsPath    = "assets/objects/"
+	wAssetMobsPath       = "assets/mobs/"
 )
 
 //=============================================================
@@ -76,6 +79,7 @@ type Global struct {
 	gLights         *lights
 	gSounds         *sound
 	gUI             *UI
+	gMap            *Map
 }
 
 var global = &Global{
@@ -95,8 +99,9 @@ var global = &Global{
 	gLights:         &lights{},
 	gSounds:         &sound{},
 	gUI:             &UI{},
+	gMap:            &Map{},
 	gPlayer: &mob{
-		sheetFile:   "assets/mobs/player.png",
+		sheetFile:   fmt.Sprintf("%v%v", wAssetMobsPath, "player.png"),
 		walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
 		idleFrames:  []int{0, 2, 3, 4, 5, 6},
 		shootFrames: []int{26},

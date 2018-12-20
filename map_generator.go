@@ -20,7 +20,7 @@ type generator struct {
 	cell_size int
 }
 
-func (g *generator) NewWorld(size_x, size_z int) []uint32 {
+func (g *generator) NewWorld(size_x, size_z, num_steps, step_length int) []uint32 {
 	rand.Seed(time.Now().Unix())
 	g.cell_size = 20
 	g.wide = size_x / g.cell_size
@@ -35,14 +35,10 @@ func (g *generator) NewWorld(size_x, size_z int) []uint32 {
 		g.cell[x] = make([]uint32, g.deep)
 	}
 
-	num_steps := 100
-	step_length := 10
-
 	g.randomWalk(num_steps, step_length)
 	g.cleanDeadEnds()
 	g.cleanDeadEnds()
 
-	Debug("Generating...")
 	pixels := make([]uint32, 0)
 	for x := 0; x < g.wide; x++ {
 		for z := 0; z < g.deep; z++ {
@@ -57,7 +53,6 @@ func (g *generator) NewWorld(size_x, size_z int) []uint32 {
 			}
 		}
 	}
-	Debug("Map generation complete.")
 	return pixels
 }
 

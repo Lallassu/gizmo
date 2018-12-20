@@ -603,11 +603,11 @@ func (p *pcg) GenerateBottomLine(x, y int) {
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
 		)
 	}
-	global.gWorld.AddPixel(
-		x,
-		y,
-		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
-	)
+	// global.gWorld.AddPixel(
+	// 	x,
+	// 	y,
+	// 	uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
+	// )
 
 }
 

@@ -342,6 +342,10 @@ func (m *mob) pickup() {
 			if item.isFree() {
 				m.attach(item)
 			}
+		case *item:
+			if item.isFree() {
+				m.attach(item)
+			}
 		case *weapon:
 			if item.isFree() {
 				m.attach(item)
@@ -385,7 +389,7 @@ func (m *mob) explode() {
 				pos := int(m.size*x + y)
 				if m.frames[i][pos] != 0 {
 					// Remove part (Don't create every particle)
-					if global.gRand.rand() < 1 {
+					if global.gRand.randFloat() < 0.05 {
 						global.gParticleEngine.effectBlood(m.bounds.X+float64(x), m.bounds.Y+float64(y), float64(5-global.gRand.rand()), float64(5-global.gRand.rand()), global.gRand.rand()/10)
 						global.gParticleEngine.newParticle(
 							particle{
@@ -578,7 +582,7 @@ func (m *mob) physics(dt float64) {
 		if m.IsOnLadder() {
 			m.velo.Y = m.speed / 2 * dt
 			m.climbing = true
-			m.velo.X = 0
+			m.velo.X /= 5
 		} else {
 			if !m.jumping {
 				m.velo.Y = m.jumpPower * dt
