@@ -82,24 +82,15 @@ func (c *controller) update(dt float64) {
 		global.gCamera.zoom += 0.05
 	}
 	if global.gWin.Pressed(pixelgl.KeyLeft) {
-		//global.gCamera.pos.X -= 2.1
-		//c.entity.move(-dt, 0)
 		move.X = -dt
 	}
 	if global.gWin.Pressed(pixelgl.KeyRight) {
-		//global.gCamera.pos.X += 2.1
-		//c.entity.move(dt, 0)
 		move.X = dt
 	}
 	if global.gWin.Pressed(pixelgl.KeyUp) {
-		//	global.gCamera.pos.Y += 2.1
-		//	c.entity.move(0, dt)
-		//	global.gSounds.play("jump")
 		move.Y = dt
 	}
 	if global.gWin.Pressed(pixelgl.KeyDown) {
-		//	global.gCamera.pos.Y -= 2.1
-		//c.entity.move(0, -dt)
 		move.Y = -dt
 	}
 	if global.gWin.Pressed(pixelgl.KeyL) {
@@ -110,9 +101,6 @@ func (c *controller) update(dt float64) {
 
 	// Handle mouse
 	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftShift) {
-		//mouse := global.gCamera.cam.Unproject(global.gWin.MousePosition())
-		// global.gWorld.Explode(mouse.X, mouse.Y, 10)
-		// global.gParticleEngine.effectExplosion(mouse.X, mouse.Y, 10)
 		c.entity.(*mob).shoot()
 		//global.gSounds.play("shot")
 	}

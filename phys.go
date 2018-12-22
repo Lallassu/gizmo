@@ -27,6 +27,7 @@ type phys struct {
 	rotation     float64
 	restitution  float64
 	scale        float64
+	offset       float64
 }
 
 //=============================================================
@@ -47,13 +48,19 @@ func (p *phys) createPhys(x, y, width, height float64) {
 
 	// Add object to QT
 	global.gWorld.AddObject(p.bounds)
+
+	// Create an offset for CD loops
+	p.offset = width / 4
+	if p.offset < 0 {
+		p.offset = 1
+	}
 }
 
 //=============================================================
 //
 //=============================================================
 func (p *phys) hitCeiling(x, y float64) bool {
-	for px := 0.0; px < p.bounds.Width; px++ {
+	for px := 0.0; px < p.bounds.Width; px += p.offset {
 		if global.gWorld.IsRegular(x+px, y+p.bounds.Height+1) {
 			return true
 		}
@@ -65,7 +72,7 @@ func (p *phys) hitCeiling(x, y float64) bool {
 //
 //=============================================================
 func (p *phys) hitFloor(x, y float64) bool {
-	for px := 0.0; px < p.bounds.Width; px++ {
+	for px := 0.0; px < p.bounds.Width; px += p.offset {
 		if global.gWorld.IsRegular(x+px, y+1) {
 			return true
 		}
@@ -77,7 +84,7 @@ func (p *phys) hitFloor(x, y float64) bool {
 //
 //=============================================================
 func (p *phys) hitWallLeft(x, y float64) bool {
-	for py := p.bounds.Height / 2; py < p.bounds.Height; py++ {
+	for py := p.bounds.Height / 2; py < p.bounds.Height; py += p.offset {
 		if global.gWorld.IsRegular(x-2, y+py) {
 			p.hitRightWall = true
 			return true
@@ -91,7 +98,7 @@ func (p *phys) hitWallLeft(x, y float64) bool {
 //
 //=============================================================
 func (p *phys) hitWallRight(x, y float64) bool {
-	for py := p.bounds.Height / 2; py < p.bounds.Height; py++ {
+	for py := p.bounds.Height / 2; py < p.bounds.Height; py += p.offset {
 		if global.gWorld.IsRegular(x+p.bounds.Width+1, y+py) {
 			p.hitLeftWall = true
 			return true
@@ -105,7 +112,7 @@ func (p *phys) hitWallRight(x, y float64) bool {
 // Check if on ladder
 //=============================================================
 func (p *phys) IsOnLadder() bool {
-	for px := p.bounds.Width / 3; px < p.bounds.Width-p.bounds.Width/3; px += 2 {
+	for px := p.bounds.Width / 3; px < p.bounds.Width-p.bounds.Width/3; px += p.offset {
 		for py := 0.0; py < p.bounds.Height; py += 2 {
 			if global.gWorld.IsLadder(p.bounds.X+px, p.bounds.Y+py) {
 				return true

@@ -1,6 +1,11 @@
 General
 --------
+- Fix bouncing of objects
+- Fix rotation when falling of objects.
+
 - Pixel density (as in urho3d?)
+
+- Reduce the entity-interface?
 
 - Interface for Draw
     - draw

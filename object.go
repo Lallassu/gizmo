@@ -124,7 +124,7 @@ func (o *object) removeOwner() {
 	o.force.X = math.Abs(o.owner.(*mob).velo.X) + 5
 	o.force.Y = 5
 	o.velo.Y = 5
-	o.velo.X = o.owner.(*mob).velo.X / 2
+	o.velo.X = o.owner.(*mob).velo.X * 10
 	o.owner = nil
 }
 
