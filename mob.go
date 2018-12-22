@@ -37,6 +37,8 @@ func (m *mob) create(x, y float64) {
 	m.createGfx(x, y)
 	m.createPhys(x, y, m.frameWidth, m.frameHeight)
 
+	m.graphics.scalexy = m.phys.scale
+
 	// Set entity type for bounds.
 	m.bounds.entity = m
 
@@ -67,7 +69,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 	// Blood effect
 	global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 
-	m.life -= float64(power)
+	m.life -= float64(power * 2)
 	if m.life <= 0 {
 		m.explode()
 		return
@@ -156,7 +158,7 @@ func (m *mob) die() {
 //
 //=============================================================
 func (m *mob) explode() {
-	m.explodeGfx(m.bounds.X, m.bounds.Y)
+	m.explodeGfx(m.bounds.X, m.bounds.Y, true)
 	m.die()
 }
 

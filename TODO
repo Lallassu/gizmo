@@ -5,17 +5,6 @@ General
 - Interface for Draw
     - draw
 
-- graphics.go
-
-- Own component for gfx.
-
-- Mob + object into one component?
-    -> mob class that uses object
-       just as weapons uses object?
-
-- Add physics to own component
-    -> Use same for both obj + mob
-    -> Mob = controls
 - Skip UnStuck and make CD better.
     -> Do same CD as Mob in Object?
 

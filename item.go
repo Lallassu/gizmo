@@ -21,7 +21,7 @@ type item struct {
 //
 //=============================================================
 func (i *item) createItem(x, y float64, iType itemType) {
-
+	i.iType = iType
 	switch iType {
 	case itemPlant:
 	case itemBucket:
@@ -29,9 +29,10 @@ func (i *item) createItem(x, y float64, iType itemType) {
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "crate2.png")
 		i.animated = false
 		i.name = "crate"
-		i.phys.scale = 1
+		i.scale = 1
 	case itemBarrel:
 	}
+
 	i.create(x, y)
 	i.bounds.entity = Entity(i)
 }

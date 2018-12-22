@@ -25,6 +25,7 @@ type graphics struct {
 	img         image.Image
 	canvas      *pixelgl.Canvas
 	animated    bool
+	scalexy     float64
 }
 
 func (gfx *graphics) createGfx(x, y float64) {
@@ -32,6 +33,9 @@ func (gfx *graphics) createGfx(x, y float64) {
 	gfx.batches = make(map[int]*pixel.Batch)
 	gfx.triangles = make(map[int]*pixel.TrianglesData)
 
+	if gfx.scalexy == 0 {
+		gfx.scalexy = 1.0
+	}
 	gfx.animRate = 0.1
 	gfx.currentAnim = animIdle
 	fullWidth := 0.0
@@ -40,10 +44,13 @@ func (gfx *graphics) createGfx(x, y float64) {
 
 	if !gfx.animated {
 		gfx.frameWidth = fullWidth
+		if gfx.frameWidth == gfx.frameHeight {
+			gfx.size += 1
+		}
 	}
 
 	f := 0
-	for w := 0.0; w <= fullWidth; w += gfx.frameWidth {
+	for w := 0.0; w < fullWidth; w += gfx.frameWidth {
 		gfx.frames[f] = make([]uint32, int(gfx.size)*int(gfx.size))
 		for x := 0.0; x <= gfx.frameWidth; x++ {
 			for y := 0.0; y <= gfx.frameHeight; y++ {
@@ -84,7 +91,6 @@ func (gfx *graphics) buildFrames() {
 	pos := 0
 
 	// Build batch for each frame.
-	Debug("F:", len(gfx.frames))
 	for i := 0; i < len(gfx.frames); i++ {
 		for x := 0.0; x < float64(gfx.frameWidth); x++ {
 			for y := 0.0; y < float64(gfx.frameHeight); y++ {
@@ -226,20 +232,27 @@ func (gfx *graphics) hitGfx(lx, ly int, gx, gy, vx, vy float64, power int, blood
 //=============================================================
 //
 //=============================================================
-func (gfx *graphics) explodeGfx(gx, gy float64) {
+func (gfx *graphics) explodeGfx(gx, gy float64, blood bool) {
+	size := gfx.scalexy
+	if size < 0.5 {
+		size = 0.5
+	}
 	for i := 0; i < len(gfx.frames); i++ {
 		for x := 0.0; x < gfx.frameWidth; x++ {
 			for y := 0.0; y < gfx.frameHeight; y++ {
 				pos := int(gfx.size*x + y)
 				if gfx.frames[i][pos] != 0 {
 					// Remove part (Don't create every particle)
-					if global.gRand.randFloat() < 0.05 {
-						global.gParticleEngine.effectBlood(gx+float64(x), gy+float64(y), float64(5-global.gRand.rand()), float64(5-global.gRand.rand()), global.gRand.rand()/10)
+					if global.gRand.randFloat() < 0.2 {
+
+						if blood {
+							global.gParticleEngine.effectBlood(gx+float64(x), gy+float64(y), float64(5-global.gRand.rand()), float64(5-global.gRand.rand()), global.gRand.rand()/10)
+						}
 						global.gParticleEngine.newParticle(
 							particle{
-								x:           gx + float64(x),
-								y:           gy + float64(y),
-								size:        1,
+								x:           gx + float64(x)*gfx.scalexy,
+								y:           gy + float64(y)*gfx.scalexy,
+								size:        size,
 								restitution: -0.1 - global.gRand.randFloat()/4,
 								life:        wParticleDefaultLife,
 								fx:          float64(15 - global.gRand.rand()),

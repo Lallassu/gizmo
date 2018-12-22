@@ -27,7 +27,7 @@ func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 		r := 175 + global.gRand.rand()*5
 		g := 10 + global.gRand.rand()*2
 		b := 10 + global.gRand.rand()*2
-		a := global.gRand.rand() * 255
+		a := 255 //global.gRand.rand() * 255
 
 		pe.newParticle(particle{
 			x:           float64(x),
