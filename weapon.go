@@ -29,8 +29,10 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 	w.wType = wType
 	switch wType {
 	case ak47:
-		w.textureFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "ak47_weapon.png")
+		w.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "ak47_weapon.png")
 		w.name = "ak47"
+		w.animated = false
+		w.rotation = 0.1
 		w.scale = 0.15
 		w.shot = ammo{
 			color: 0xFFFF33FF,
@@ -44,7 +46,9 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 		w.bullets = 1
 		w.reload = 0.05
 	case shotgun:
-		w.textureFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "shotgun_weapon.png")
+		w.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "shotgun_weapon.png")
+		w.animated = false
+		w.rotation = 0.1
 		w.name = "Shotgun"
 		w.scale = 0.15
 		w.shot = ammo{
@@ -77,6 +81,7 @@ func (w *weapon) shoot() {
 	}
 	if w.reloadTime > w.reload {
 		// Use mass = 5 and fx/fy = 0.5 for missile
+		w.rotation = 0.1
 		for i := 0; i < w.bullets; i++ {
 			w.shot.x = w.bounds.X + w.bounds.Width/2 + w.owner.(*mob).dir*3
 			w.shot.y = w.bounds.Y + w.bounds.Height

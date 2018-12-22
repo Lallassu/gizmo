@@ -1,10 +1,29 @@
 General
 --------
+- Pixel density (as in urho3d?)
 
+- Interface for Draw
+    - draw
+
+- graphics.go
+
+- Own component for gfx.
+
+- Mob + object into one component?
+    -> mob class that uses object
+       just as weapons uses object?
+
+- Add physics to own component
+    -> Use same for both obj + mob
+    -> Mob = controls
 - Skip UnStuck and make CD better.
     -> Do same CD as Mob in Object?
 
 - Random weapons/enemies of different types based on map type
+
+- Attach smoke/fire/fuse to objects
+    - For boms/fire etc.
+    - own struct for spawning particles
 
 - UI
     -> Life
@@ -39,9 +58,6 @@ General
         -> map.go with Draw() function
     - Configurable map generation vars
 
-- Attach smoke/fire/fuse to objects
-    - For boms/fire etc.
- 
 - Special-effects
     -> Lightning
     -> Shaders
@@ -51,9 +67,11 @@ General
     -> Enemy physics?
     -> triangle count?
 
-
 - AI
     - Follow player
+    - Walk speed/run speed
+    - "think-bubbles"
+        - Spotted
     - Pickup weapons if seen
         -> Distance to < X pickup()
 
