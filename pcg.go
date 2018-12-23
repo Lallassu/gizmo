@@ -336,11 +336,11 @@ func (p *pcg) MetalFloor(x, y int) {
 	}
 }
 
-func (p *pcg) GenerateDoor(x, y int) {
+func (p *pcg) GenerateDoor(x, y int) bool {
 	p.doorCnt++
 
 	if p.doorCnt < 200 {
-		return
+		return false
 	}
 	p.doorCnt = 0
 
@@ -456,6 +456,7 @@ func (p *pcg) GenerateDoor(x, y int) {
 			)
 		}
 	}
+	return true
 }
 
 func (p *pcg) GenerateLamp(x, y int) {

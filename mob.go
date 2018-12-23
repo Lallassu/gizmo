@@ -8,6 +8,7 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"math"
+	"math/rand"
 )
 
 type mob struct {
@@ -107,6 +108,23 @@ func (m *mob) attach(o interface{}) {
 		item.setOwner(m)
 	}
 
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *mob) action() {
+	// Check if close to doors
+	for _, p := range global.gWorld.doors {
+		d := distance(p, pixel.Vec{m.bounds.X, m.bounds.Y})
+		if d < 10 {
+			// Get a random new door position for player.
+			pos := global.gWorld.doors[rand.Intn(len(global.gWorld.doors)-1)]
+			m.bounds.X = pos.X
+			m.bounds.Y = pos.Y
+			break
+		}
+	}
 }
 
 //=============================================================

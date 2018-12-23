@@ -31,6 +31,7 @@ type world struct {
 	currentMap mapType
 	gravity    float64
 	bgSprite   *pixel.Sprite
+	doors      []pixel.Vec
 }
 
 //=============================================================
@@ -50,6 +51,7 @@ func (w *world) Init() {
 		Level:      0,
 	}
 	w.gravity = wGravity
+	w.doors = make([]pixel.Vec, 0)
 }
 
 //=============================================================
@@ -711,7 +713,10 @@ func (w *world) paintMap() {
 						}
 					}
 					if !skip {
-						pcgGen.GenerateDoor(x, y+1)
+						if pcgGen.GenerateDoor(x, y+1) {
+							// save door position
+							w.doors = append(w.doors, pixel.Vec{float64(x + wDoorLen/2), float64(y + 1)})
+						}
 					}
 				}
 			}

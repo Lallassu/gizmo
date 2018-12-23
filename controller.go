@@ -65,6 +65,11 @@ func (c *controller) update(dt float64) {
 
 	move := pixel.Vec{0, 0}
 
+	// Go into door
+	if global.gWin.Pressed(pixelgl.KeyA) {
+		c.entity.(*mob).action()
+	}
+
 	// Test pickup
 	if global.gWin.Pressed(pixelgl.KeyB) {
 		c.entity.(*mob).pickup()

@@ -3,6 +3,8 @@ General
 - Pixel density (as in urho3d?)
 
 - Reduce the entity-interface?
+    - Just have Draw()?
+        -> The rest should be a different interface?
 
 - Interface for Draw
     - draw
@@ -15,10 +17,6 @@ General
 - UI
     -> Life
     -> Deaths
-
-- Teleport through doors
-    -> Random doors
-    -> Save door positions
 
 - Jump on items
 - Landa på item -> inte dö, item explode (ifall högt fall).
@@ -92,6 +90,8 @@ General
 - Elevators
     -> Object
     -> Moving certain path
+
+- Sound effect when go through doors
 
 - Configuration support
     - Json file -> struct

@@ -19,5 +19,6 @@ type Entity interface {
 	setPosition(x, y float64)
 	getBounds() *Bounds
 	pickup()
+	action()
 	throw()
 }

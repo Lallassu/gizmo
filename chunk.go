@@ -28,6 +28,9 @@ type chunk struct {
 func (c *chunk) hit(x, y, vx, vy float64, power int) {
 }
 
+func (c *chunk) action() {
+}
+
 func (c *chunk) explode() {
 }
 
