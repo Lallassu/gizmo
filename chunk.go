@@ -28,38 +28,8 @@ type chunk struct {
 func (c *chunk) hit(x, y, vx, vy float64, power int) {
 }
 
-func (c *chunk) action() {
-}
-
-func (c *chunk) explode() {
-}
-
-func (c *chunk) move(x, y float64) {
-
-}
-
-func (c *chunk) getMass() float64 {
-	return 1.0
-}
-
-func (c *chunk) throw() {
-
-}
-
-func (c *chunk) pickup() {
-}
-
 func (c *chunk) getPosition() pixel.Vec {
 	return pixel.Vec{c.bounds.X, c.bounds.Y}
-}
-
-func (c *chunk) setPosition(x, y float64) {
-	c.bounds.X = x
-	c.bounds.Y = y
-}
-
-func (c *chunk) getBounds() *Bounds {
-	return c.bounds
 }
 
 //=============================================================

@@ -17,10 +17,12 @@ type object struct {
 	graphics
 	name        string
 	oType       itemType
-	owner       Entity
+	owner       *mob
 	reloadTime  float64
 	animateIdle bool
 	drawFunc    func(dt, elapsed float64)
+	explodeFunc func()
+	hitFunc     func(x, y, vx, vy float64, power int)
 }
 
 //=============================================================
@@ -45,7 +47,11 @@ func (o *object) create(x, y float64) {
 //
 //=============================================================
 func (o *object) hit(x_, y_, vx, vy float64, power int) {
+	// TBD: Remove explode and hit instead.
 	o.explode()
+	if o.hitFunc != nil {
+		o.hitFunc(x_, y_, vx, vy, power)
+	}
 	return
 }
 
@@ -68,33 +74,9 @@ func (o *object) explode() {
 	if o.owner != nil {
 		o.owner.throw()
 	}
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) throw() {
-
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) pickup() {
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) action() {
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) move(dx, dy float64) {
-	o.phys.keyMove.X = dx
-	o.phys.keyMove.Y = dy
+	if o.explodeFunc != nil {
+		o.explodeFunc()
+	}
 }
 
 //=============================================================
@@ -107,23 +89,8 @@ func (o *object) getPosition() pixel.Vec {
 //=============================================================
 //
 //=============================================================
-func (o *object) getMass() float64 {
-	return o.mass
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) setPosition(x, y float64) {
-	o.bounds.X = x
-	o.bounds.Y = y
-}
-
-//=============================================================
-//
-//=============================================================
-func (o *object) setOwner(e Entity) {
-	o.owner = e
+func (o *object) setOwner(m *mob) {
+	o.owner = m
 }
 
 //=============================================================
@@ -131,13 +98,6 @@ func (o *object) setOwner(e Entity) {
 //=============================================================
 func (o *object) removeOwner() {
 	o.owner = nil
-}
-
-//=============================================================
-// Get bounds
-//=============================================================
-func (o *object) getBounds() *Bounds {
-	return o.bounds
 }
 
 //=============================================================
@@ -164,18 +124,17 @@ func (o *object) draw(dt, elapsed float64) {
 		}
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 	} else {
-		owner := o.owner.(*mob)
 		offset := 0.0
 		switch o.bounds.entity.(type) {
 		case *item:
 			offset = 10.0
 		}
-		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*owner.dir, o.scale)).
-			Moved(pixel.V(owner.bounds.X+owner.bounds.Width/2, offset+owner.bounds.Y+owner.bounds.Height/2-2)).
-			Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*owner.dir))
+		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*o.owner.dir, o.scale)).
+			Moved(pixel.V(o.owner.bounds.X+o.owner.bounds.Width/2, offset+o.owner.bounds.Y+o.owner.bounds.Height/2-2)).
+			Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*o.owner.dir))
 		// Update oect positions based on mob
-		o.bounds.X = owner.bounds.X
-		o.bounds.Y = owner.bounds.Y
+		o.bounds.X = o.owner.bounds.X
+		o.bounds.Y = o.owner.bounds.Y
 	}
 
 	// Call custom draw

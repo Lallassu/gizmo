@@ -23,7 +23,7 @@ type particleEngine struct {
 // Blood effect
 //=============================================================
 func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 3; i++ {
 		r := 175 + global.gRand.rand()*5
 		g := 10 + global.gRand.rand()*2
 		b := 10 + global.gRand.rand()*2

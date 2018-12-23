@@ -8,7 +8,6 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"math/rand"
 )
 
 type controller struct {
@@ -98,11 +97,8 @@ func (c *controller) update(dt float64) {
 	if global.gWin.Pressed(pixelgl.KeyDown) {
 		move.Y = -dt
 	}
-	if global.gWin.Pressed(pixelgl.KeyL) {
-		c.entity.setPosition(float64(rand.Intn(global.gWorld.width)), float64(rand.Intn(global.gWorld.height)))
-	}
 
-	c.entity.move(move.X, move.Y)
+	c.entity.(*mob).move(move.X, move.Y)
 
 	// Handle mouse
 	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftShift) {

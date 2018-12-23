@@ -2,12 +2,6 @@ General
 --------
 - Pixel density (as in urho3d?)
 
-- Reduce the entity-interface?
-    - Just have Draw()?
-        -> The rest should be a different interface?
-
-- Interface for Draw
-    - draw
 
 - Throw objects
     - With force
@@ -16,7 +10,8 @@ General
 
 - UI
     -> Life
-    -> Deaths
+    -> Deaths/lives
+    -> Icons?
 
 - Jump on items
 - Landa på item -> inte dö, item explode (ifall högt fall).
@@ -63,10 +58,9 @@ General
 - Lights
     - Generic light
     - Lightning around ammo
+    - Lightning around weapons
     - Lightning around explosion fragments
 
-- Generic events for explode/hit for objects
-    -> so a box can explode etc.
 
 - Sounds
     -> repeatable

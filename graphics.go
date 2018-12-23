@@ -246,7 +246,7 @@ func (gfx *graphics) explodeGfx(gx, gy float64, blood bool) {
 			for y := 0.0; y < gfx.frameHeight; y++ {
 				pos := int(gfx.size*x + y)
 				if gfx.frames[i][pos] != 0 {
-					// Remove part (Don't create every particle)
+					// Remove parts (Don't create every particle)
 					if global.gRand.randFloat() < 0.2 {
 
 						if blood {

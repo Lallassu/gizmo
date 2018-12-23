@@ -83,9 +83,9 @@ func (w *weapon) shoot() {
 		// Use mass = 5 and fx/fy = 0.5 for missile
 		w.rotation = 0.1
 		for i := 0; i < w.bullets; i++ {
-			w.shot.x = w.bounds.X + w.bounds.Width/2 + w.owner.(*mob).dir*3
+			w.shot.x = w.bounds.X + w.bounds.Width/2 + w.owner.dir*3
 			w.shot.y = w.bounds.Y + w.bounds.Height
-			w.shot.vx = 10.0 * w.owner.(*mob).dir
+			w.shot.vx = 10.0 * w.owner.dir
 			w.shot.vy = 10.0*w.rotation + (w.spread - global.gRand.randFloat()*w.spread*2)
 			w.shot.mass = 6 + global.gRand.randFloat()*4
 			w.shot.owner = w.owner
@@ -93,9 +93,9 @@ func (w *weapon) shoot() {
 		}
 
 		global.gParticleEngine.ammoShell(
-			w.bounds.X+w.bounds.Width/2+w.owner.(*mob).dir*3,
+			w.bounds.X+w.bounds.Width/2+w.owner.dir*3,
 			w.bounds.Y+w.bounds.Height,
-			w.owner.(*mob).dir,
+			w.owner.dir,
 			0.5)
 		w.reloadTime = 0
 	}
