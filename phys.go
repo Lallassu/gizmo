@@ -54,6 +54,10 @@ func (p *phys) createPhys(x, y, width, height float64) {
 	if p.offset < 0 {
 		p.offset = 1
 	}
+
+	if p.speed == 0 {
+		p.speed = 100
+	}
 }
 
 //=============================================================
@@ -72,7 +76,7 @@ func (p *phys) hitCeiling(x, y float64) bool {
 //
 //=============================================================
 func (p *phys) hitFloor(x, y float64) bool {
-	for px := 0.0; px < p.bounds.Width; px += p.offset {
+	for px := 0.0; px < p.bounds.Width; px += 2 { // use instead of offset.
 		if global.gWorld.IsRegular(x+px, y+1) {
 			return true
 		}
@@ -128,7 +132,7 @@ func (p *phys) physics(dt float64) {
 	if p.keyMove.X != 0 {
 		p.velo.X = dt * p.speed * p.dir
 	} else {
-		if p.hitFloor(p.bounds.X, p.bounds.Y-5) {
+		if p.hitFloor(p.bounds.X, p.bounds.Y-1) {
 			p.velo.X = 0
 		} else {
 			p.velo.X = math.Min(math.Abs(p.velo.X)-dt*p.speed/100, 0) * p.dir
@@ -151,6 +155,7 @@ func (p *phys) physics(dt float64) {
 		}
 	}
 
+	p.falling = false
 	if p.velo.Y != 0 {
 		if p.velo.Y > 0 {
 			if !p.hitCeiling(p.bounds.X, p.bounds.Y+p.velo.Y) {
@@ -161,16 +166,8 @@ func (p *phys) physics(dt float64) {
 		} else {
 			if !p.hitFloor(p.bounds.X, p.bounds.Y+p.velo.Y) {
 				p.bounds.Y += p.velo.Y
+				p.falling = true
 			} else {
-				if p.velo.Y < -6 {
-					p.falling = true
-					// TBD: Fall to death, not explode
-					// Or power?
-					//	p.explode()
-					p.rotation += 0.1
-				} else {
-					p.falling = false
-				}
 				p.velo.Y = 0
 				p.jumping = false
 			}
@@ -206,18 +203,20 @@ func (p *phys) unStuck(dt float64) {
 	top := false
 	offset := 1.0
 	// Check bottom pixels
-	for x := p.bounds.X; x < p.bounds.X+p.bounds.Width; x += 2 {
+	for x := p.bounds.X; x < p.bounds.X+p.bounds.Width; x += p.offset {
 		if global.gWorld.IsRegular(x, p.bounds.Y+offset) {
 			bottom = true
 			break
 		}
 	}
 
-	//Check top pixels
-	for x := p.bounds.X; x < p.bounds.X+p.bounds.Width; x += 2 {
-		if global.gWorld.IsRegular(x, p.bounds.Y+p.bounds.Height-offset) {
-			top = true
-			break
+	if !bottom {
+		//Check top pixels
+		for x := p.bounds.X; x < p.bounds.X+p.bounds.Width; x += p.offset {
+			if global.gWorld.IsRegular(x, p.bounds.Y+p.bounds.Height-offset) {
+				top = true
+				break
+			}
 		}
 	}
 

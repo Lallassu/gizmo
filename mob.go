@@ -13,9 +13,10 @@ import (
 type mob struct {
 	phys
 	graphics
-	life  float64
-	carry interface{}
-	ai    *AI
+	life     float64
+	carry    interface{}
+	ai       *AI
+	drawFunc func(dt, elapsed float64)
 }
 
 //=============================================================
@@ -102,6 +103,8 @@ func (m *mob) attach(o interface{}) {
 		item.setOwner(m)
 	case *object:
 		item.setOwner(m)
+	case *item:
+		item.setOwner(m)
 	}
 
 }
@@ -138,6 +141,8 @@ func (m *mob) throw() {
 		case *object:
 			item.removeOwner()
 		case *weapon:
+			item.removeOwner()
+		case *item:
 			item.removeOwner()
 		}
 	}
@@ -216,6 +221,11 @@ func (m *mob) draw(dt, elapsed float64) {
 		shooting = true
 	}
 
+	if m.velo.Y < -6 {
+		// TBD: Fall to death, not explode
+		// Or power?
+	}
+
 	// Update physics & AI
 	m.physics(dt)
 
@@ -271,4 +281,9 @@ func (m *mob) draw(dt, elapsed float64) {
 	//m.canvas.SetColorMask(pixel.Alpha(1))
 	m.batches[idx].Draw(m.canvas)
 	m.canvas.Draw(global.gWin, (pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2))))
+
+	// Call custom draw
+	if m.drawFunc != nil {
+		m.drawFunc(dt, elapsed)
+	}
 }

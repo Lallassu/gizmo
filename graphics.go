@@ -212,12 +212,16 @@ func (gfx *graphics) hitGfx(lx, ly int, gx, gy, vx, vy float64, power int, blood
 					if pos >= 0 && pos < int(gfx.size*gfx.size) {
 						if gfx.frames[i][pos] != 0 {
 							if blood {
-								// Blood
-								r := 175 + global.gRand.rand()*5
-								g := 10 + global.gRand.rand()*2
-								b := 10 + global.gRand.rand()*2
-								a := global.gRand.rand() * 255
-								gfx.frames[i][pos] = uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF)
+								// Don't color eyes, assume white.
+								p := gfx.frames[i][pos]
+								if !(p>>24&0xFF == 0xFF && p>>16&0xFF == 0xFF && p>>8&0xFF == 0xFF) {
+									// Blood
+									r := 175 + global.gRand.rand()*5
+									g := 10 + global.gRand.rand()*2
+									b := 10 + global.gRand.rand()*2
+									a := global.gRand.rand() * 255
+									gfx.frames[i][pos] = uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF)
+								}
 							}
 						}
 					}

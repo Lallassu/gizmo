@@ -1,8 +1,5 @@
 General
 --------
-- Fix bouncing of objects
-- Fix rotation when falling of objects.
-
 - Pixel density (as in urho3d?)
 
 - Reduce the entity-interface?
@@ -10,14 +7,10 @@ General
 - Interface for Draw
     - draw
 
-- Skip UnStuck and make CD better.
-    -> Do same CD as Mob in Object?
+- Throw objects
+    - With force
 
 - Random weapons/enemies of different types based on map type
-
-- Attach smoke/fire/fuse to objects
-    - For boms/fire etc.
-    - own struct for spawning particles
 
 - UI
     -> Life

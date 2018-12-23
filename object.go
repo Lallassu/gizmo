@@ -20,6 +20,7 @@ type object struct {
 	owner       Entity
 	reloadTime  float64
 	animateIdle bool
+	drawFunc    func(dt, elapsed float64)
 }
 
 //=============================================================
@@ -86,6 +87,8 @@ func (o *object) pickup() {
 //
 //=============================================================
 func (o *object) move(dx, dy float64) {
+	o.phys.keyMove.X = dx
+	o.phys.keyMove.Y = dy
 }
 
 //=============================================================
@@ -121,10 +124,6 @@ func (o *object) setOwner(e Entity) {
 //
 //=============================================================
 func (o *object) removeOwner() {
-	o.force.X = math.Abs(o.owner.(*mob).velo.X) + 5
-	o.force.Y = 5
-	o.velo.Y = 5
-	o.velo.X = o.owner.(*mob).velo.X * 10
 	o.owner = nil
 }
 
@@ -147,6 +146,11 @@ func (o *object) draw(dt, elapsed float64) {
 	o.batches[0].Draw(o.canvas)
 	if o.owner == nil {
 		o.physics(dt)
+		if o.falling {
+			o.rotation += 0.1
+		} else {
+			o.rotation = 0
+		}
 		offset := 0.0
 		if !(o.falling || !o.animateIdle) {
 			// Animate up/down
@@ -166,6 +170,10 @@ func (o *object) draw(dt, elapsed float64) {
 		// Update oect positions based on mob
 		o.bounds.X = owner.bounds.X
 		o.bounds.Y = owner.bounds.Y
+	}
 
+	// Call custom draw
+	if o.drawFunc != nil {
+		o.drawFunc(dt, elapsed)
 	}
 }
