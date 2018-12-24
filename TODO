@@ -2,11 +2,9 @@ General
 --------
 - Pixel density (as in urho3d?)
 
-
-- Throw objects
-    - With force
-
 - Random weapons/enemies of different types based on map type
+
+- Carry object, down pushed -> no offset -> Hide from AI
 
 - UI
     -> Life
@@ -76,8 +74,6 @@ General
 
 - Enemies:
     - pickup bombs and run towards player
-
-- Handle scale for objects Hit() functions
 
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
 

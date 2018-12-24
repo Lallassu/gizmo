@@ -28,6 +28,8 @@ type phys struct {
 	restitution  float64
 	scale        float64
 	offset       float64
+	throwable    bool
+	moving       bool
 }
 
 //=============================================================
@@ -38,6 +40,8 @@ func (p *phys) createPhys(x, y, width, height float64) {
 	if p.scale == 0 {
 		p.scale = 1
 	}
+
+	p.throwable = false
 
 	p.bounds = &Bounds{
 		X:      x,
@@ -135,7 +139,16 @@ func (p *phys) physics(dt float64) {
 		if p.hitFloor(p.bounds.X, p.bounds.Y-1) {
 			p.velo.X = 0
 		} else {
-			p.velo.X = math.Min(math.Abs(p.velo.X)-dt*p.speed/100, 0) * p.dir
+			if p.throwable {
+				p.velo.X += dt * p.speed / 100 * p.dir
+				if p.velo.X != 0 {
+					p.moving = true
+				} else {
+					p.moving = false
+				}
+			} else {
+				p.velo.X = math.Min(math.Abs(p.velo.X)-dt*p.speed/100, 0) * p.dir
+			}
 		}
 	}
 

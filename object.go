@@ -18,6 +18,7 @@ type object struct {
 	name        string
 	oType       itemType
 	owner       *mob
+	prevOwner   *mob
 	reloadTime  float64
 	animateIdle bool
 	drawFunc    func(dt, elapsed float64)
@@ -97,6 +98,11 @@ func (o *object) setOwner(m *mob) {
 //
 //=============================================================
 func (o *object) removeOwner() {
+	o.throwable = true
+	o.speed = 300
+	o.dir = o.owner.dir
+	o.keyMove.X = o.owner.dir
+	o.prevOwner = o.owner
 	o.owner = nil
 }
 
@@ -112,6 +118,19 @@ func (o *object) draw(dt, elapsed float64) {
 	o.batches[0].Draw(o.canvas)
 	if o.owner == nil {
 		o.physics(dt)
+
+		// Check if thrown.
+		if o.moving {
+			for _, v := range global.gWorld.qt.RetrieveIntersections(o.bounds) {
+				switch item := v.entity.(type) {
+				case *mob:
+					if item != o.prevOwner {
+						item.hit(item.bounds.X, item.bounds.Y, o.velo.X, o.velo.Y, 20)
+					}
+				}
+			}
+		}
+
 		if o.falling {
 			o.rotation += 0.1
 		} else {

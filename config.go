@@ -53,7 +53,7 @@ const (
 	wLightsMax           = 10
 	wMiddleTextSize      = 22
 	wFPSTextSize         = 8
-	wDeathScreenText     = "You Are Dead!"
+	wDeathScreenText     = "You Died"
 	wAssetObjectsPath    = "assets/objects/"
 	wAssetMobsPath       = "assets/mobs/"
 )

@@ -22,6 +22,7 @@ import (
 type UI struct {
 	fps              *text.Text
 	middleText       *text.Text
+	lifeText         *text.Text
 	canvas           *pixelgl.Canvas
 	miniMapScale     float64
 	middleTextStr    string
@@ -64,6 +65,9 @@ func (u *UI) create() {
 
 	u.middleText = text.New(pixel.ZV, regularMiddle)
 	u.middleText.Color = pixel.RGBA{1, 1, 1, 1}
+
+	u.lifeText = text.New(pixel.ZV, regular)
+	u.lifeText.Color = pixel.RGBA{1, 0, 0, 1}
 }
 
 //=============================================================
@@ -122,6 +126,10 @@ func (u *UI) draw(dt float64) {
 	u.fps.Draw(u.canvas, pixel.IM.Moved(pixel.V(1, wViewMax/2+22)))
 
 	u.middleText.Draw(u.canvas, pixel.IM.Moved(pixel.V(float64(wViewMax/2-((len(u.middleTextStr)/3)*wMiddleTextSize)), wViewMax/3)))
+
+	u.lifeText.Clear()
+	u.lifeText.WriteString(fmt.Sprintf("Life: %v", global.gPlayer.life))
+	u.lifeText.Draw(u.canvas, pixel.IM.Moved(pixel.V(1, wViewMax/2+40)))
 
 	u.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))
 
