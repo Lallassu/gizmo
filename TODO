@@ -4,10 +4,9 @@ General
 
 - Random weapons/enemies of different types based on map type
 
-- Carry object, down pushed -> no offset -> Hide from AI
+- If ducking with object, hide from AI.
 
 - UI
-    -> Life
     -> Deaths/lives
     -> Icons?
 

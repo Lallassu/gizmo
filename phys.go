@@ -30,6 +30,7 @@ type phys struct {
 	offset       float64
 	throwable    bool
 	moving       bool
+	duck         bool
 }
 
 //=============================================================
@@ -155,6 +156,7 @@ func (p *phys) physics(dt float64) {
 	p.climbing = false
 	p.velo.Y += wGravity * dt
 	p.velo.Y = math.Max(p.velo.Y, wGravity)
+	p.duck = false
 	if p.keyMove.Y > 0 {
 		if p.IsOnLadder() {
 			p.velo.Y = p.speed / 2 * dt
@@ -166,6 +168,8 @@ func (p *phys) physics(dt float64) {
 				p.jumping = true
 			}
 		}
+	} else if p.keyMove.Y < 0 {
+		p.duck = true
 	}
 
 	p.falling = false
