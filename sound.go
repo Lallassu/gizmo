@@ -29,7 +29,7 @@ func (s *sound) create() {
 			}
 			s.sounds[name] = beep.NewBuffer(format)
 			s.sounds[name].Append(stream)
-			speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+			speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/15))
 		} else if strings.Contains(file, "wav") {
 			//name := strings.TrimSuffix(file, ".wav")
 			//stream, format, err := wav.Decode(f)
@@ -43,6 +43,7 @@ func (s *sound) create() {
 }
 
 func (s *sound) play(name string) {
-	stream := s.sounds[name].Streamer(0, s.sounds[name].Len())
+	//stream := s.sounds[name].Streamer(40000, s.sounds[name].Len())
+	stream := s.sounds[name].Streamer(s.sounds[name].Len()/5, s.sounds[name].Len())
 	speaker.Play(stream)
 }

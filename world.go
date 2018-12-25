@@ -339,6 +339,7 @@ func (w *world) RemovePixel(x, y int) {
 // Also hits objects in the world.
 //=============================================================
 func (w *world) Explode(x_, y_ float64, power int) {
+	//global.gSounds.play("explosion")
 	global.gCamera.shake(pixel.V(x_, y_), power)
 	x := int(x_)
 	y := int(y_)

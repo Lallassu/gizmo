@@ -18,6 +18,9 @@ const (
 var gSoundFiles = []string{
 	"jump.wav",
 	"shot.mp3",
+	"shot2.mp3",
+	"explosion.mp3",
+	"shot3.mp3",
 }
 
 // World constants

@@ -81,7 +81,7 @@ func (w *weapon) shoot() {
 		return
 	}
 	if w.reloadTime > w.reload {
-		global.gSounds.play("shot")
+		//global.gSounds.play("shot")
 		w.rotation = 0.1
 		for i := 0; i < w.bullets; i++ {
 			w.shot.x = w.bounds.X + w.bounds.Width/2 + w.owner.dir*3
