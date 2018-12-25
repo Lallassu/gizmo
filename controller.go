@@ -103,6 +103,5 @@ func (c *controller) update(dt float64) {
 	// Handle mouse
 	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftShift) {
 		c.entity.(*mob).shoot()
-		//global.gSounds.play("shot")
 	}
 }

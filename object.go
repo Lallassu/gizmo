@@ -144,10 +144,12 @@ func (o *object) draw(dt, elapsed float64) {
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 	} else {
 		offset := 0.0
-		if !o.owner.duck {
-			switch o.bounds.entity.(type) {
-			case *item:
+		switch o.bounds.entity.(type) {
+		case *item:
+			if !o.owner.duck {
 				offset = 10.0
+			} else {
+				offset = 5.0
 			}
 		}
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*o.owner.dir, o.scale)).

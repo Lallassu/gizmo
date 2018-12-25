@@ -191,6 +191,16 @@ func (pe *particleEngine) update(dt float64) {
 				sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
 			} else {
 				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, float64(a) / 255.0})
+				// if pe.particles[i].pType == particleFire {
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.1).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.3})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.2})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.3).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.1})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.4).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.01})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.5).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.005})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 2.0).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.004})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 2.3).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.003})
+				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 2.5).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.001})
+				// }
 			}
 		}
 	}

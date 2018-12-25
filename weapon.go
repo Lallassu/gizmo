@@ -76,11 +76,12 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 //
 //=============================================================
 func (w *weapon) shoot() {
+	// Use mass = 5 and fx/fy = 0.5 for missile
 	if w.owner == nil {
 		return
 	}
 	if w.reloadTime > w.reload {
-		// Use mass = 5 and fx/fy = 0.5 for missile
+		global.gSounds.play("shot")
 		w.rotation = 0.1
 		for i := 0; i < w.bullets; i++ {
 			w.shot.x = w.bounds.X + w.bounds.Width/2 + w.owner.dir*3

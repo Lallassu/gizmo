@@ -74,7 +74,6 @@ General
 - Enemies:
     - pickup bombs and run towards player
 
-- Rename wPixelsPerChunk (wPixelsPerChunkSide)
 
 - Elevators
     -> Object
@@ -90,3 +89,4 @@ General
     - Number of particles
         -> Explode of objects/mobs
 
+- Rename wPixelsPerChunk (wPixelsPerChunkSide)
