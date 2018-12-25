@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -17,6 +18,8 @@ type particleEngine struct {
 	batch     *pixel.Batch
 	colors    []uint8
 	colormap  map[uint32]int
+	imd       *imdraw.IMDraw
+	imCanvas  *pixelgl.Canvas
 }
 
 //=============================================================
@@ -138,6 +141,9 @@ func (pe *particleEngine) create() {
 	pe.particles = make([]particle, wParticlesMax)
 	pe.colormap = make(map[uint32]int)
 
+	pe.imCanvas = pixelgl.NewCanvas(global.gWin.Bounds())
+	pe.imd = imdraw.New(nil)
+
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)) // Max seems to be 2^14 per row
 	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 
@@ -146,6 +152,34 @@ func (pe *particleEngine) create() {
 		pe.particles = append(pe.particles, p)
 	}
 	pe.idx = 0
+
+	// Set fragment shader for imCanvas
+	var fragmentShader = `
+             #version 330 core
+             
+             in vec2  vTexCoords;
+             in vec2  vColor;
+             
+             out vec4 fragColor;
+             
+             uniform vec4 uTexBounds;
+             uniform sampler2D uTexture;
+             
+             void main() {
+             	// Get our current screen coordinate
+             	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+             
+             	// Sum our 3 color channels
+             	float sum  = texture(uTexture, t).r;
+             	      sum += texture(uTexture, t).g;
+             	      sum += texture(uTexture, t).b;
+             
+             	// Divide by 3, and set the output to the result
+             	vec4 color = vec4( 1,0.0,0, 1.0);
+             	fragColor = color;
+             }
+             `
+	pe.imCanvas.SetFragmentShader(fragmentShader)
 }
 
 //=============================================================
@@ -191,18 +225,25 @@ func (pe *particleEngine) update(dt float64) {
 				sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
 			} else {
 				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, float64(a) / 255.0})
-				// if pe.particles[i].pType == particleFire {
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.1).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.3})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.2})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.3).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.1})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.4).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.01})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 1.5).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.005})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 2.0).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.004})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 2.3).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.003})
-				// 	sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, 2.5).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.001})
-				// }
+				pe.imd.Color = pixel.RGBA{1, 0, 0, 1}
+				pe.imd.Push(pixel.Vec{pe.particles[i].x, pe.particles[i].y})
+				pe.imd.Push(pixel.Vec{pe.particles[i].x + 1, pe.particles[i].y + 1})
+				pe.imd.Rectangle(0)
+				//if pe.particles[i].pType == particleFire {
+				//	for n := 0.0; n < 10; n++ {
+				//		sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size+n/10).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)),
+				//			pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 1 / n * 2})
+				//	}
+				//}
 			}
 		}
 	}
+
+	//	if pe.imCanvas != nil && pe.imd != nil {
+	pe.imd.Draw(pe.imCanvas)
+	//pe.imCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.width/2), float64(global.gWorld.height/2))))
+	pe.imCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.width/2), float64(global.gWorld.height/2)-100)))
+	//	pe.imCanvas.Draw(global.gWin, pixel.IM)
+	//	}
 	pe.batch.Draw(global.gWin)
 }
