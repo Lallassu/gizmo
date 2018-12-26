@@ -20,6 +20,13 @@ type particleEngine struct {
 	colormap  map[uint32]int
 	imd       *imdraw.IMDraw
 	imCanvas  *pixelgl.Canvas
+	utime     float32
+	trails    []*trail
+}
+
+type trail struct {
+	pos pixel.Vec
+	ts  float32
 }
 
 //=============================================================
@@ -89,7 +96,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 			vy:          float64(5 - global.gRand.rand()),
 			fx:          10,
 			fy:          10,
-			life:        global.gRand.randFloat(),
+			life:        global.gRand.randFloat() * 3,
 			mass:        1,
 			pType:       particleFire,
 			restitution: 0,
@@ -141,7 +148,10 @@ func (pe *particleEngine) create() {
 	pe.particles = make([]particle, wParticlesMax)
 	pe.colormap = make(map[uint32]int)
 
-	pe.imCanvas = pixelgl.NewCanvas(global.gWin.Bounds())
+	pe.trails = make([]*trail, 0)
+
+	//pe.imCanvas = pixelgl.NewCanvas(global.gWin.Bounds())
+	pe.imCanvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWindowWidth), float64(global.gWindowHeight)))
 	pe.imd = imdraw.New(nil)
 
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)) // Max seems to be 2^14 per row
@@ -158,28 +168,46 @@ func (pe *particleEngine) create() {
              #version 330 core
              
              in vec2  vTexCoords;
-             in vec2  vColor;
+             in vec4  vColor;
              
              out vec4 fragColor;
              
              uniform vec4 uTexBounds;
+			 uniform float utime;
              uniform sampler2D uTexture;
              
              void main() {
-             	// Get our current screen coordinate
-             	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
-             
-             	// Sum our 3 color channels
-             	float sum  = texture(uTexture, t).r;
-             	      sum += texture(uTexture, t).g;
-             	      sum += texture(uTexture, t).b;
-             
-             	// Divide by 3, and set the output to the result
-             	vec4 color = vec4( 1,0.0,0, 1.0);
-             	fragColor = color;
+				vec4 c = vColor;
+				vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+
+		  		vec4 tx = texture(uTexture, t);
+				if (c.r == 1) {
+				fragColor = vec4(tx.x, tx.y, tx.z, tx.w);
+				} else {
+				fragColor = vColor;
+				}
+				if (c.a == 0.1111) {
+				c *= 2;
+				c -= 1;
+				vec3 fc = vec3(1.0, 0.3, 0.1);
+	            vec2 borderSize = vec2(0.5); 
+
+	            vec2 rectangleSize = vec2(1.0) - borderSize; 
+
+	           float distanceField = length(max(abs(c.x)-rectangleSize,0.0) / borderSize);
+
+	            float alpha = 1.0 - distanceField;
+				fc *= abs(0.5 / (sin( c.x + sin(c.y)+utime* 0.3 ) * 20.0) );
+             	fragColor = vec4(fc, alpha*3);
+				}
              }
-             `
-	pe.imCanvas.SetFragmentShader(fragmentShader)
+             
+			 `
+
+	//pe.imCanvas.SetUniform("utime", &pe.utime)
+	//pe.imCanvas.SetFragmentShader(fragmentShader)
+	global.gWin.Canvas().SetUniform("utime", &pe.utime)
+	global.gWin.Canvas().SetFragmentShader(fragmentShader)
 }
 
 //=============================================================
@@ -209,6 +237,10 @@ func (pe *particleEngine) newParticle(p particle) {
 //=============================================================
 func (pe *particleEngine) update(dt float64) {
 	pe.batch.Clear()
+
+	pe.imd.Clear()
+	pe.utime = float32(dt)
+
 	sprite := pixel.NewSprite(pe.canvas, pixel.R(0, 0, 1, 1))
 	for i, _ := range pe.particles {
 		if pe.particles[i].active {
@@ -225,25 +257,41 @@ func (pe *particleEngine) update(dt float64) {
 				sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
 			} else {
 				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, float64(a) / 255.0})
-				pe.imd.Color = pixel.RGBA{1, 0, 0, 1}
-				pe.imd.Push(pixel.Vec{pe.particles[i].x, pe.particles[i].y})
-				pe.imd.Push(pixel.Vec{pe.particles[i].x + 1, pe.particles[i].y + 1})
-				pe.imd.Rectangle(0)
-				//if pe.particles[i].pType == particleFire {
-				//	for n := 0.0; n < 10; n++ {
-				//		sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size+n/10).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)),
-				//			pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 1 / n * 2})
-				//	}
-				//}
+				if pe.particles[i].pType == particleFire {
+					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*3).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.1111})
+				}
+				// if pe.particles[i].pType == particleFire {
+				// 	pe.imd.Color = pixel.RGBA{1, 0, 0, 1.0}
+				// 	pe.imd.Push(pixel.Vec{pe.particles[i].x, pe.particles[i].y})
+				// 	//	pe.imd.Push(pixel.Vec{pe.particles[i].x + 4, pe.particles[i].y + 4})
+				// 	pe.imd.Circle(1, 2)
+				// 	pe.trails = append(pe.trails, &trail{pos: pixel.Vec{pe.particles[i].x, pe.particles[i].y}, ts: pe.utime})
+				// }
 			}
 		}
 	}
 
-	//	if pe.imCanvas != nil && pe.imd != nil {
-	pe.imd.Draw(pe.imCanvas)
-	//pe.imCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.width/2), float64(global.gWorld.height/2))))
-	pe.imCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWorld.width/2), float64(global.gWorld.height/2)-100)))
-	//	pe.imCanvas.Draw(global.gWin, pixel.IM)
-	//	}
+	//pe.imCanvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	tmp := pe.trails[:0]
+	for i, p := range pe.trails {
+		if pe.utime-pe.trails[i].ts > 0.1 {
+			// pe.trails[i] = pe.trails[len(pe.trails)-1]
+			// pe.trails[len(pe.trails)-1] = nil
+			// pe.trails = pe.trails[:len(pe.trails)-1]
+		} else {
+			//pe.imd.Color = pixel.RGBA{1, 0, 0, 1}
+			//pe.imd.Push(p.pos)
+			//pe.imd.Circle(1, 2)
+			tmp = append(tmp, p)
+			// pe.imd.Color = pixel.RGBA{1, 0, 0, 1.0 / float64(p.ts)}
+			// pe.imd.Push(p.pos)
+			// pe.imd.Circle(1, 2)
+		}
+	}
+	pe.trails = tmp
+
+	// pe.imd.Draw(pe.imCanvas)
+	// pe.imCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(global.gWindowWidth/2), float64(global.gWindowHeight/2))))
+
 	pe.batch.Draw(global.gWin)
 }

@@ -1,5 +1,12 @@
 General
 --------
+
+- Each "fire" pixel kept location
+    - Each previous position is saved and changed alpha.
+    - if alpha == 0 remove pixel.
+    - leave a trail after fire pixels.
+    - Glow on bg?
+
 - Pixel density (as in urho3d?)
 
 - Random weapons/enemies of different types based on map type
