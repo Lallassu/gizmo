@@ -1,6 +1,11 @@
 General
 --------
 
+- One canvas per pixel that glows.
+
+- Test pixel-array canvas for fireparticles.
+    -> To make trails.
+
 - Each "fire" pixel kept location
     - Each previous position is saved and changed alpha.
     - if alpha == 0 remove pixel.

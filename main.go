@@ -68,6 +68,56 @@ func setup() {
 	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
 	global.gMap.newMap(1)
+
+	// Full screen fragment shader
+	var fragmentShader = `
+             #version 330 core
+             
+             in vec2  vTexCoords;
+             in vec4  vColor;
+             
+             out vec4 fragColor;
+             
+             uniform vec4 uTexBounds;
+             uniform sampler2D uTexture;
+             
+             void main() {
+				vec4 c = vColor;
+				vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+		  		vec4 tx = texture(uTexture, t);
+				if (c.r == 1) {
+			       fragColor = vec4(tx.x, tx.y, tx.z, tx.w);
+			    } else {
+			       fragColor = vColor;
+			    }
+			    if (c.a == 0.1111) {
+			       //vec2 st = gl_FragCoord.xy/vec2(768, 1024);
+				   //vec2 vv = vec2(c.x, c.y);
+                   //vec2 dist = vv-vec2(0.5);
+				   //float radius = 2.5;
+                   //float res = 1.-smoothstep(radius-(radius*1.01),
+                   //                     radius+(radius*1.01),
+                   //                     dot(dist,dist)*5.0);
+				   //fragColor = vec4( res, res, res, 1.0 );
+				   c *= 2;
+				   
+				   vec3 fc = vec3(1.0, 0.3, 0.1);
+	               vec2 borderSize = vec2(0.5); 
+
+	               vec2 rectangleSize = vec2(1.0) - borderSize; 
+
+	               float distanceField = length(max(abs(c.x)-rectangleSize,0.0) / borderSize);
+
+	               float alpha = 1.0 - distanceField;
+			       fc *= abs(0.8 / (sin( c.x + sin(c.y)+ 1.3 ) * 5.0) );
+                   fragColor = vec4(fc, alpha*5);
+				}
+             }
+             
+			 `
+	//global.gWin.Canvas().SetUniform("utime", &global.utime)
+	global.gWin.Canvas().SetFragmentShader(fragmentShader)
+
 }
 
 //=============================================================
@@ -78,53 +128,10 @@ func gameLoop() {
 	frameDt := 0.0
 	startTime := time.Now()
 
-	// var fragmentShader = `
-	//    #version 330 core
-	//
-	//    in vec2  vTexCoords;
-	//    in vec2 vPosition;
-	//    in vec4 vColor;
-	//
-	//    out vec4 fragColor;
-	//
-	//    uniform float uPosX[10];
-	//    uniform float uPosY[10];
-	//    uniform vec4 uTexBounds;
-	//    uniform sampler2D uTexture;
-	//
-	//    void main() {
-	//    	// Get our current screen coordinate
-	//    	vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
-	//
-	//       vec4 color = vec4(0.0,0.0,0.0,1.0);
-	//  	 if (vColor.r == 1.0 && vColor.g == 1.0 && vColor.b == 1.0 && vColor.a == 1.0 ){
-	//          color = vec4(texture(uTexture,t).r, texture(uTexture,t).g, texture(uTexture,t).b, texture(uTexture,t).a);
-	//      } else {
-	// 		  for ( int i = 0; i < 10; i++ {
-	// 	          int val = int(vColor.a*255) & 0xFF;
-	//
-	//         	  float distance = sqrt(pow(vPosition.x-uPosX[i], 2) + pow(vPosition.y-uPosY[i], 2))/5;
-	// 			  color = vec4(vColor.r/(distance/2), vColor.g/distance, vColor.b/distance, vColor.a);
-	// 	      }
-	// 	 }
-
-	//      //     if (val == 0x8F) {
-	//      //   		    color = vec4(vColor.r/(distance/2), vColor.g/distance, vColor.b/distance, vColor.a);
-	//      //     } else {
-	//      //   		 color = vec4(vColor.r, vColor.g, vColor.b, vColor.a);
-	//      //	 }
-	//      }
-	//    	fragColor = color;
-	//    }
-	//    `
-
 	//fps := time.Tick(time.Second / 1000)
 	//second := time.Tick(time.Second)
 	//frames := 0
 
-	// var uPosX, uPosY float32
-	//global.gWin.Canvas().SetUniform("uPos", &pos)
-	//global.gWin.Canvas().SetFragmentShader(fragmentShader)
 	elapsed := 0.0
 
 	for !global.gWin.Closed() && !global.gController.quit {
@@ -132,6 +139,7 @@ func gameLoop() {
 		frameDt += dt
 		last = time.Now()
 		elapsed = float64(time.Now().Unix() - startTime.Unix())
+		//	global.utime += float32(dt)
 
 		for {
 			if frameDt >= wMaxInvFPS {

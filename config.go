@@ -83,6 +83,7 @@ type Global struct {
 	gSounds         *sound
 	gUI             *UI
 	gMap            *Map
+	//utime           float32
 }
 
 var global = &Global{
