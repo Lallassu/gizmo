@@ -10,110 +10,140 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"math"
+	"math/rand"
 )
 
-//=============================================================
-// Light pool
-//=============================================================
-type lights struct {
-	pool   []light
-	idx    int
-	canvas *pixelgl.Canvas
-}
+var blocks []block
+var lights []light
+
+var limd *imdraw.IMDraw
+var lcanvas *pixelgl.Canvas
 
 //=============================================================
 // Specific light
 //=============================================================
 type light struct {
-	pos    pixel.Vec
-	color  pixel.RGBA
-	spread float64
-	imd    *imdraw.IMDraw
-	canvas *pixelgl.Canvas
-	angle  float64
-	radius float64
-	active bool
-	life   float64
+	position    pixel.Vec
+	color       pixel.RGBA
+	angleSpread float64
+	angle       float64
+	radius      float64
 }
 
-//=============================================================
-//
-// Light pool
-//
-//=============================================================
-
-//=============================================================
-// Init light pool
-//=============================================================
-func (l *lights) create() {
-	l.pool = make([]light, wLightsMax)
-	l.canvas = pixelgl.NewCanvas(global.gWin.Bounds())
-
-	for i := 0; i < wLightsMax; i++ {
-		nl := light{active: true}
-		nl.canvas = pixelgl.NewCanvas(global.gWin.Bounds())
-		nl.pos = pixel.Vec{100.0, 100.0 + float64(i)*10.0}
-		nl.imd = imdraw.New(nil)
-		nl.imd.Color = pixel.RGBA{1, 0, 0, 1}
-		nl.imd.Push(pixel.ZV)
-		nl.imd.Color = pixel.RGBA{0, 0, 0, 0}
-		nl.spread = 10
-		nl.radius = math.Pi
-		for angle := -nl.spread / 2; angle <= nl.spread/2; angle += nl.spread / 64 {
-			nl.imd.Push(pixel.V(1, 0).Rotated(angle))
-		}
-		nl.imd.Polygon(0)
-		l.pool = append(l.pool, nl)
-	}
-	l.idx = 0
+type block struct {
+	position pixel.Vec
+	width    float64
+	height   float64
+	visible  bool
 }
 
-//=============================================================
-// Create a new light from pool
-//=============================================================
-func (l *lights) newLight(newl light) {
-	l.idx++
-	if l.idx >= len(l.pool) {
-		l.idx = 0
-	}
-	newLight := l.pool[l.idx : l.idx+1][0]
+func (l *light) findDistance(b_ block, angle, rLen_ float64, start_ bool, shortest_ float64, closestBlock_ block) (start bool, rLen, shortest float64, closestBlock block) {
+	b := b_
+	rLen = rLen_
+	start = start_
+	shortest = shortest_
+	closestBlock = closestBlock_
 
-	newLight = newl
-	newLight.active = true
-	l.pool[l.idx : l.idx+1][0] = newLight
-}
+	y := (b.position.Y + b.height/2) - l.position.Y
+	x := (b.position.X + b.width/2) - l.position.X
+	dist := math.Sqrt((y * y) + (x * x))
 
-//=============================================================
-// Update all active lights
-//=============================================================
-func (l *lights) update(dt, time float64) {
-	l.canvas.Clear(pixel.Alpha(0))
-	l.canvas.SetComposeMethod(pixel.ComposePlus)
+	if l.radius >= dist {
+		rads := angle * (math.Pi / 180)
+		pointPos := pixel.V(l.position.X, l.position.Y)
 
-	for i, _ := range l.pool {
-		if l.pool[i].active {
-			l.pool[i].update(dt, time)
-			l.pool[i].canvas.Draw(l.canvas, pixel.IM.Moved(l.canvas.Bounds().Center()))
+		pointPos.X += math.Cos(rads) * dist
+		pointPos.Y += math.Sin(rads) * dist
+
+		if pointPos.X > b.position.X && pointPos.X < b.position.X+b.width && pointPos.Y > b.position.Y && pointPos.Y < b.position.Y+b.height {
+			if start || dist < shortest {
+				start = false
+				shortest = dist
+				rLen = dist
+				closestBlock = b
+			}
+			return
 		}
 	}
-	global.gWin.SetColorMask(pixel.Alpha(1))
-	l.canvas.Draw(global.gWin, pixel.IM.Moved(global.gWin.Bounds().Center()))
+	return
 }
 
-//=============================================================
-//
-// Individual Lights
-//
-//=============================================================
+func (l *light) shineLight() {
+	curAngle := l.angle - (l.angleSpread / 2)
+	dynLen := l.radius
+	addTo := 1 / l.radius
 
-//=============================================================
-// Update light
-//=============================================================
-func (l *light) update(dt, time float64) {
-	l.canvas.Clear(pixel.Alpha(0))
-	l.pos.X = l.pos.X + math.Sin(time/2)
-	l.canvas.SetMatrix(pixel.IM.Scaled(pixel.ZV, l.radius).Rotated(pixel.ZV, l.angle).Moved(l.pos))
-	l.canvas.SetColorMask(pixel.Alpha(1))
-	l.canvas.SetComposeMethod(pixel.ComposePlus)
-	l.imd.Draw(l.canvas)
+	for ; curAngle < l.angle+(l.angleSpread/2); curAngle += (addTo * (180 / math.Pi)) * 2 {
+		dynLen = l.radius
+
+		start := true
+		shortest := 0.0
+		rLen := dynLen
+		b := block{}
+
+		for i := 0; i < len(blocks); i++ {
+			start, rLen, shortest, b = l.findDistance(blocks[i], curAngle, rLen, start, shortest, b)
+		}
+
+		rads := curAngle * (math.Pi / 180)
+		end := pixel.Vec{l.position.X, l.position.Y}
+
+		b.visible = true
+		end.X += math.Cos(rads) * rLen
+		end.Y += math.Sin(rads) * rLen
+
+		// DRAW IMD
+		limd.Color = pixel.RGBA{0.2, 0, 0.2, 0.1}
+		limd.Push(pixel.Vec{l.position.X, l.position.Y})
+		limd.Push(pixel.Vec{end.X, end.Y})
+		limd.Line(1)
+		// ctx.beginPath()
+		// ctx.moveTo(l.position.x, l.position.y)
+		// ctx.lineTo(end.x, end.y)
+		// ctx.closePath()
+		// // ctx.clip();
+		// ctx.stroke()
+	}
+}
+
+var angle float64
+var totaldt float64
+
+func drawLights(dt float64) {
+	angle += 0.6
+
+	lcanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(600, 600)))
+
+}
+
+func createLights() {
+	lcanvas = pixelgl.NewCanvas(pixel.R(0, 0, 1000, 1000))
+	lcanvas.Clear(pixel.RGBA{0.0, 0, 0, 0.0})
+	limd = imdraw.New(lcanvas)
+
+	for i := 0; i < 50; i++ {
+		size := float64(rand.Intn(20) + 10)
+		blocks = append(blocks, block{position: pixel.Vec{float64(rand.Intn(512)), float64(rand.Intn(512))}, width: size, height: size})
+	}
+	for _, b := range blocks {
+		if b.visible {
+			limd.Color = pixel.RGBA{1.0, 0, 1.0, 1}
+			limd.Push(pixel.Vec{b.position.X, b.position.Y})
+			limd.Push(pixel.Vec{b.position.X + b.width, b.position.Y + b.height})
+			limd.Rectangle(0)
+			b.visible = false
+		} else {
+			limd.Color = pixel.RGBA{0, 1.00, 0, 1}
+			limd.Push(pixel.Vec{b.position.X, b.position.Y})
+			limd.Push(pixel.Vec{b.position.X + b.width, b.position.Y + b.height})
+			limd.Rectangle(0)
+		}
+	}
+	lights = append(lights, light{position: pixel.Vec{300, 300}, angleSpread: 300, angle: 300, color: pixel.RGBA{0, 0, 0.4, 0.1}})
+	for i, _ := range lights {
+		lights[i].radius = 1000
+		lights[i].shineLight()
+	}
+	limd.Draw(lcanvas)
+
 }

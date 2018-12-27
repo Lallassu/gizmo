@@ -93,6 +93,11 @@ func (w *weapon) shoot() {
 			global.gAmmoEngine.newAmmo(w.shot)
 		}
 
+		global.gParticleEngine.effectSmoke(
+			w.bounds.X+w.bounds.Width/2+w.owner.dir*3,
+			w.bounds.Y+w.bounds.Height,
+			1)
+
 		global.gParticleEngine.ammoShell(
 			w.bounds.X+w.bounds.Width/2+w.owner.dir*3,
 			w.bounds.Y+w.bounds.Height,

@@ -79,7 +79,6 @@ type Global struct {
 	gTextures       *textures
 	gRand           *fRand
 	gPlayer         *mob
-	gLights         *lights
 	gSounds         *sound
 	gUI             *UI
 	gMap            *Map
@@ -100,7 +99,6 @@ var global = &Global{
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},
 	gRand:           &fRand{},
-	gLights:         &lights{},
 	gSounds:         &sound{},
 	gUI:             &UI{},
 	gMap:            &Map{},

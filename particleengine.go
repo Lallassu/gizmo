@@ -69,9 +69,30 @@ func (pe *particleEngine) ammoShell(x, y, dir, size float64) {
 	})
 }
 
+func (pe *particleEngine) effectSmoke(x, y float64, size int) {
+	for i := 0; i < size*2; i++ {
+		c := 50 + global.gRand.rand()*20
+		a := 20 + global.gRand.rand()*200
+		pe.newParticle(particle{
+			color:       uint32(c&0xFF<<24 | c&0xFF<<16 | c&0xFF<<8 | a&0xFF),
+			size:        global.gRand.randFloat() * 2.5,
+			x:           x + float64(size/2) - global.gRand.randFloat()*float64(size) + global.gRand.randFloat()*2,
+			y:           y + float64(size/2) - global.gRand.randFloat()*float64(size) + global.gRand.randFloat()*2,
+			vx:          0,
+			vy:          global.gRand.randFloat() * 10,
+			fy:          -global.gRand.randFloat() * 10,
+			fx:          0,
+			life:        global.gRand.randFloat() * 3.5,
+			mass:        -0.1,
+			pType:       particleSmoke,
+			restitution: 0,
+		})
+	}
+}
+
 func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	// Create fire part
-	for i := 0; i < size*2; i++ {
+	for i := 0; i < size*5; i++ {
 		r := 0xF9
 		g := 50 + global.gRand.rand()*14
 		b := 16
@@ -86,7 +107,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 			vy:          float64(5 - global.gRand.rand()),
 			fx:          10,
 			fy:          10,
-			life:        global.gRand.randFloat() * 3,
+			life:        global.gRand.randFloat() * 2,
 			mass:        1,
 			pType:       particleFire,
 			restitution: 0,

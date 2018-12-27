@@ -63,11 +63,13 @@ func setup() {
 	global.gCamera.setPosition(0, 0)
 	global.gCamera.zoom = 3
 	global.gWin.SetSmooth(false)
-	global.gLights.create()
 	global.gController.setActiveEntity(global.gPlayer)
 	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
 	global.gMap.newMap(1)
+
+	// TEST
+	createLights()
 
 	// Full screen fragment shader
 	var fragmentShader = `
@@ -86,31 +88,23 @@ func setup() {
 				vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
 		  		vec4 tx = texture(uTexture, t);
 				if (c.r == 1) {
-			       fragColor = vec4(tx.x, tx.y, tx.z, tx.w);
+			       fragColor = vec4(tx.r, tx.g, tx.b, tx.a);
 			    } else {
-			       fragColor = vColor;
-			    }
-			    if (c.a == 0.1111) {
-			       //vec2 st = gl_FragCoord.xy/vec2(768, 1024);
-				   //vec2 vv = vec2(c.x, c.y);
-                   //vec2 dist = vv-vec2(0.5);
-				   //float radius = 2.5;
-                   //float res = 1.-smoothstep(radius-(radius*1.01),
-                   //                     radius+(radius*1.01),
-                   //                     dot(dist,dist)*5.0);
-				   //fragColor = vec4( res, res, res, 1.0 );
-				   c *= 2;
-				   
-				   vec3 fc = vec3(1.0, 0.3, 0.1);
-	               vec2 borderSize = vec2(0.5); 
+			        if (c.a == 0.1111) {
+				       c *= 2;
+				       vec3 fc = vec3(1.0, 0.3, 0.1);
+	                   vec2 borderSize = vec2(0.1); 
 
-	               vec2 rectangleSize = vec2(1.0) - borderSize; 
+	                   vec2 rectangleSize = vec2(1.0) - borderSize; 
 
-	               float distanceField = length(max(abs(c.x)-rectangleSize,0.0) / borderSize);
+	                   float distanceField = length(max(abs(c.x)-rectangleSize,0.0) / borderSize);
 
-	               float alpha = 1.0 - distanceField;
-			       fc *= abs(0.8 / (sin( c.x + sin(c.y)+ 1.3 ) * 5.0) );
-                   fragColor = vec4(fc, alpha*5);
+	                   float alpha = 1.0 - distanceField;
+			           fc *= abs(0.8 / (sin( c.x + sin(c.y)+ 1.3 ) * 5.0) );
+                       fragColor = vec4(fc, alpha*5);
+				    } else {
+			           fragColor = vColor;
+			        }
 				}
              }
              
@@ -163,6 +157,9 @@ func gameLoop() {
 				//	global.gWin.SetColorMask(pixel.Alpha(1))
 
 				global.gUI.draw(wMaxInvFPS)
+
+				// TEST
+				drawLights(wMaxInvFPS)
 
 				global.gWin.Update()
 				//uPosX = float32(test.bounds.X)
