@@ -3,9 +3,6 @@ General
 
 - Ljus från lampor
 - Skugga
-- Använda QT för lights + blocks
--> Bygga block av foreground?
--> Eller använda pixels.
 
 
 - Pixel density (as in urho3d?)

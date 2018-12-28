@@ -12,10 +12,10 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"image"
+	_ "image"
 	"math"
 	"math/rand"
-	"os"
+	_ "os"
 )
 
 //=============================================================
@@ -133,18 +133,18 @@ func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
 	return pixel.Vec{float64(x_), float64(y_)}, true
 }
 
-func loadPicture(path string) (pixel.Picture, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	img, _, err := image.Decode(file)
-	if err != nil {
-		return nil, err
-	}
-	return pixel.PictureDataFromImage(img), nil
-}
+//func loadPicture(path string) (pixel.Picture, error) {
+//	file, err := os.Open(path)
+//	if err != nil {
+//		return nil, err
+//	}
+//	defer file.Close()
+//	img, _, err := image.Decode(file)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return pixel.PictureDataFromImage(img), nil
+//}
 
 //=============================================================
 // Add object to world (QT)

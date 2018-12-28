@@ -10,14 +10,48 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"math"
-	"math/rand"
+	_ "time"
 )
 
-var blocks []block
 var lights []light
 
 var limd *imdraw.IMDraw
 var lcanvas *pixelgl.Canvas
+var li *light
+
+var fragmentShaderLight = `
+             #version 330 core
+             
+             in vec2  vTexCoords;
+             in vec4  vColor;
+             
+             out vec4 fragColor;
+             
+			 uniform float uPosX;
+			 uniform float uPosY;
+             uniform vec4 uTexBounds;
+             uniform sampler2D uTexture;
+             
+             void main() {
+				vec4 c = vColor;
+			    c *= 2;
+			    vec3 fc = vec3(1.0, 0.3, 0.1);
+	            vec2 borderSize = vec2(0.1); 
+
+	            vec2 rectangleSize = vec2(1.0) - borderSize; 
+
+				float dist = distance(vec2(uPosX, uPosY), vTexCoords);
+
+	            //float distanceField = length(max(abs(c.x)-rectangleSize,0.0) / borderSize);
+
+	            //float alpha = 1.0 - distanceField;
+			    fc *= abs(0.3 / (sin( c.x + sin(c.y)+ 1.3 ) * 1.0) );
+                fragColor = vec4(fc, 0.1);
+             }
+             
+			 `
+var uPosX float32
+var uPosY float32
 
 //=============================================================
 // Specific light
@@ -30,120 +64,61 @@ type light struct {
 	radius      float64
 }
 
-type block struct {
-	position pixel.Vec
-	width    float64
-	height   float64
-	visible  bool
-}
-
-func (l *light) findDistance(b_ block, angle, rLen_ float64, start_ bool, shortest_ float64, closestBlock_ block) (start bool, rLen, shortest float64, closestBlock block) {
-	b := b_
-	rLen = rLen_
-	start = start_
-	shortest = shortest_
-	closestBlock = closestBlock_
-
-	y := (b.position.Y + b.height/2) - l.position.Y
-	x := (b.position.X + b.width/2) - l.position.X
-	dist := math.Sqrt((y * y) + (x * x))
-
-	if l.radius >= dist {
-		rads := angle * (math.Pi / 180)
-		pointPos := pixel.V(l.position.X, l.position.Y)
-
-		pointPos.X += math.Cos(rads) * dist
-		pointPos.Y += math.Sin(rads) * dist
-
-		if pointPos.X > b.position.X && pointPos.X < b.position.X+b.width && pointPos.Y > b.position.Y && pointPos.Y < b.position.Y+b.height {
-			if start || dist < shortest {
-				start = false
-				shortest = dist
-				rLen = dist
-				closestBlock = b
-			}
-			return
-		}
-	}
-	return
-}
-
 func (l *light) shineLight() {
-	curAngle := l.angle - (l.angleSpread / 2)
-	dynLen := l.radius
+	//dynLen := l.radius
+	//start := time.Now()
 	addTo := 1 / l.radius
 
-	for ; curAngle < l.angle+(l.angleSpread/2); curAngle += (addTo * (180 / math.Pi)) * 2 {
-		dynLen = l.radius
-
-		start := true
-		shortest := 0.0
-		rLen := dynLen
-		b := block{}
-
-		for i := 0; i < len(blocks); i++ {
-			start, rLen, shortest, b = l.findDistance(blocks[i], curAngle, rLen, start, shortest, b)
-		}
-
+	limd.Clear()
+	for curAngle := l.angle - (l.angleSpread / 2); curAngle < l.angle+(l.angleSpread/2); curAngle += addTo * (180 / math.Pi) * 2 {
+		// Find next foreground.
+		end := l.position
 		rads := curAngle * (math.Pi / 180)
-		end := pixel.Vec{l.position.X, l.position.Y}
-
-		b.visible = true
-		end.X += math.Cos(rads) * rLen
-		end.Y += math.Sin(rads) * rLen
-
-		// DRAW IMD
-		limd.Color = pixel.RGBA{0.2, 0, 0.2, 0.1}
+		dist := 0.0
+		for !global.gWorld.IsRegular(end.X, end.Y) && dist < l.radius {
+			dist += 1
+			end.X += math.Cos(rads)
+			end.Y += math.Sin(rads)
+		}
+		limd.Color = pixel.RGBA{0.1, 0.1, 0.0, 0}
 		limd.Push(pixel.Vec{l.position.X, l.position.Y})
 		limd.Push(pixel.Vec{end.X, end.Y})
 		limd.Line(1)
-		// ctx.beginPath()
-		// ctx.moveTo(l.position.x, l.position.y)
-		// ctx.lineTo(end.x, end.y)
-		// ctx.closePath()
-		// // ctx.clip();
-		// ctx.stroke()
+
+		//Debug("FROM:", l.position, "TO:", end)
 	}
+	limd.Draw(lcanvas)
+	//elapsed := time.Since(start)
+	//Debug("Build took %s", elapsed)
 }
 
 var angle float64
 var totaldt float64
 
 func drawLights(dt float64) {
-	angle += 0.6
+	//li.angle += 0.6
 
-	lcanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(600, 600)))
+	// TBD: Don't update if position hasn't changed
+
+	lcanvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	li.position = global.gPlayer.getPosition()
+	li.position.Y += 10
+	uPosX = float32(li.position.X)
+	uPosY = float32(li.position.Y)
+	li.shineLight()
+	lcanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(1000, 1000)))
 
 }
 
 func createLights() {
-	lcanvas = pixelgl.NewCanvas(pixel.R(0, 0, 1000, 1000))
-	lcanvas.Clear(pixel.RGBA{0.0, 0, 0, 0.0})
+	lcanvas = pixelgl.NewCanvas(pixel.R(0, 0, 2000, 2000))
+	lcanvas.SetUniform("uPosX", &uPosX)
+	lcanvas.SetUniform("uPosY", &uPosY)
+	lcanvas.SetFragmentShader(fragmentShaderLight)
+	lcanvas.Clear(pixel.RGBA{0.0, 0.01, 0, 0.1})
 	limd = imdraw.New(lcanvas)
 
-	for i := 0; i < 50; i++ {
-		size := float64(rand.Intn(20) + 10)
-		blocks = append(blocks, block{position: pixel.Vec{float64(rand.Intn(512)), float64(rand.Intn(512))}, width: size, height: size})
-	}
-	for _, b := range blocks {
-		if b.visible {
-			limd.Color = pixel.RGBA{1.0, 0, 1.0, 1}
-			limd.Push(pixel.Vec{b.position.X, b.position.Y})
-			limd.Push(pixel.Vec{b.position.X + b.width, b.position.Y + b.height})
-			limd.Rectangle(0)
-			b.visible = false
-		} else {
-			limd.Color = pixel.RGBA{0, 1.00, 0, 1}
-			limd.Push(pixel.Vec{b.position.X, b.position.Y})
-			limd.Push(pixel.Vec{b.position.X + b.width, b.position.Y + b.height})
-			limd.Rectangle(0)
-		}
-	}
-	lights = append(lights, light{position: pixel.Vec{300, 300}, angleSpread: 300, angle: 300, color: pixel.RGBA{0, 0, 0.4, 0.1}})
-	for i, _ := range lights {
-		lights[i].radius = 1000
-		lights[i].shineLight()
-	}
-	limd.Draw(lcanvas)
+	li = &light{position: global.gPlayer.getPosition(), angleSpread: 360, angle: 300, color: pixel.RGBA{0, 0, 0.4, 0.1}}
+	li.radius = 100
 
 }
