@@ -42,11 +42,6 @@ func (l *light) create(x, y, angle, spread, radius float64, color pixel.RGBA) {
 	l.angleSpread = spread
 	l.color = color
 
-	l.canvas.SetUniform("uPosX", &l.uPosX)
-	l.canvas.SetUniform("uPosY", &l.uPosY)
-	l.canvas.SetUniform("uRadius", &l.radius)
-	l.canvas.SetFragmentShader(fragmentShaderLight)
-
 	l.bounds = &Bounds{
 		X:      x,
 		Y:      y,
@@ -54,6 +49,14 @@ func (l *light) create(x, y, angle, spread, radius float64, color pixel.RGBA) {
 		Height: float64(radius + radius/2),
 		entity: Entity(l),
 	}
+
+	l.uPosX = float32(l.bounds.Width / 2)
+	l.uPosY = float32(l.bounds.Height / 2)
+	l.canvas.SetUniform("uPosX", &l.uPosY)
+	l.canvas.SetUniform("uPosY", &l.uPosY)
+	l.canvas.SetUniform("uRadius", &l.radius)
+	l.canvas.SetFragmentShader(fragmentShaderLight)
+
 	global.gWorld.AddObject(l.bounds)
 }
 
@@ -79,13 +82,12 @@ func (l *light) draw(dt, elapsed float64) {
 
 	if l.redrawDt > 1/30 {
 		l.redrawDt = 0
-		l.uPosX = float32(l.bounds.X)
-		l.uPosY = float32(l.bounds.Y)
 
-		l.canvas.Clear(pixel.RGBA{0.0, 0.0, 0.0, 0.0})
+		l.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 		l.shine()
 	}
-	l.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(l.bounds.X+l.bounds.Width/2, l.bounds.Y+l.bounds.Height/2)))
+	//l.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(l.bounds.X+l.bounds.Width/2, l.bounds.Y+l.bounds.Height/2)))
+	l.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(l.bounds.X, l.bounds.Y)))
 }
 
 //=============================================================
@@ -100,13 +102,14 @@ func (l *light) shine() {
 	last := pixel.Vec{-1, -1}
 
 	for curAngle := l.angle - (l.angleSpread / 2); curAngle < l.angle+(l.angleSpread/2); curAngle += addTo * (180 / math.Pi) * 10 {
-		end := pixel.Vec{l.bounds.Width / 2, l.bounds.Height / 2}
+		end := pixel.Vec{l.bounds.X, l.bounds.Y}
 		rads := curAngle * (math.Pi / 180)
 
 		dist := float32(0.0)
 
 		// Find next foreground.
 		// Incr radius to make it fade away
+		//for !global.gWorld.IsRegular(l.bounds.X+l.bounds.Width/2+end.X, l.bounds.Y+l.bounds.Height/2+end.Y) && dist < l.radius+(l.radius/2) {
 		for !global.gWorld.IsRegular(end.X, end.Y) && dist < l.radius+(l.radius/2) {
 			dist += 1
 			end.X += math.Cos(rads)
@@ -115,11 +118,11 @@ func (l *light) shine() {
 		if last.X == -1 {
 			last = end
 		}
-		l.imd.Push(pixel.Vec{end.X, end.Y})
+		l.imd.Push(pixel.Vec{end.X - l.bounds.X + l.bounds.Width/2, end.Y - l.bounds.Y + l.bounds.Height/2})
 	}
 
 	// Add the first position again so we close the polygon.
-	l.imd.Push(pixel.Vec{last.X, last.Y})
+	l.imd.Push(pixel.Vec{last.X - l.bounds.X + l.bounds.Width/2, last.Y - l.bounds.Y + l.bounds.Height/2})
 	l.imd.Polygon(0)
 	l.imd.Draw(l.canvas)
 }

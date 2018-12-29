@@ -7,7 +7,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/faiface/pixel"
+	_ "github.com/faiface/pixel"
 )
 
 type Map struct {
@@ -59,16 +59,6 @@ func (m *Map) newMap(level int) {
 			test.create(p.X, p.Y)
 			enemies--
 		}
-	}
-
-	lights := 100
-	for lights != 0 {
-		if p, fit := global.gWorld.fitInWorld(50); fit {
-			l := &light{}
-			l.create(float64(p.X), float64(p.Y), 0, 360, 100, pixel.RGBA{1.0, 0, 0, 1.0})
-			lights--
-		}
-
 	}
 
 	// Place weapons

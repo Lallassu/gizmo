@@ -17,6 +17,7 @@ type controller struct {
 	moveRightKey pixelgl.Button
 	moveClimbKey pixelgl.Button
 	moveJumpKey  pixelgl.Button
+	lightDt      float64
 }
 
 //=============================================================
@@ -63,6 +64,17 @@ func (c *controller) update(dt float64) {
 	}
 
 	move := pixel.Vec{0, 0}
+
+	// TEST
+	c.lightDt += dt
+	if global.gWin.Pressed(pixelgl.KeyL) {
+		if c.lightDt > 1 {
+			l := &light{}
+			pos := global.gPlayer.getPosition()
+			l.create(pos.X, pos.Y, 300, 360, 200, pixel.RGBA{0.8, 0.6, 0, 0.1})
+			c.lightDt = 0
+		}
+	}
 
 	// Go into door
 	if global.gWin.Pressed(pixelgl.KeyA) {

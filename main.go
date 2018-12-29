@@ -87,6 +87,8 @@ func gameLoop() {
 
 	elapsed := 0.0
 
+	// TEST
+
 	for !global.gWin.Closed() && !global.gController.quit {
 		dt := time.Since(last).Seconds()
 		frameDt += dt
