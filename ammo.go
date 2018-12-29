@@ -172,17 +172,18 @@ func (p *ammo) update(dt float64) {
 
 	// Check if hit object.
 	for _, x := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: p.x, Y: p.y, Width: 1, Height: 1}) {
-		isSelf := false
-		isChunk := false
+		skipHit := false
 		switch item := x.entity.(type) {
+		case *light:
+			skipHit = true
 		case *chunk:
-			isChunk = true
+			skipHit = true
 		case *mob:
 			if item == p.owner.(*mob) {
-				isSelf = true
+				skipHit = true
 			}
 		}
-		if !isSelf && !isChunk {
+		if !skipHit {
 			x.entity.hit(p.x, p.y, p.vx, p.vy, p.power)
 			p.active = false
 			break
