@@ -1,15 +1,8 @@
 General
 --------
-- Light should not be hit.
-- Lightning effects from bombs using lights with expanding radius
-- Fiender har ett rött svagt sken som visar vad de ser.
-- Make lights objects with bounds that can be added to QT.
-- One small canvas covering the lights + area.
-- Ljus tar hänsyn till object
-- Update only 1/10 fps lights.
-- Ljus från lampor
-- Skugga
+- Lägg in lampor
 
+- Fiender har ett rött svagt sken som visar vad de ser.
 
 - Pixel density (as in urho3d?)
 

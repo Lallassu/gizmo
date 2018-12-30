@@ -25,9 +25,11 @@ void main() {
    vec4 c = vColor;
 
    // Normalized distance where min(0), max(radius)
-   float dist = abs(distance(vec2(uPosX, uPosY), vPosition))/uRadius;
+   float dist = distance(vec2(uPosX, uPosY), vPosition)/uRadius;
 
-   fragColor = vec4(c.r-(dist/c.r), c.g-(dist/c.g), c.b-(dist/c.b), c.a-dist);
+   //fragColor = vec4(c.r-(dist/c.r), c.g-(dist/c.g), c.b-(dist/c.b), c.a-dist);
+   fragColor = vec4(c.r*(1.0-dist), c.g*(1.0-dist), c.b*(1.0-dist), c.a*(1.0-dist));
+   
 }
 
 `

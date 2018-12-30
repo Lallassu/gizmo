@@ -23,28 +23,28 @@ type particleEngine struct {
 // Blood effect
 //=============================================================
 func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
-	for i := 0; i < 3; i++ {
-		r := 175 + global.gRand.rand()*5
-		g := 10 + global.gRand.rand()*2
-		b := 10 + global.gRand.rand()*2
-		a := 255 //global.gRand.rand() * 255
+	//	for i := 0; i < 1; i++ {
+	r := 175 + global.gRand.rand()*5
+	g := 10 + global.gRand.rand()*2
+	b := 10 + global.gRand.rand()*2
+	a := 255 //global.gRand.rand() * 255
 
-		pe.newParticle(particle{
-			x:           float64(x),
-			y:           float64(y),
-			size:        global.gRand.randFloat() * 3,
-			restitution: -0.1 - global.gRand.randFloat()/4,
-			life:        wParticleDefaultLife,
-			fx:          5 + global.gRand.randFloat()*5,
-			fy:          5 + global.gRand.randFloat()*5,
-			vx:          vx / 2,
-			vy:          float64(5 - global.gRand.rand()),
-			mass:        2,
-			pType:       particleBlood,
-			color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
-			static:      true,
-		})
-	}
+	pe.newParticle(particle{
+		x:           float64(x),
+		y:           float64(y),
+		size:        global.gRand.randFloat() * 3,
+		restitution: -0.1 - global.gRand.randFloat()/4,
+		life:        wParticleDefaultLife,
+		fx:          5 + global.gRand.randFloat()*5,
+		fy:          5 + global.gRand.randFloat()*5,
+		vx:          vx / 2,
+		vy:          float64(5 - global.gRand.rand()),
+		mass:        2,
+		pType:       particleBlood,
+		color:       uint32(r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF),
+		static:      true,
+	})
+	//}
 
 }
 func (pe *particleEngine) ammoShell(x, y, dir, size float64) {

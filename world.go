@@ -340,6 +340,7 @@ func (w *world) RemovePixel(x, y int) {
 //=============================================================
 func (w *world) Explode(x_, y_ float64, power int) {
 	//	global.gSounds.play("explosion")
+
 	global.gCamera.shake(pixel.V(x_, y_), power)
 	x := int(x_)
 	y := int(y_)
@@ -386,6 +387,10 @@ func (w *world) Explode(x_, y_ float64, power int) {
 				}
 			}
 		}
+	}
+	l := light{}
+	if power > 10 {
+		l.create(x_, y_, 300, 360, float64(2*power), pixel.RGBA{0.8, 0.3, 0, 0.1}, true, 0.1)
 	}
 
 	// Floodfill

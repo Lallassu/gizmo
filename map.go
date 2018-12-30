@@ -17,9 +17,9 @@ func (m *Map) newMap(level int) {
 	weapons := 0
 	enemies := 0
 	items := 0
-	weapons = 20 + global.gRand.rand()
+	weapons = 10 + global.gRand.rand()
 	enemies = 1 + global.gRand.rand()/2
-	items = 1 + global.gRand.rand()/2
+	items = 10 + global.gRand.rand()/2
 
 	switch level {
 	case 1:
