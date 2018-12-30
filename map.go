@@ -7,19 +7,18 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/faiface/pixel"
+	"github.com/faiface/pixel"
 )
 
 type Map struct {
 }
 
 func (m *Map) newMap(level int) {
-	weapons := 0
-	enemies := 0
-	items := 0
-	weapons = 10 + global.gRand.rand()
-	enemies = 1 + global.gRand.rand()/2
-	items = 10 + global.gRand.rand()/2
+	pcgGen := &pcg{}
+	weapons := 10 + global.gRand.rand()
+	enemies := 1 + global.gRand.rand()/2
+	items := 10 + global.gRand.rand()/2
+	lamps := 4 + global.gRand.rand()/2
 
 	switch level {
 	case 1:
@@ -36,6 +35,32 @@ func (m *Map) newMap(level int) {
 		if p, fit := global.gWorld.fitInWorld(50); fit {
 			global.gPlayer.create(float64(p.X), float64(p.Y))
 			player--
+		}
+	}
+
+	// Place lamps
+	for lamps != 0 {
+		radius := float64(100 + global.gRand.rand()*5)
+		if p, fit := global.gWorld.fitInWorld(10); fit {
+			for !global.gWorld.IsRegular(p.X, p.Y) {
+				p.Y++
+			}
+
+			// Check if lamp is close already.
+			skip := false
+			for _, b := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: p.X - radius/2, Y: p.Y - radius/2, Width: radius * 2, Height: radius * 2}) {
+				switch b.entity.(type) {
+				case *light:
+					skip = true
+					break
+				}
+			}
+			if !skip {
+				l := &light{}
+				pcgGen.GenerateLamp(int(p.X), int(p.Y-5))
+				l.create(p.X, p.Y-10, -90, 100, radius, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
+				lamps--
+			}
 		}
 	}
 

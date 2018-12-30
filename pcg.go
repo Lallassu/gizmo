@@ -460,11 +460,11 @@ func (p *pcg) GenerateDoor(x, y int) bool {
 }
 
 func (p *pcg) GenerateLamp(x, y int) {
-	p.lampCnt++
-	if p.lampCnt < 100 {
-		return
-	}
-	p.lampCnt = 0
+	// p.lampCnt++
+	// if p.lampCnt < 100 {
+	// 	return
+	// }
+	// p.lampCnt = 0
 
 	lr := 0x3b
 	lg := 0x3a
@@ -488,28 +488,28 @@ func (p *pcg) GenerateLamp(x, y int) {
 			global.gWorld.AddPixel(
 				x+i,
 				y-j,
-				uint32(lr&0xFF<<24|lg&0xFF<<16|lb&0xFF<<8|wBackground8),
+				uint32(lr&0xFF<<24|lg&0xFF<<16|lb&0xFF<<8|0xFF),
 			)
 		}
 	}
 
-	for j := 5; j < 60; j++ {
-		for i := -j * 2 / 2; i < j*2/2; i++ {
-			c := global.gWorld.PixelColor(float64(x+i), float64(y-j))
-			r := c>>24&0xFF + int32(60-j)
-			g := c>>16&0xFF + int32(60-j)
-			b := c >> 8 & 0xFF
-			a := c & 0xFF
+	// for j := 5; j < 60; j++ {
+	// 	for i := -j * 2 / 2; i < j*2/2; i++ {
+	// 		c := global.gWorld.PixelColor(float64(x+i), float64(y-j))
+	// 		r := c>>24&0xFF + int32(60-j)
+	// 		g := c>>16&0xFF + int32(60-j)
+	// 		b := c >> 8 & 0xFF
+	// 		a := c & 0xFF
 
-			if global.gWorld.IsShadow(float64(x+i), float64(y-j)) || global.gWorld.IsBackground(float64(x+i), float64(y-j)) {
-				global.gWorld.AddPixel(
-					x+i,
-					y-j,
-					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
-				)
-			}
-		}
-	}
+	// 		//	if global.gWorld.IsShadow(float64(x+i), float64(y-j)) || global.gWorld.IsBackground(float64(x+i), float64(y-j)) {
+	// 		global.gWorld.AddPixel(
+	// 			x+i,
+	// 			y-j,
+	// 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
+	// 		)
+	// 		//	}
+	// 	}
+	// }
 }
 
 func (p *pcg) GenerateLine(x, y int) {

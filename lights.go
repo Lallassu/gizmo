@@ -85,6 +85,12 @@ func (l *light) getPosition() pixel.Vec {
 func (l *light) draw(dt, elapsed float64) {
 	l.redrawDt += dt
 
+	if !l.dynamic {
+		if global.gRand.randFloat() < 0.01 {
+			return
+		}
+	}
+
 	if l.redrawDt > 1/20 {
 		l.redrawDt = 0
 
@@ -114,7 +120,7 @@ func (l *light) shine() {
 	last := pixel.Vec{-1, -1}
 
 	bounds := []*Bounds{}
-	for _, b := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: l.bounds.X - float64(l.radius)/2, Y: l.bounds.Y - float64(l.radius)/2, Width: float64(l.radius) * 2, Height: float64(l.radius) * 2}) {
+	for _, b := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: l.bounds.X - float64(l.radius), Y: l.bounds.Y - float64(l.radius), Width: float64(l.radius * 2), Height: float64(l.radius * 2)}) {
 		switch b.entity.(type) {
 		case *chunk:
 			continue
@@ -136,8 +142,8 @@ func (l *light) shine() {
 			// Check if object.
 			next := false
 			for _, b := range bounds {
-				if end.X >= b.X && end.X <= b.X+b.Width {
-					if end.Y >= b.Y && end.Y <= b.Y+b.Height {
+				if end.X >= b.X && end.X < b.X+b.Width {
+					if end.Y >= b.Y && end.Y < b.Y+b.Height {
 						next = true
 						break
 					}
@@ -156,7 +162,7 @@ func (l *light) shine() {
 	}
 
 	// Add the first position again so we close the polygon.
-	l.imd.Push(pixel.Vec{last.X - l.bounds.X + l.bounds.Width/2, last.Y - l.bounds.Y + l.bounds.Height/2})
+	//l.imd.Push(pixel.Vec{last.X - l.bounds.X + l.bounds.Width/2, last.Y - l.bounds.Y + l.bounds.Height/2})
 	l.imd.Polygon(0)
 	l.imd.Draw(l.canvas)
 }

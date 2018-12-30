@@ -700,14 +700,14 @@ func (w *world) paintMap() {
 				p := w.pixels[x*w.width+y] & 0xFF
 				pafter := w.pixels[(x+wDoorLen)*w.width+y+1] & 0xFF
 				pbelow := w.pixels[(x+wDoorLen)*w.width+y-1] & 0xFF
-				pbelowLong := w.pixels[x*w.width+y-wDoorHeight-55] & 0xFF
+				//pbelowLong := w.pixels[x*w.width+y-wDoorHeight-55] & 0xFF
 				pp := w.pixels[x*w.width+y+1] & 0xFF
 				up := w.pixels[x*w.width+y+wDoorHeight] & 0xFF
-				down := w.pixels[x*w.width+y-1] & 0xFF
+				//down := w.pixels[x*w.width+y-1] & 0xFF
 
-				if p == 0xFF && pbelowLong == 0xFF && (down == wShadow8 || down == wBackground8) {
-					pcgGen.GenerateLamp(x, y-1)
-				}
+				// if p == 0xFF && pbelowLong == 0xFF && (down == wShadow8 || down == wBackground8) {
+				// 	pcgGen.GenerateLamp(x, y-1)
+				// }
 
 				if pbelow != wBackground8 && pafter == wBackground8 && p == 0xFF && up == wBackground8 && pp == wBackground8 {
 					// Check there is no ladder
