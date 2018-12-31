@@ -57,8 +57,8 @@ func (m *Map) newMap(level int) {
 			}
 			if !skip {
 				l := &light{}
-				pcgGen.GenerateLamp(int(p.X), int(p.Y-5))
-				l.create(p.X, p.Y-10, -90, 100, radius, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
+				pcgGen.GenerateLamp(int(p.X), int(p.Y))
+				l.create(p.X, p.Y-5, -90, 100, radius, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
 				lamps--
 			}
 		}

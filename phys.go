@@ -182,6 +182,7 @@ func (p *phys) physics(dt float64) {
 			}
 		} else {
 			if !p.hitFloor(p.bounds.X, p.bounds.Y+p.velo.Y) {
+				// TBD: Check if hitting an object. Then place above object.
 				p.bounds.Y += p.velo.Y
 				p.falling = true
 			} else {

@@ -89,6 +89,11 @@ func (l *light) draw(dt, elapsed float64) {
 		if global.gRand.randFloat() < 0.01 {
 			return
 		}
+		// If "position" is destroyed, remove light.
+		if !global.gWorld.IsRegular(l.bounds.X, l.bounds.Y+1) {
+			global.gWorld.qt.Remove(l.bounds)
+			return
+		}
 	}
 
 	if l.redrawDt > 1/20 {
@@ -133,7 +138,7 @@ func (l *light) shine() {
 	}
 
 	// Raytrace around position (Using a bit of non-granular approach to speed up things)
-	for curAngle := l.angle - (l.angleSpread / 2); curAngle < l.angle+(l.angleSpread/2); curAngle += addTo * (180 / math.Pi) * 10 {
+	for curAngle := l.angle - (l.angleSpread / 2); curAngle < l.angle+(l.angleSpread/2); curAngle += addTo * (180 / math.Pi) * 7 {
 		end := pixel.Vec{l.bounds.X, l.bounds.Y}
 		rads := curAngle * (math.Pi / 180)
 

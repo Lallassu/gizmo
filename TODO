@@ -1,6 +1,11 @@
 General
 --------
-- Destroy lamps when they are hit.
+- Lights, fetch QT-bounds at a certain lower FPS.
+- Lights should be configured to hit objects or not.
+    -> For example lights from bombs/vision lights.
+- Connect lights to objects.
+- blinking lights (for ex. bombs)
+
 - Place doors better.
 
 - Fiender har ett rött svagt sken som visar vad de ser.
@@ -40,9 +45,6 @@ General
         -> map.go with Draw() function
     - Configurable map generation vars
 
-- Special-effects
-    -> Lightning
-    -> Shaders
 
 - Performance issues?
     -> AI loads high?
@@ -56,16 +58,8 @@ General
         - Spotted
     - Pickup weapons if seen
         -> Distance to < X pickup()
+    - AI Can pick up objecst and throw towards player
 
-- Lights
-    - Generic light
-    - Lightning around ammo
-    - Lightning around weapons
-    - Lightning around explosion fragments
-
-
-- Sounds
-    -> repeatable
 
 - Menu
     - New Game
@@ -75,9 +69,6 @@ General
     - Quit
 
 - Own animations + sprites
-
-- Enemies:
-    - pickup bombs and run towards player
 
 
 - Elevators
