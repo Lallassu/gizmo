@@ -1,8 +1,5 @@
 General
 --------
-- Lights, fetch QT-bounds at a certain lower FPS.
-- Lights should be configured to hit objects or not.
-    -> For example lights from bombs/vision lights.
 - Connect lights to objects.
 - blinking lights (for ex. bombs)
 
