@@ -34,6 +34,8 @@ type light struct {
 	objectCD             bool
 	unlimitedLife        bool
 	ownerBounds          *Bounds
+	blinkFrequency       float64
+	blinkDt              float64
 }
 
 //=============================================================
@@ -131,6 +133,13 @@ func (l *light) draw(dt, elapsed float64) {
 		}
 		l.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 		l.shine()
+	}
+	if l.blinkFrequency > 0 {
+		l.blinkDt += dt
+		if l.blinkDt >= l.blinkFrequency {
+			l.blinkDt = 0
+			return
+		}
 	}
 	l.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(l.bounds.X, l.bounds.Y)))
 }
