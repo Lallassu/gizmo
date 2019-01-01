@@ -32,6 +32,8 @@ type light struct {
 	objectBounds         []*Bounds
 	updateObjectBoundsDt float64
 	objectCD             bool
+	unlimitedLife        bool
+	ownerBounds          *Bounds
 }
 
 //=============================================================
@@ -79,6 +81,13 @@ func (l *light) hit(x, y, vx, vy float64, power int) {
 }
 
 //=============================================================
+// Destroy light
+//=============================================================
+func (l *light) destroy() {
+	global.gWorld.qt.Remove(l.bounds)
+}
+
+//=============================================================
 // Get position
 //=============================================================
 func (l *light) getPosition() pixel.Vec {
@@ -115,7 +124,7 @@ func (l *light) draw(dt, elapsed float64) {
 
 		if l.dynamic {
 			l.life -= dt
-			if l.life <= 0 {
+			if l.life <= 0 && !l.unlimitedLife {
 				global.gWorld.qt.Remove(l.bounds)
 				return
 			}
@@ -141,7 +150,9 @@ func (l *light) updateObjectBounds() {
 		case *mob:
 			continue
 		}
-		l.objectBounds = append(l.objectBounds, b)
+		if b != l.ownerBounds {
+			l.objectBounds = append(l.objectBounds, b)
+		}
 	}
 }
 

@@ -100,6 +100,12 @@ func (m *Map) newMap(level int) {
 		if p, fit := global.gWorld.fitInWorld(50); fit {
 			w := &item{}
 			w.createItem(p.X, p.Y, itemCrate)
+			// TEST
+			l := &light{}
+			l.create(p.X, p.Y, 360, 360, 50, pixel.RGBA{1.0, 0, 0, 0.5}, true, 0)
+			l.unlimitedLife = true
+			l.ownerBounds = w.bounds
+			w.AddLight(5, 20, l)
 			items--
 		}
 	}

@@ -15,15 +15,18 @@ import (
 type object struct {
 	phys
 	graphics
-	name        string
-	oType       itemType
-	owner       *mob
-	prevOwner   *mob
-	reloadTime  float64
-	animateIdle bool
-	drawFunc    func(dt, elapsed float64)
-	explodeFunc func()
-	hitFunc     func(x, y, vx, vy float64, power int)
+	light          *light
+	light_offset_x float64
+	light_offset_y float64
+	name           string
+	oType          itemType
+	owner          *mob
+	prevOwner      *mob
+	reloadTime     float64
+	animateIdle    bool
+	drawFunc       func(dt, elapsed float64)
+	explodeFunc    func()
+	hitFunc        func(x, y, vx, vy float64, power int)
 }
 
 //=============================================================
@@ -53,7 +56,20 @@ func (o *object) hit(x_, y_, vx, vy float64, power int) {
 	if o.hitFunc != nil {
 		o.hitFunc(x_, y_, vx, vy, power)
 	}
+	if o.light != nil {
+		o.light.destroy()
+	}
 	return
+}
+
+//=============================================================
+// Add light to object
+// x,y =>
+//=============================================================
+func (o *object) AddLight(x, y float64, l *light) {
+	o.light = l
+	o.light_offset_x = x
+	o.light_offset_y = y
 }
 
 //=============================================================
@@ -113,6 +129,11 @@ func (o *object) draw(dt, elapsed float64) {
 	// This should be kept in weapon somehow...
 	// But currently weapon has no draw.
 	o.reloadTime += dt
+
+	if o.light != nil {
+		o.light.bounds.X = o.bounds.X + o.light_offset_x
+		o.light.bounds.Y = o.bounds.Y + o.light_offset_y
+	}
 
 	o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 	o.batches[0].Draw(o.canvas)
