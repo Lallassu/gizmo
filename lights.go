@@ -136,9 +136,10 @@ func (l *light) draw(dt, elapsed float64) {
 	}
 	if l.blinkFrequency > 0 {
 		l.blinkDt += dt
-		if l.blinkDt >= l.blinkFrequency {
-			l.blinkDt = 0
+		if l.blinkDt <= l.blinkFrequency {
 			return
+		} else if l.blinkDt >= l.blinkFrequency {
+			l.blinkDt = 0
 		}
 	}
 	l.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(l.bounds.X, l.bounds.Y)))

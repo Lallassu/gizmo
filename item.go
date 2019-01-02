@@ -20,7 +20,7 @@ type item struct {
 //=============================================================
 //
 //=============================================================
-func (i *item) createItem(x, y float64, iType itemType) {
+func (i *item) newItem(x, y float64, iType itemType) {
 	i.iType = iType
 	switch iType {
 	case itemPlant:

@@ -1,7 +1,11 @@
 General
 --------
-- Connect lights to objects.
-- blinking lights (for ex. bombs)
+- bomb
+    - New class (explosive)
+    - Active blink slow
+    - Proxemity blink faster
+    - explode after timer triggered.
+    - Own draw function?
 
 - Place doors better.
 

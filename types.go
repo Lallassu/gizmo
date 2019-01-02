@@ -10,6 +10,13 @@ const (
 	mapWtf
 )
 
+type explosiveType int
+
+const (
+	explosiveRegularMine explosiveType = iota
+	explosiveClusterMine
+)
+
 type weaponType int
 
 const (

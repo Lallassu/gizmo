@@ -19,6 +19,7 @@ func (m *Map) newMap(level int) {
 	enemies := 1 + global.gRand.rand()/2
 	items := 10 + global.gRand.rand()/2
 	lamps := 4 + global.gRand.rand()/2
+	regularMines := 20
 
 	switch level {
 	case 1:
@@ -99,14 +100,17 @@ func (m *Map) newMap(level int) {
 	for items != 0 {
 		if p, fit := global.gWorld.fitInWorld(50); fit {
 			w := &item{}
-			w.createItem(p.X, p.Y, itemCrate)
-			// TEST
-			l := &light{}
-			l.create(p.X, p.Y, 360, 360, 50, pixel.RGBA{1.0, 0, 0, 0.5}, true, 0)
-			l.unlimitedLife = true
-			l.ownerBounds = w.bounds
-			w.AddLight(5, 20, l)
+			w.newItem(p.X, p.Y, itemCrate)
 			items--
+		}
+	}
+
+	// Place items
+	for regularMines != 0 {
+		if p, fit := global.gWorld.fitInWorld(10); fit {
+			w := &explosive{}
+			w.newExplosive(p.X, p.Y, explosiveRegularMine)
+			regularMines--
 		}
 	}
 }
