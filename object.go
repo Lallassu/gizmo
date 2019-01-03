@@ -24,9 +24,6 @@ type object struct {
 	prevOwner      *mob
 	reloadTime     float64
 	animateIdle    bool
-	drawFunc       func(dt, elapsed float64)
-	explodeFunc    func()
-	hitFunc        func(x, y, vx, vy float64, power int)
 }
 
 //=============================================================
@@ -53,9 +50,6 @@ func (o *object) create(x, y float64) {
 func (o *object) hit(x_, y_, vx, vy float64, power int) {
 	// TBD: Remove explode and hit instead.
 	o.explode()
-	if o.hitFunc != nil {
-		o.hitFunc(x_, y_, vx, vy, power)
-	}
 	if o.light != nil {
 		o.light.destroy()
 	}
@@ -90,9 +84,6 @@ func (o *object) explode() {
 	global.gWorld.qt.Remove(o.bounds)
 	if o.owner != nil {
 		o.owner.throw()
-	}
-	if o.explodeFunc != nil {
-		o.explodeFunc()
 	}
 }
 
@@ -181,8 +172,4 @@ func (o *object) draw(dt, elapsed float64) {
 		o.bounds.Y = o.owner.bounds.Y
 	}
 
-	// Call custom draw
-	if o.drawFunc != nil {
-		o.drawFunc(dt, elapsed)
-	}
 }

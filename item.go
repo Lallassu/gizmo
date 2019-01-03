@@ -30,9 +30,6 @@ func (i *item) newItem(x, y float64, iType itemType) {
 		i.animated = false
 		i.name = "crate"
 		i.scale = 1
-		//i.drawFunc = i.drawItem
-		i.drawFunc = func(dt, e float64) {
-		}
 	case itemBarrel:
 	}
 
@@ -41,19 +38,22 @@ func (i *item) newItem(x, y float64, iType itemType) {
 }
 
 //=============================================================
-// Custom draw function called after object.draw
+// Custom draw function
 //=============================================================
-func (i *item) drawItem(dt, elapsed float64) {
+func (i *item) draw(dt, elapsed float64) {
+	i.object.draw(dt, elapsed)
 }
 
 //=============================================================
 // custom explode function called after object.explode
 //=============================================================
-func (i *item) explodeFunc() {
+func (i *item) explode() {
+	i.object.explode()
 }
 
 //=============================================================
 // custom hit function called after object.hit
 //=============================================================
-func (i *item) hitFunc(x, y, vx, vy float64, power int) {
+func (i *item) hit(x, y, vx, vy float64, power int) {
+	i.object.hit(x, y, vx, vy, power)
 }

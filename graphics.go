@@ -58,7 +58,7 @@ func (gfx *graphics) createGfx(x, y float64) {
 				if r == 0 && g == 0 && b == 0 && a == 0 {
 					continue
 				}
-				gfx.frames[f][int(x*gfx.size+y)] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+				gfx.frames[f][int(x*gfx.size+y-1)] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
 			}
 		}
 		gfx.triangles[f] = pixel.MakeTrianglesData(100)

@@ -2,13 +2,7 @@ General
 --------
 - Place doors better.
 
-- Fiender har ett rött svagt sken som visar vad de ser.
-
-- Pixel density (as in urho3d?)
-
 - Random weapons/enemies of different types based on map type
-
-- If ducking with object, hide from AI.
 
 - UI
     -> Deaths/lives
@@ -22,7 +16,6 @@ General
 - Items class
     - crates
     - Plants/pots
-    - bombs
     - items
     - Power ups
     - Helmet
@@ -33,8 +26,6 @@ General
 
 - Map generation
     - More objects
-    - Better spread of lights
-        -> Use shader lightning instead
     - effects such as smoke
         -> map.go with Draw() function
     - Configurable map generation vars
@@ -53,6 +44,7 @@ General
     - Pickup weapons if seen
         -> Distance to < X pickup()
     - AI Can pick up objecst and throw towards player
+    - If ducking with object, hide from AI.
 
 
 - Menu
@@ -80,3 +72,5 @@ General
         -> Explode of objects/mobs
 
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
+
+- Pixel density (as in urho3d?)
