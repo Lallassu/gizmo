@@ -178,8 +178,11 @@ func (p *ammo) update(dt float64) {
 		case *chunk:
 			skipHit = true
 		case *mob:
-			if item == p.owner.(*mob) {
-				skipHit = true
+			switch owner := p.owner.(type) {
+			case *mob:
+				if item == owner {
+					skipHit = true
+				}
 			}
 		}
 		if !skipHit {

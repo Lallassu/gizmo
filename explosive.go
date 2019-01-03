@@ -39,6 +39,20 @@ func (e *explosive) newExplosive(x, y float64, eType explosiveType) {
 		e.light.ownerBounds = e.bounds
 		e.light.blinkFrequency = 1
 		e.AddLight(5, 7, e.light)
+	case explosiveClusterMine:
+		e.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "regularMine.png")
+		e.name = "Cluster Mine"
+		e.animated = false
+		e.rotation = 0
+		e.power = 5
+		e.delayTime = 2
+		e.scale = 0.2
+		e.light = &light{}
+		e.light.create(x, y, 360, 360, 15, pixel.RGBA{0.4, 0.3, 0, 0.1}, true, 0)
+		e.light.unlimitedLife = true
+		e.light.ownerBounds = e.bounds
+		e.light.blinkFrequency = 1
+		e.AddLight(5, 7, e.light)
 	}
 	e.countDown = false
 
@@ -67,6 +81,28 @@ func (e *explosive) draw(dt, elapsed float64) {
 			e.light.destroy()
 			global.gWorld.qt.Remove(e.bounds)
 			global.gWorld.Explode(e.bounds.X, e.bounds.Y, e.power)
+
+			switch e.eType {
+			case explosiveClusterMine:
+				for i := 0; i < 10; i++ {
+					shot := ammo{
+						color: 0xFF0033FF,
+						size:  0.2,
+						life:  0.2,
+						fx:    10.0,
+						fy:    10.0,
+						power: 10,
+					}
+					shot.x = e.bounds.X + e.bounds.Width/2
+					shot.y = e.bounds.Y + e.bounds.Height
+					shot.vx = 10.0 * (0.5 - global.gRand.randFloat())
+					shot.vy = 10.0 * global.gRand.randFloat()
+					shot.mass = 5 + global.gRand.randFloat()*4
+					shot.owner = e
+					global.gAmmoEngine.newAmmo(shot)
+				}
+
+			}
 		}
 	}
 }

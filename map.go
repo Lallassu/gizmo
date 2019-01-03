@@ -109,7 +109,7 @@ func (m *Map) newMap(level int) {
 	for regularMines != 0 {
 		if p, fit := global.gWorld.fitInWorld(10); fit {
 			w := &explosive{}
-			w.newExplosive(p.X, p.Y, explosiveRegularMine)
+			w.newExplosive(p.X, p.Y, explosiveClusterMine)
 			regularMines--
 		}
 	}

@@ -106,6 +106,8 @@ func (m *mob) attach(o interface{}) {
 		item.setOwner(m)
 	case *item:
 		item.setOwner(m)
+	case *explosive:
+		item.setOwner(m)
 	}
 
 }
@@ -142,6 +144,10 @@ func (m *mob) pickup() {
 			if item.isFree() {
 				m.attach(item)
 			}
+		case *explosive:
+			if item.isFree() {
+				m.attach(item)
+			}
 		case *weapon:
 			if item.isFree() {
 				m.attach(item)
@@ -161,6 +167,8 @@ func (m *mob) throw() {
 		case *weapon:
 			item.removeOwner()
 		case *item:
+			item.removeOwner()
+		case *explosive:
 			item.removeOwner()
 		}
 	}

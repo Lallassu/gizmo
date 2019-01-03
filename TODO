@@ -1,12 +1,5 @@
 General
 --------
-- bomb
-    - New class (explosive)
-    - Active blink slow
-    - Proxemity blink faster
-    - explode after timer triggered.
-    - Own draw function?
-
 - Place doors better.
 
 - Fiender har ett rött svagt sken som visar vad de ser.
