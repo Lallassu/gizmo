@@ -1,5 +1,16 @@
 General
 --------
+- Move reload time to weapons from object
+
+- Jump on items
+- Objects should collide 
+    -> Land on each other etc.
+
+
+
+- Map from image in gimp?
+    -> skip generated?
+
 - Place doors better.
 
 - Random weapons/enemies of different types based on map type
@@ -8,7 +19,6 @@ General
     -> Deaths/lives
     -> Icons?
 
-- Jump on items
 - Landa på item -> inte dö, item explode (ifall högt fall).
 
 - Reload map (if totaly fubar)

@@ -32,13 +32,13 @@ func (e *explosive) newExplosive(x, y float64, eType explosiveType) {
 		e.rotation = 0
 		e.power = 20
 		e.delayTime = 2
-		e.scale = 0.2
+		e.scale = 0.5
 		e.light = &light{}
-		e.light.create(x, y, 360, 360, 15, pixel.RGBA{0.8, 0, 0, 0.1}, true, 0)
+		e.light.create(x, y, 360, 360, 10, pixel.RGBA{0.8, 0, 0, 0.3}, true, 0)
 		e.light.unlimitedLife = true
 		e.light.ownerBounds = e.bounds
 		e.light.blinkFrequency = 1
-		e.AddLight(5, 7, e.light)
+		e.AddLight(5, 6, e.light)
 	case explosiveClusterMine:
 		e.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "regularMine.png")
 		e.name = "Cluster Mine"
@@ -48,11 +48,11 @@ func (e *explosive) newExplosive(x, y float64, eType explosiveType) {
 		e.delayTime = 2
 		e.scale = 0.5
 		e.light = &light{}
-		e.light.create(x, y, 360, 360, 15, pixel.RGBA{0.9, 0.3, 0, 0.1}, true, 0)
+		e.light.create(x, y, 360, 360, 10, pixel.RGBA{0.9, 0.3, 0, 0.2}, true, 0)
 		e.light.unlimitedLife = true
 		e.light.ownerBounds = e.bounds
 		e.light.blinkFrequency = 1
-		e.AddLight(5, 7, e.light)
+		e.AddLight(5, 6, e.light)
 	}
 	e.countDown = false
 	e.light.objectCD = false

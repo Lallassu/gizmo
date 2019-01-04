@@ -139,6 +139,7 @@ func (p *phys) physics(dt float64) {
 	} else {
 		if p.hitFloor(p.bounds.X, p.bounds.Y-1) {
 			p.velo.X = 0
+			p.moving = false
 		} else {
 			if p.throwable {
 				p.velo.X += dt * p.speed / 100 * p.dir

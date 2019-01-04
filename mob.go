@@ -50,31 +50,36 @@ func (m *mob) create(x, y float64) {
 //
 //=============================================================
 func (m *mob) hit(x_, y_, vx, vy float64, power int) {
-	// If carry somerhing, hit that first!
-	if m.carry != nil {
-		switch item := m.carry.(type) {
-		case *weapon:
-			item.hit(x_, y_, vx, vy, power)
-			return
-		case *object:
-			item.hit(x_, y_, vx, vy, power)
+	pow := float64(power)
+	// If distance is close, explode, otherwise push away.
+	dist := distance(pixel.Vec{x_ + pow/2, y_ + pow/2}, pixel.Vec{m.bounds.X + m.bounds.Width/2, m.bounds.Y + m.bounds.Height/2})
+	if dist < float64(power) {
+		// If carry somerhing, hit that first!
+		if m.carry != nil {
+			switch item := m.carry.(type) {
+			case *weapon:
+				item.hit(x_, y_, vx, vy, power)
+				return
+			case *object:
+				item.hit(x_, y_, vx, vy, power)
+				return
+			}
+		}
+
+		x := int(math.Abs(float64(m.bounds.X - x_)))
+		y := int(math.Abs(float64(m.bounds.Y - y_)))
+
+		// Gfx update
+		m.hitGfx(x, y, x_, y_, vx, vy, power, true)
+
+		// Blood effect
+		global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
+
+		m.life -= float64(power * 2)
+		if m.life <= 0 {
+			m.explode()
 			return
 		}
-	}
-
-	x := int(math.Abs(float64(m.bounds.X - x_)))
-	y := int(math.Abs(float64(m.bounds.Y - y_)))
-
-	// Gfx update
-	m.hitGfx(x, y, x_, y_, vx, vy, power, true)
-
-	// Blood effect
-	global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
-
-	m.life -= float64(power * 2)
-	if m.life <= 0 {
-		m.explode()
-		return
 	}
 }
 

@@ -47,9 +47,28 @@ func (o *object) create(x, y float64) {
 //=============================================================
 //
 //=============================================================
-func (o *object) hit(x_, y_, vx, vy float64, power int) {
-	// TBD: Remove explode and hit instead.
-	o.explode()
+func (o *object) hit(x_, y_, vx, vy float64, pow int) {
+	power := float64(pow)
+	// If distance is close, explode, otherwise push away.
+	dist := distance(pixel.Vec{x_ + power/2, y_ + power/2}, pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2})
+	if dist < float64(power) {
+		o.explode()
+	} else {
+		if vx == 0 && vy == 0 {
+			if x_ < o.bounds.X {
+				o.dir = 1
+				vx = power
+			} else {
+				vx = -power
+				o.dir = -1
+			}
+		}
+		o.throwable = true
+		o.speed = dist * 2
+		o.phys.keyMove.X = o.dir
+		o.phys.velo.Y += math.Abs(power * 5 / dist)
+	}
+
 	if o.light != nil {
 		o.light.destroy()
 	}
@@ -137,7 +156,7 @@ func (o *object) draw(dt, elapsed float64) {
 				switch item := v.entity.(type) {
 				case *mob:
 					if item != o.prevOwner {
-						item.hit(item.bounds.X, item.bounds.Y, o.velo.X, o.velo.Y, 20)
+						item.hit(item.bounds.X, item.bounds.Y, o.velo.X, o.velo.Y, int(math.Abs(o.velo.X*o.velo.Y*2)))
 					}
 				}
 			}

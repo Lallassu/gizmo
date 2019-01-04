@@ -15,8 +15,8 @@ type Map struct {
 
 func (m *Map) newMap(level int) {
 	pcgGen := &pcg{}
-	weapons := 10 + global.gRand.rand()
-	enemies := 1 + global.gRand.rand()/2
+	weapons := 20 + global.gRand.rand()
+	enemies := 0 //+ global.gRand.rand()/2
 	items := 10 + global.gRand.rand()/2
 	lamps := 4 + global.gRand.rand()/2
 	regularMines := 20
@@ -67,22 +67,41 @@ func (m *Map) newMap(level int) {
 
 	for enemies != 0 {
 		if p, fit := global.gWorld.fitInWorld(50); fit {
+			// if global.gRand.rand() < 0 {
+			// 	test := mob{
+			// 		graphics: graphics{
+			// 			sheetFile:   fmt.Sprintf("%v%v", wAssetMobsPath, "enemy1.png"),
+			// 			animated:    true,
+			// 			walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
+			// 			idleFrames:  []int{0, 2, 3, 4, 5, 6},
+			// 			shootFrames: []int{26},
+			// 			jumpFrames:  []int{15, 16, 17, 18, 19, 20},
+			// 			climbFrames: []int{1, 7},
+			// 			frameWidth:  12.0,
+			// 		},
+			// 		life: 100.0,
+			// 		phys: phys{speed: 100},
+			// 		ai:   &AI{},
+			// 	}
+			// 	test.create(p.X, p.Y)
+			//} else {
 			test := mob{
 				graphics: graphics{
-					sheetFile:   fmt.Sprintf("%v%v", wAssetMobsPath, "enemy1.png"),
+					sheetFile:   fmt.Sprintf("%v%v", wAssetMobsPath, "enemy2.png"),
 					animated:    true,
-					walkFrames:  []int{8, 9, 10, 11, 12, 13, 14},
-					idleFrames:  []int{0, 2, 3, 4, 5, 6},
-					shootFrames: []int{26},
-					jumpFrames:  []int{15, 16, 17, 18, 19, 20},
-					climbFrames: []int{1, 7},
-					frameWidth:  12.0,
+					walkFrames:  []int{7, 8},
+					idleFrames:  []int{0, 1, 2, 3, 4, 5, 6},
+					shootFrames: []int{0},
+					jumpFrames:  []int{8},
+					climbFrames: []int{7, 8},
+					frameWidth:  47.0,
 				},
 				life: 100.0,
 				phys: phys{speed: 100},
 				ai:   &AI{},
 			}
 			test.create(p.X, p.Y)
+			//}
 			enemies--
 		}
 	}
@@ -109,7 +128,11 @@ func (m *Map) newMap(level int) {
 	for regularMines != 0 {
 		if p, fit := global.gWorld.fitInWorld(10); fit {
 			w := &explosive{}
-			w.newExplosive(p.X, p.Y, explosiveClusterMine)
+			if global.gRand.rand() > 9 {
+				w.newExplosive(p.X, p.Y, explosiveClusterMine)
+			} else {
+				w.newExplosive(p.X, p.Y, explosiveRegularMine)
+			}
 			regularMines--
 		}
 	}
