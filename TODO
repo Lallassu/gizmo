@@ -1,12 +1,11 @@
 General
 --------
-- Right left wall functions in phys is 
-  strangly named (opposite?)
+- Lights should origin from light and not one point for lamps
 
-- Add other algorithm for generation of maps
-
+- Different algorithms for generating maps?
 - Map from image in gimp?
-    -> skip generated?
+    -> just red marks
+    -> Placement of items
 
 - Place doors better.
 
@@ -79,3 +78,6 @@ General
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
 
 - Pixel density (as in urho3d?)
+
+- Right left wall functions in phys is 
+  strangly named (opposite?)

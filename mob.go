@@ -80,6 +80,21 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 			m.explode()
 			return
 		}
+	} else {
+		if vx == 0 && vy == 0 {
+			if x_ < m.bounds.X {
+				m.dir = 1
+				vx = pow
+			} else {
+				vx = -pow
+				m.dir = -1
+			}
+		}
+		// Temprorary throwable (in order for shockwave effect)
+		// Resets in move function
+		m.phys.throwable = true
+		m.phys.velo.Y += math.Abs(pow * 5 / dist)
+		m.phys.velo.X += m.dir * pow * 5 / dist
 	}
 }
 
@@ -206,6 +221,7 @@ func (m *mob) move(x, y float64) {
 	m.phys.keyMove.Y = y
 
 	if x != 0 {
+		m.phys.throwable = false
 		if x > 0 {
 			m.dir = 1
 		} else {

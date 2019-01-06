@@ -179,8 +179,8 @@ func (l *light) shine() {
 
 	// Raytrace around position (Using a bit of non-granular approach to speed up things)
 	for curAngle := l.angle - (l.angleSpread / 2); curAngle < l.angle+(l.angleSpread/2); curAngle += addTo * (180 / math.Pi) * 7 {
-		end := pixel.Vec{l.bounds.X, l.bounds.Y}
 		rads := curAngle * (math.Pi / 180)
+		end := pixel.Vec{l.bounds.X, l.bounds.Y}
 
 		// Find next foreground.
 		for !global.gWorld.IsRegular(end.X, end.Y) && math.Abs((end.X-l.bounds.X)) < float64(l.radius) && math.Abs(end.Y-l.bounds.Y) < float64(l.radius) {

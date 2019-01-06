@@ -12,10 +12,8 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	_ "image"
 	"math"
 	"math/rand"
-	_ "os"
 )
 
 //=============================================================

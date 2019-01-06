@@ -15,11 +15,11 @@ type Map struct {
 
 func (m *Map) newMap(level int) {
 	pcgGen := &pcg{}
-	weapons := 20 + global.gRand.rand()
-	enemies := 0 //+ global.gRand.rand()/2
-	items := 10 + global.gRand.rand()/2
-	lamps := 4 + global.gRand.rand()/2
-	regularMines := 20
+	weapons := 10 + global.gRand.rand()
+	enemies := 5 + global.gRand.rand()/2
+	items := 5 + global.gRand.rand()/2
+	lamps := 5 + global.gRand.rand()/2
+	regularMines := 30
 
 	switch level {
 	case 1:
