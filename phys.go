@@ -134,6 +134,22 @@ func (p *phys) hitWallLeft(x, y float64) bool {
 			return true
 		}
 	}
+	// Also check if hit object.
+	// Only CD for other than mobs.
+	switch p.bounds.entity.(type) {
+	case *mob:
+		break
+	default:
+		for _, b := range p.objectBounds {
+			if (p.bounds.X+p.bounds.Width/2) >= b.X && (p.bounds.X+p.bounds.Width/2) <= b.X+b.Width {
+				if (p.bounds.Y+p.bounds.Height/2) >= b.Y && (p.bounds.Y+p.bounds.Height/2) <= b.Y+b.Height {
+					p.hitRightWall = true
+					return true
+				}
+			}
+		}
+	}
+
 	p.hitRightWall = false
 	return false
 }
@@ -148,6 +164,23 @@ func (p *phys) hitWallRight(x, y float64) bool {
 			return true
 		}
 	}
+
+	// Also check if hit object.
+	// Only CD for other than mobs.
+	switch p.bounds.entity.(type) {
+	case *mob:
+		break
+	default:
+		for _, b := range p.objectBounds {
+			if (p.bounds.X+p.bounds.Width/2) >= b.X && (p.bounds.X+p.bounds.Width/2) <= b.X+b.Width {
+				if (p.bounds.Y+p.bounds.Height/2) >= b.Y && (p.bounds.Y+p.bounds.Height/2) <= b.Y+b.Height {
+					p.hitLeftWall = true
+					return true
+				}
+			}
+		}
+	}
+
 	p.hitLeftWall = false
 	return false
 }

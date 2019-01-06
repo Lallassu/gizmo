@@ -1,12 +1,9 @@
 General
 --------
-- Move reload time to weapons from object
+- Right left wall functions in phys is 
+  strangly named (opposite?)
 
-- Jump on items
-- Objects should collide 
-    -> Land on each other etc.
-
-
+- Add other algorithm for generation of maps
 
 - Map from image in gimp?
     -> skip generated?
@@ -18,8 +15,6 @@ General
 - UI
     -> Deaths/lives
     -> Icons?
-
-- Landa på item -> inte dö, item explode (ifall högt fall).
 
 - Reload map (if totaly fubar)
 

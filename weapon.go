@@ -15,11 +15,12 @@ import (
 //=============================================================
 type weapon struct {
 	object
-	shot    ammo
-	wType   weaponType
-	bullets int
-	spread  float64
-	reload  float64
+	shot       ammo
+	wType      weaponType
+	bullets    int
+	spread     float64
+	reload     float64
+	reloadTime float64
 }
 
 //=============================================================
@@ -71,6 +72,14 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 
 	// Must change entity type in bounds for QT lookup
 	w.bounds.entity = Entity(w)
+}
+
+//=============================================================
+//
+//=============================================================
+func (w *weapon) draw(dt, elapsed float64) {
+	w.reloadTime += dt
+	w.object.draw(dt, elapsed)
 }
 
 //=============================================================

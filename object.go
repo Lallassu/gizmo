@@ -22,7 +22,6 @@ type object struct {
 	oType          itemType
 	owner          *mob
 	prevOwner      *mob
-	reloadTime     float64
 	animateIdle    bool
 }
 
@@ -136,9 +135,6 @@ func (o *object) removeOwner() {
 //
 //=============================================================
 func (o *object) draw(dt, elapsed float64) {
-	// This should be kept in weapon somehow...
-	// But currently weapon has no draw.
-	o.reloadTime += dt
 
 	if o.light != nil {
 		o.light.bounds.X = o.bounds.X + o.light_offset_x
@@ -170,7 +166,7 @@ func (o *object) draw(dt, elapsed float64) {
 		offset := 0.0
 		if !(o.falling || !o.animateIdle) {
 			// Animate up/down
-			offset = 5 + math.Sin(o.reloadTime)*3
+			offset = 5 + math.Sin(elapsed)*3
 		}
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 	} else {
