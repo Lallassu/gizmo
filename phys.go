@@ -11,26 +11,28 @@ import (
 )
 
 type phys struct {
-	bounds       *Bounds
-	hitRightWall bool
-	hitLeftWall  bool
-	keyMove      pixel.Vec
-	velo         pixel.Vec
-	force        pixel.Vec
-	speed        float64
-	dir          float64
-	climbing     bool
-	jumping      bool
-	jumpPower    float64
-	mass         float64
-	falling      bool
-	rotation     float64
-	restitution  float64
-	scale        float64
-	offset       float64
-	throwable    bool
-	moving       bool
-	duck         bool
+	bounds               *Bounds
+	hitRightWall         bool
+	hitLeftWall          bool
+	keyMove              pixel.Vec
+	velo                 pixel.Vec
+	force                pixel.Vec
+	speed                float64
+	dir                  float64
+	climbing             bool
+	jumping              bool
+	jumpPower            float64
+	mass                 float64
+	falling              bool
+	rotation             float64
+	restitution          float64
+	scale                float64
+	offset               float64
+	throwable            bool
+	moving               bool
+	duck                 bool
+	objectBounds         []*Bounds
+	updateObjectBoundsDt float64
 }
 
 //=============================================================
@@ -66,6 +68,29 @@ func (p *phys) createPhys(x, y, width, height float64) {
 }
 
 //=============================================================
+// Fetch object bounds
+//=============================================================
+func (p *phys) updateObjectBounds() {
+	// TBD: this might cause a lot of GC?
+	p.objectBounds = make([]*Bounds, 0)
+	for _, b := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: p.bounds.X - float64(p.bounds.Width/2), Y: p.bounds.Y - float64(p.bounds.Height/2), Width: float64(p.bounds.Width), Height: float64(p.bounds.Height)}) {
+		switch b.entity.(type) {
+		case *chunk:
+			continue
+		case *light:
+			continue
+		case *weapon:
+			continue
+			//case *mob:
+			//	continue
+		}
+		if b != p.bounds {
+			p.objectBounds = append(p.objectBounds, b)
+		}
+	}
+}
+
+//=============================================================
 //
 //=============================================================
 func (p *phys) hitCeiling(x, y float64) bool {
@@ -86,6 +111,16 @@ func (p *phys) hitFloor(x, y float64) bool {
 			return true
 		}
 	}
+
+	// Also check if hit object.
+	for _, b := range p.objectBounds {
+		if (p.bounds.X+p.bounds.Width/2) >= b.X && (p.bounds.X+p.bounds.Width/2) <= b.X+b.Width {
+			if p.bounds.Y <= b.Y+b.Height+1 && p.bounds.Y > b.Y+b.Height-1 {
+				return true
+			}
+		}
+	}
+
 	return false
 }
 
@@ -134,6 +169,12 @@ func (p *phys) IsOnLadder() bool {
 //=============================================================
 //=============================================================
 func (p *phys) physics(dt float64) {
+	p.updateObjectBoundsDt += dt
+	if p.updateObjectBoundsDt > 1/2 {
+		p.updateObjectBounds()
+		p.updateObjectBoundsDt = 0
+	}
+
 	if p.keyMove.X != 0 {
 		p.velo.X = dt * p.speed * p.dir
 	} else {

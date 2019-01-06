@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/faiface/pixel"
 )
 
 //=============================================================
