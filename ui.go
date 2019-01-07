@@ -35,7 +35,6 @@ type UI struct {
 func (u *UI) create() {
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
 	u.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	u.miniMapScale = 0.08
 
 	ttf, err := truetype.Parse(goregular.TTF)
 	if err != nil {
@@ -74,6 +73,7 @@ func (u *UI) create() {
 // Mini map
 //=============================================================
 func (u *UI) updateMiniMap() {
+	u.miniMapScale = 0.08 / (float64(global.gWorld.width) / 1024)
 	pos := global.gPlayer.getPosition()
 	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
 	canvas.Clear(pixel.RGBA{1.0, 0, 0, 0.5})

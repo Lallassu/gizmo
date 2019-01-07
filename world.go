@@ -12,6 +12,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
+	"image"
 	"math"
 	"math/rand"
 )
@@ -55,7 +56,7 @@ func (w *world) Init() {
 //=============================================================
 // New Map
 //=============================================================
-func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapType) {
+func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapType) image.Image {
 	w.qt.Clear()
 
 	w.width = width
@@ -66,13 +67,25 @@ func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapTyp
 
 	w.pixels = make([]uint32, w.size)
 
-	g := generator{}
-	pixels := g.NewWorld(w.width, w.height, num_steps, step_length)
+	// g := generator{}
+	// pixels := g.NewWorld(w.width, w.height, num_steps, step_length)
+	img, ww, hh, _ := loadTexture("assets/maps/map1.png")
+	added := 0
+	for x := 0.0; x <= ww; x++ {
+		for y := 0.0; y <= hh; y++ {
+			r, g, b, _ := img.At(int(x), int(hh-y)).RGBA()
+			if r == 0xFFFF && g == 0 && b == 0 {
+				added++
+				w.AddPixel(int(x), int(y-1), uint32(0xFF0000FF))
+			}
+		}
+	}
+	Debug("LOADED MAP DONE", added)
 
 	// Add all pixels as red before coloring
-	for i := 0; i < len(pixels); i += 2 {
-		w.AddPixel(int(pixels[i]), int(pixels[i+1]), uint32(0xFF0000FF))
-	}
+	//for i := 0; i < len(pixels); i += 2 {
+	//	w.AddPixel(int(pixels[i]), int(pixels[i+1]), uint32(0xFF0000FF))
+	//}
 
 	// Paint the map with colors
 	w.paintMap()
@@ -100,7 +113,7 @@ func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapTyp
 
 	// One sprite for whole bg
 	c := &chunk{cType: bgChunk}
-	c.create(float64(0), float64(0), 1024)
+	c.create(float64(0), float64(0), width)
 	c.build()
 	w.bgSprite = c.sprite
 	//w.qt.Insert(c.bounds)
@@ -112,6 +125,8 @@ func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapTyp
 
 	Debug("Tree Size:", w.qt.Total)
 	Debug("World generation complete.")
+
+	return img
 }
 
 func (w *world) fitInWorld(size int) (pixel.Vec, bool) {

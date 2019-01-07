@@ -11,6 +11,14 @@ type mapColor struct {
 	foreground     uint32
 	ladders        uint32
 	borders        uint32
+	entityCodes    map[string]entityColor
+}
+
+type entityColor struct {
+	r int
+	g int
+	b int
+	a int
 }
 
 func GenerateMapColor(maptype mapType) *mapColor {
@@ -25,6 +33,12 @@ func GenerateMapColor(maptype mapType) *mapColor {
 		ladders:        0x8b4513FF,
 		borders:        0xFF0000FF,
 	}
+
+	m.entityCodes = make(map[string]entityColor)
+	m.entityCodes["player"] = entityColor{0, 0xFFFF, 0, 0}
+	m.entityCodes["crate"] = entityColor{0xFFFF, 0xFFFF, 0xFFFF, 0}
+	m.entityCodes["weapon_ak47"] = entityColor{0xFFFF, 0xFFFF, 0xFFFF, 0}
+
 	return m
 }
 

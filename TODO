@@ -1,6 +1,20 @@
 General
 --------
+- load map with size from image.
+
+- Factory for weapon/items/mobs/explosives.
+    -> Each type has a color connected to it.
+    -> Factory checks color and creates based on type.
+
+- HP-bars above heads of enemies.
+- Ammo-bars above weapons
+    -> Max ammo per weapon.
 - Lights should origin from light and not one point for lamps
+
+- Update minimap/ui not that frequent.
+
+- Doors should be connected pairs.
+    -> Not random location when entering.
 
 - Different algorithms for generating maps?
 - Map from image in gimp?
@@ -60,6 +74,7 @@ General
 
 - Own animations + sprites
 
+- Keys to unlock doors.
 
 - Elevators
     -> Object
