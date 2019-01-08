@@ -1,10 +1,8 @@
 General
 --------
-- load map with size from image.
+- Move painMap to map from world.
 
-- Factory for weapon/items/mobs/explosives.
-    -> Each type has a color connected to it.
-    -> Factory checks color and creates based on type.
+- Throwable objects (they just drops now)
 
 - HP-bars above heads of enemies.
 - Ammo-bars above weapons
@@ -16,20 +14,13 @@ General
 - Doors should be connected pairs.
     -> Not random location when entering.
 
-- Different algorithms for generating maps?
-- Map from image in gimp?
-    -> just red marks
-    -> Placement of items
-
 - Place doors better.
-
-- Random weapons/enemies of different types based on map type
+    - Colored. Same color => same teleport.
+    - Teleports instead of doors.
 
 - UI
     -> Deaths/lives
     -> Icons?
-
-- Reload map (if totaly fubar)
 
 - Items class
     - crates
@@ -40,13 +31,6 @@ General
     -> May be attachable
     -> Events
     -> Explode -> Drop item
-
-
-- Map generation
-    - More objects
-    - effects such as smoke
-        -> map.go with Draw() function
-    - Configurable map generation vars
 
 
 - Performance issues?

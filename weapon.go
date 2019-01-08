@@ -16,7 +16,7 @@ import (
 type weapon struct {
 	object
 	shot       ammo
-	wType      weaponType
+	wType      objectType
 	bullets    int
 	spread     float64
 	reload     float64
@@ -26,11 +26,11 @@ type weapon struct {
 //=============================================================
 //
 //=============================================================
-func (w *weapon) newWeapon(x, y float64, wType weaponType) {
+func (w *weapon) newWeapon(x, y float64, wType objectType) {
 	w.reloadTime = 0
 	w.wType = wType
 	switch wType {
-	case ak47:
+	case weaponAk47:
 		w.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "ak47_weapon.png")
 		w.name = "ak47"
 		w.animated = false
@@ -47,7 +47,7 @@ func (w *weapon) newWeapon(x, y float64, wType weaponType) {
 		w.spread = 0.5
 		w.bullets = 1
 		w.reload = 0.05
-	case shotgun:
+	case weaponShotgun:
 		w.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "shotgun_weapon.png")
 		w.animated = false
 		w.rotation = 0.1

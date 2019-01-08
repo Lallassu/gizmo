@@ -59,6 +59,7 @@ const (
 	wDeathScreenText     = "You Died"
 	wAssetObjectsPath    = "assets/objects/"
 	wAssetMobsPath       = "assets/mobs/"
+	wAssetMapsPath       = "assets/maps/"
 )
 
 //=============================================================
@@ -82,6 +83,7 @@ type Global struct {
 	gSounds         *sound
 	gUI             *UI
 	gMap            *Map
+	gMapColor       *mapColor
 	//utime           float32
 }
 
@@ -102,6 +104,7 @@ var global = &Global{
 	gSounds:         &sound{},
 	gUI:             &UI{},
 	gMap:            &Map{},
+	gMapColor:       &mapColor{},
 	gPlayer: &mob{
 		graphics: graphics{
 			animated:    true,

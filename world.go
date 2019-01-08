@@ -24,7 +24,6 @@ type world struct {
 	width      int
 	height     int
 	size       int
-	coloring   *mapColor
 	qt         *Quadtree
 	pixels     []uint32
 	currentMap mapType
@@ -56,31 +55,39 @@ func (w *world) Init() {
 //=============================================================
 // New Map
 //=============================================================
-func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapType) image.Image {
+func (w *world) NewMap(mapFile string) image.Image {
 	w.qt.Clear()
-
-	w.width = width
-	w.height = height
-
-	w.coloring = GenerateMapColor(maptype)
-	w.size = w.width * w.height
-
-	w.pixels = make([]uint32, w.size)
 
 	// g := generator{}
 	// pixels := g.NewWorld(w.width, w.height, num_steps, step_length)
-	img, ww, hh, _ := loadTexture("assets/maps/map1.png")
-	added := 0
-	for x := 0.0; x <= ww; x++ {
-		for y := 0.0; y <= hh; y++ {
-			r, g, b, _ := img.At(int(x), int(hh-y)).RGBA()
+	var img image.Image
+	var width float64
+	var height float64
+	img, width, height, _ = loadTexture(mapFile)
+	w.width = int(width)
+	w.height = int(height)
+	w.size = w.width * w.height
+	w.pixels = make([]uint32, int(w.size))
+
+	for x := 0; x <= w.width; x++ {
+		for y := 0; y <= w.height; y++ {
+			r, g, b, _ := img.At(x, w.height-y).RGBA()
+			add := false
 			if r == 0xFFFF && g == 0 && b == 0 {
-				added++
-				w.AddPixel(int(x), int(y-1), uint32(0xFF0000FF))
+				add = true
+			} else {
+				for _, c := range global.gMapColor.entityCodes {
+					if c.r == r && c.g == g && c.b == b {
+						add = true
+						break
+					}
+				}
+			}
+			if add {
+				w.AddPixel(x, y, uint32(0xFF0000FF))
 			}
 		}
 	}
-	Debug("LOADED MAP DONE", added)
 
 	// Add all pixels as red before coloring
 	//for i := 0; i < len(pixels); i += 2 {
@@ -113,7 +120,7 @@ func (w *world) NewMap(width, height, num_steps, step_length int, maptype mapTyp
 
 	// One sprite for whole bg
 	c := &chunk{cType: bgChunk}
-	c.create(float64(0), float64(0), width)
+	c.create(float64(0), float64(0), w.width)
 	c.build()
 	w.bgSprite = c.sprite
 	//w.qt.Insert(c.bounds)
@@ -339,7 +346,7 @@ func (w *world) RemovePixel(x, y int) {
 
 		// Set bg pixel.
 		if w.pixels[pos] != 0 {
-			v := w.coloring.getBackgroundSoft()
+			v := global.gMapColor.backgroundSoft
 			v &= wBackgroundNew32
 			w.pixels[pos] = v
 		}
@@ -490,19 +497,19 @@ func (w *world) paintMap() {
 			g := p >> 16 & 0xFF
 			b := p >> 8 & 0xFF
 			if r == 0xFF && g == 0x00 && b == 0x00 {
-				v := w.coloring.getBackgroundSoft()
+				v := global.gMapColor.backgroundSoft
 				// add some alpha to background
 				v &= wBackground32
 				w.pixels[x*w.width+y] = v
 			} else if r == 0x00 && g == 0x00 && b == 0x00 {
-				v := w.coloring.getBackground()
+				v := global.gMapColor.background
 				w.pixels[x*w.width+y] = v
 			}
 		}
 	}
 
 	// Ladders
-	color := w.coloring.getLadder()
+	color := global.gMapColor.ladders
 	for x := 0; x < w.width; x++ {
 		for y := 0; y < w.height; y++ {
 			if y+1 < w.height && x+60 < w.width && x > 0 && y > 0 {

@@ -19,7 +19,7 @@ type object struct {
 	light_offset_x float64
 	light_offset_y float64
 	name           string
-	oType          itemType
+	oType          objectType
 	owner          *mob
 	prevOwner      *mob
 	animateIdle    bool

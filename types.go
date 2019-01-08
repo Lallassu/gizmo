@@ -10,28 +10,6 @@ const (
 	mapWtf
 )
 
-type explosiveType int
-
-const (
-	explosiveRegularMine explosiveType = iota
-	explosiveClusterMine
-)
-
-type weaponType int
-
-const (
-	ak47 weaponType = iota
-	p90
-	shotgun
-)
-
-type objectType int
-
-const (
-	objectWeapon objectType = iota
-	objectCrate
-)
-
 type particleType int
 
 const (
@@ -58,12 +36,15 @@ const (
 	animIdle
 )
 
-type itemType int
+type objectType int
 
 const (
-	itemPlant itemType = iota
-	itemBucket
-	itemVase
-	itemCrate
-	itemBarrel
+	itemCrate objectType = iota
+	mobPlayer
+	mobEnemy1
+	explosiveRegularMine
+	explosiveClusterMine
+	weaponAk47
+	weaponP90
+	weaponShotgun
 )

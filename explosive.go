@@ -15,14 +15,14 @@ import (
 //=============================================================
 type explosive struct {
 	object
-	eType     explosiveType
+	eType     objectType
 	power     int
 	countDown bool
 	delayTime float64
 	light     *light
 }
 
-func (e *explosive) newExplosive(x, y float64, eType explosiveType) {
+func (e *explosive) newExplosive(x, y float64, eType objectType) {
 	e.eType = eType
 	switch eType {
 	case explosiveRegularMine:

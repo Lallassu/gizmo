@@ -11,57 +11,35 @@ type mapColor struct {
 	foreground     uint32
 	ladders        uint32
 	borders        uint32
-	entityCodes    map[string]entityColor
+	entityCodes    map[objectType]entityColor
 }
 
 type entityColor struct {
-	r int
-	g int
-	b int
-	a int
+	r uint32
+	g uint32
+	b uint32
+	a uint32
 }
 
-func GenerateMapColor(maptype mapType) *mapColor {
+func (m *mapColor) generateColors(maptype mapType) {
 	// Randomize within palettes different
 	// types of coloring schemes depending
 	// on map type.
-	m := &mapColor{
-		//background:     0x242c27FF,
-		background:     0x000000FF,
-		backgroundSoft: 0x3e585cFF,
-		foreground:     0x3d6253FF,
-		ladders:        0x8b4513FF,
-		borders:        0xFF0000FF,
-	}
-
-	m.entityCodes = make(map[string]entityColor)
-	m.entityCodes["player"] = entityColor{0, 0xFFFF, 0, 0}
-	m.entityCodes["crate"] = entityColor{0xFFFF, 0xFFFF, 0xFFFF, 0}
-	m.entityCodes["weapon_ak47"] = entityColor{0xFFFF, 0xFFFF, 0xFFFF, 0}
-
-	return m
 }
 
-func (m *mapColor) getFlower() uint32 {
-	return m.background
-}
+func (m *mapColor) create() {
+	// default colors
+	m.background = 0x000000FF
+	m.backgroundSoft = 0x3e585cFF
+	m.foreground = 0x3d6253FF
+	m.ladders = 0x8b4513FF
+	m.borders = 0xFF0000FF
 
-func (m *mapColor) getBackgroundSoft() uint32 {
-	return m.backgroundSoft
-}
-
-func (m *mapColor) getBackground() uint32 {
-	return m.background
-}
-
-func (m *mapColor) getForeground() uint32 {
-	return m.foreground
-}
-
-func (m *mapColor) getLadder() uint32 {
-	return m.ladders
-}
-
-func (m *mapColor) getBorder() uint32 {
-	return m.borders
+	// Color codes for items in the map (image)
+	// Must correspond with the image colors.
+	m.entityCodes = make(map[objectType]entityColor)
+	m.entityCodes[mobPlayer] = entityColor{0, 0xFFFF, 0, 0}
+	m.entityCodes[itemCrate] = entityColor{0xFFFF, 0xFFFF, 0xFFFF, 0}
+	m.entityCodes[weaponAk47] = entityColor{0xFFFF, 0xFFFF, 0, 0}
+	m.entityCodes[mobEnemy1] = entityColor{0, 0, 0xFFFF, 0}
 }
