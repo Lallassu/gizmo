@@ -47,4 +47,5 @@ const (
 	weaponAk47
 	weaponP90
 	weaponShotgun
+	lampRegular
 )

@@ -1,15 +1,13 @@
 General
 --------
-- Move painMap to map from world.
-
-- Throwable objects (they just drops now)
+- Update AI with less FPS when not inside QT bounds bounds.
+    -> To make enemies keep moving.
 
 - HP-bars above heads of enemies.
+    - Sprite with fixed image and resize based on HP?
+
 - Ammo-bars above weapons
     -> Max ammo per weapon.
-- Lights should origin from light and not one point for lamps
-
-- Update minimap/ui not that frequent.
 
 - Doors should be connected pairs.
     -> Not random location when entering.
@@ -17,6 +15,13 @@ General
 - Place doors better.
     - Colored. Same color => same teleport.
     - Teleports instead of doors.
+
+- Throwable objects (they just drops now)
+
+- Lights should origin from light and not one point for lamps
+
+- Update minimap/ui not that frequent.
+
 
 - UI
     -> Deaths/lives

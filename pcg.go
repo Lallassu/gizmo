@@ -24,7 +24,7 @@ func (p *pcg) Flower(x, y int) {
 	//color := global.gWorld.coloring.getFlower()
 	stem := rand.Intn(10)
 	for i := 0; i < stem; i++ {
-		global.gWorld.AddPixel(x, y+i, 0xFF00FFFF)
+		global.gWorld.SetPixel(x, y+i, 0xFF00FFFF)
 		global.gWorld.addShadow(x+1, y+i-1)
 	}
 }
@@ -61,13 +61,13 @@ func (p *pcg) MetalCornerDown(x, y int, left bool) {
 				b = 0x26
 			}
 			if left {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x+i,
 					y+j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 				)
 			} else {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x-i,
 					y+j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -109,13 +109,13 @@ func (p *pcg) MetalCornerUp(x, y int, left bool) {
 				b = 0x26
 			}
 			if left {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x-i,
 					y-j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 				)
 			} else {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x+i,
 					y-j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -149,13 +149,13 @@ func (p *pcg) MetalCornerRight(x, y int, left bool) {
 				b = 0x42
 			}
 			if left {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x+i,
 					y+j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 				)
 			} else {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x-i,
 					y+j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -189,13 +189,13 @@ func (p *pcg) MetalCornerLeft(x, y int, left bool) {
 				b = 0x42
 			}
 			if left {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x+i,
 					y-j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 				)
 			} else {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x-i,
 					y-j,
 					uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -238,7 +238,7 @@ func (p *pcg) MetalWall(x, y int, leftSide bool) {
 		} else {
 			x_ = x - i
 		}
-		global.gWorld.AddPixel(
+		global.gWorld.SetPixel(
 			x_,
 			y,
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -277,13 +277,13 @@ func (p *pcg) MetalFlat(x, y int, floor bool) {
 			b = 0x26
 		}
 		if !floor {
-			global.gWorld.AddPixel(
+			global.gWorld.SetPixel(
 				x,
 				y+i,
 				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 			)
 		} else {
-			global.gWorld.AddPixel(
+			global.gWorld.SetPixel(
 				x,
 				y-i,
 				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -325,7 +325,7 @@ func (p *pcg) MetalFloor(x, y int) {
 			b = 0x23
 		}
 
-		global.gWorld.AddPixel(
+		global.gWorld.SetPixel(
 			x,
 			y-i,
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
@@ -449,7 +449,7 @@ func (p *pcg) GenerateDoor(x, y int) bool {
 				g = 0x23
 				b = 0x23
 			}
-			global.gWorld.AddPixel(
+			global.gWorld.SetPixel(
 				x+i,
 				y+j,
 				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
@@ -485,7 +485,7 @@ func (p *pcg) GenerateLamp(x, y int) {
 				lg = 0xd6 - rand.Intn(20)
 				lb = 0x2f
 			}
-			global.gWorld.AddPixel(
+			global.gWorld.SetPixel(
 				x+i,
 				y-j,
 				uint32(lr&0xFF<<24|lg&0xFF<<16|lb&0xFF<<8|0xFF),
@@ -502,7 +502,7 @@ func (p *pcg) GenerateLamp(x, y int) {
 	// 		a := c & 0xFF
 
 	// 		//	if global.gWorld.IsShadow(float64(x+i), float64(y-j)) || global.gWorld.IsBackground(float64(x+i), float64(y-j)) {
-	// 		global.gWorld.AddPixel(
+	// 		global.gWorld.SetPixel(
 	// 			x+i,
 	// 			y-j,
 	// 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
@@ -526,18 +526,18 @@ func (p *pcg) GenerateLine(x, y int) {
 	lineSize := 10
 
 	for i := 0; i < lineSize; i++ {
-		global.gWorld.AddPixel(
+		global.gWorld.SetPixel(
 			x,
 			y-i,
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
 		)
 	}
-	global.gWorld.AddPixel(
+	global.gWorld.SetPixel(
 		x,
 		y,
 		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
 	)
-	global.gWorld.AddPixel(
+	global.gWorld.SetPixel(
 		x,
 		y-lineSize,
 		uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
@@ -575,7 +575,7 @@ func (p *pcg) GenerateBottomAirIntake(x, y int) {
 				b = 0x0 + i
 			}
 
-			global.gWorld.AddPixel(
+			global.gWorld.SetPixel(
 				x+i,
 				y+j,
 				uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
@@ -598,13 +598,13 @@ func (p *pcg) GenerateBottomLine(x, y int) {
 	lineSize := 3
 
 	for i := 0; i < lineSize; i++ {
-		global.gWorld.AddPixel(
+		global.gWorld.SetPixel(
 			x,
 			y-i,
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|a),
 		)
 	}
-	// global.gWorld.AddPixel(
+	// global.gWorld.SetPixel(
 	// 	x,
 	// 	y,
 	// 	uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
@@ -641,7 +641,7 @@ func (p *pcg) GenerateBricks(x, y int) {
 				b /= 2
 			}
 			if global.gWorld.IsBackground(float64(x+i), float64(y+j)) {
-				global.gWorld.AddPixel(
+				global.gWorld.SetPixel(
 					x+j,
 					y+i,
 					uint32(r/2&0xFF<<24|g/2&0xFF<<16|b/2&0xFF<<8|a),
@@ -666,7 +666,7 @@ func (p *pcg) GrassFloor(x, y int) {
 		} else if i == p.floorHeight-2 {
 			g_ -= 50
 		}
-		global.gWorld.AddPixel(
+		global.gWorld.SetPixel(
 			x,
 			y-i,
 			uint32(r&0xFF<<24|g_&0xFF<<16|b&0xFF<<8|a&0xFF),

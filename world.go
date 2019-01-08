@@ -12,7 +12,6 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"image"
 	"math"
 	"math/rand"
 )
@@ -55,47 +54,13 @@ func (w *world) Init() {
 //=============================================================
 // New Map
 //=============================================================
-func (w *world) NewMap(mapFile string) image.Image {
+func (w *world) NewMap(width, height, size float64) {
 	w.qt.Clear()
 
-	// g := generator{}
-	// pixels := g.NewWorld(w.width, w.height, num_steps, step_length)
-	var img image.Image
-	var width float64
-	var height float64
-	img, width, height, _ = loadTexture(mapFile)
 	w.width = int(width)
 	w.height = int(height)
-	w.size = w.width * w.height
-	w.pixels = make([]uint32, int(w.size))
-
-	for x := 0; x <= w.width; x++ {
-		for y := 0; y <= w.height; y++ {
-			r, g, b, _ := img.At(x, w.height-y).RGBA()
-			add := false
-			if r == 0xFFFF && g == 0 && b == 0 {
-				add = true
-			} else {
-				for _, c := range global.gMapColor.entityCodes {
-					if c.r == r && c.g == g && c.b == b {
-						add = true
-						break
-					}
-				}
-			}
-			if add {
-				w.AddPixel(x, y, uint32(0xFF0000FF))
-			}
-		}
-	}
-
-	// Add all pixels as red before coloring
-	//for i := 0; i < len(pixels); i += 2 {
-	//	w.AddPixel(int(pixels[i]), int(pixels[i+1]), uint32(0xFF0000FF))
-	//}
-
-	// Paint the map with colors
-	w.paintMap()
+	w.size = int(size)
+	w.pixels = make([]uint32, int(size))
 
 	// FG Chunks
 	for x := 0; x < w.width; x += wPixelsPerChunk {
@@ -105,35 +70,19 @@ func (w *world) NewMap(mapFile string) image.Image {
 			w.qt.Insert(c.bounds)
 		}
 	}
+}
 
-	// Place enemies
-
-	// BG Chunks
-	// for x := 0; x < w.width; x += wPixelsPerChunkBG {
-	// 	for y := 0; y < w.height; y += wPixelsPerChunkBG {
-	// 		c := &chunk{cType: bgChunk}
-	// 		c.create(float64(x), float64(y), wPixelsPerChunkBG)
-	// 		c.build()
-	// 		w.qt.Insert(c.bounds)
-	// 	}
-	// }
+func (w *world) buildAllChunks() {
+	// Build all chunks first time.
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
+		v.entity.draw(-1, 0)
+	}
 
 	// One sprite for whole bg
 	c := &chunk{cType: bgChunk}
 	c.create(float64(0), float64(0), w.width)
 	c.build()
 	w.bgSprite = c.sprite
-	//w.qt.Insert(c.bounds)
-
-	// Build all chunks first time.
-	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
-		v.entity.draw(-1, 0)
-	}
-
-	Debug("Tree Size:", w.qt.Total)
-	Debug("World generation complete.")
-
-	return img
 }
 
 func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
@@ -297,8 +246,18 @@ func (w *world) Draw(dt, elapsed float64) {
 func (w *world) AddPixel(x, y int, color uint32) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
-		w.pixels[w.width*x+y] = color
+		w.pixels[pos] = color
 		w.markChunkDirty(x, y)
+	}
+}
+
+//=============================================================
+// Set pixel without rebuilding chunk
+//=============================================================
+func (w *world) SetPixel(x, y int, color uint32) {
+	pos := w.width*x + y
+	if pos < w.width*w.height && pos >= 0 {
+		w.pixels[pos] = color
 	}
 }
 
@@ -481,273 +440,4 @@ func (w *world) markChunkDirty(x, y int) {
 			item.dirty = true
 		}
 	}
-}
-
-//=============================================================
-// paint generated map
-// everything has to be performed in a specific order.
-//=============================================================
-func (w *world) paintMap() {
-	pcgGen := &pcg{}
-
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			p := w.pixels[x*w.width+y]
-			r := p >> 24 & 0xFF
-			g := p >> 16 & 0xFF
-			b := p >> 8 & 0xFF
-			if r == 0xFF && g == 0x00 && b == 0x00 {
-				v := global.gMapColor.backgroundSoft
-				// add some alpha to background
-				v &= wBackground32
-				w.pixels[x*w.width+y] = v
-			} else if r == 0x00 && g == 0x00 && b == 0x00 {
-				v := global.gMapColor.background
-				w.pixels[x*w.width+y] = v
-			}
-		}
-	}
-
-	// Ladders
-	color := global.gMapColor.ladders
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			if y+1 < w.height && x+60 < w.width && x > 0 && y > 0 {
-				before := w.pixels[(x-1)*w.width+y] & 0xFF
-				point := w.pixels[x*w.width+y] & 0xFF
-				after := w.pixels[(x+1)*w.width+y] & 0xFF
-				above := w.pixels[x*w.width+y+1] & 0xFF
-				long := w.pixels[(x+60)*w.width+y] & 0xFF
-
-				if (above == wBackground8 || above == wShadow8) && point == 0xFF && before == 0xFF && (after == wBackground8 || after == wShadow8) && long == 0xFF {
-					for i := 5; i < 18; i++ {
-						if i == 5 || i == 17 {
-							for n := 0; n < 500000; n++ {
-								if y-n > 0 {
-									if (w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 || w.pixels[(x+i)*w.width+y-n]&0xFF == wShadow8) && w.pixels[(x+i)*w.width+y-n]&0xFF != wLadder8 {
-										w.pixels[(x+i)*w.width+y-n] = color & wLadder32
-										// Shadows
-										if w.pixels[(x+i+1)*w.width+y-n-1]&0xFF != 0xFF {
-											w.pixels[(x+i+1)*w.width+y-n-1] &= 0x555555FF & wLadder32
-										}
-									} else {
-										break
-									}
-								}
-							}
-
-						}
-						for n := 0; ; n += 5 {
-							if y-n > 0 {
-								if w.pixels[(x+i)*w.width+y-n]&0xFF == wBackground8 || w.pixels[(x+i)*w.width+y-n]&0xFF == wShadow8 {
-									w.pixels[(x+i)*w.width+y-n] = color & wLadder32
-									// Dont shadow above walls
-									if w.pixels[(x+i+1)*w.width+y-n-1]&0xFF != 0xFF {
-										w.pixels[(x+i+1)*w.width+y-n-1] &= 0x555555FF & wLadder32
-									}
-
-								} else {
-									break
-								}
-							} else {
-								break
-							}
-						}
-					}
-				}
-				// Make shadows
-				if y-5 > 0 && x+5 < w.width {
-					below := w.pixels[x*w.width+y-1]
-					right := w.pixels[(x+1)*w.width+y]
-					if (below&0xFF == wShadow8 || below&0xFF == wBackground8) && point&0xFF == 0xFF {
-						for i := 1; i < wShadowLength; i++ {
-							p := w.pixels[(x+i)*w.width+y-i]
-							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
-								r := uint32(math.Ceil(float64(p>>24&0xFF) / wShadowDepth))
-								g := uint32(math.Ceil(float64(p>>16&0xFF) / wShadowDepth))
-								b := uint32(math.Ceil(float64(p>>8&0xFF) / wShadowDepth))
-								w.pixels[(x+i)*w.width+y-i] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
-							}
-						}
-					}
-					if (right&0xFF == wShadow8 || right&0xFF == wBackground8) && point&0xFF == 0xFF {
-						for i := 0; i < wShadowLength; i++ {
-							p := w.pixels[(x+i)*w.width+y-i]
-							if p&0xFF != wShadow8 && p&0xFF != 0xFF {
-								r := uint32(math.Ceil(float64(p>>24&0xFF) / wShadowDepth))
-								g := uint32(math.Ceil(float64(p>>16&0xFF) / wShadowDepth))
-								b := uint32(math.Ceil(float64(p>>8&0xFF) / wShadowDepth))
-								w.pixels[(x+i)*w.width+y-i] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
-							}
-							p = w.pixels[(x+i)*w.width+y-i-1]
-							if p&0xFF != wShadow8 && p&0xFF != 0xFF && i < 4 {
-								r := uint32(math.Ceil(float64(p>>24&0xFF) / wShadowDepth))
-								g := uint32(math.Ceil(float64(p>>16&0xFF) / wShadowDepth))
-								b := uint32(math.Ceil(float64(p>>8&0xFF) / wShadowDepth))
-								w.pixels[(x+i)*w.width+y-i-1] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | wShadow8&0xFF
-							}
-						}
-					}
-				}
-			}
-
-		}
-	}
-
-	// Create objects/materials AFTER ladders otherwise we must take objects into account
-	// when generating ladders. Overhead with multiple loops, but easier.
-	// First walls
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				before := w.pixels[(x-1)*w.width+y] & 0xFF
-				point := w.pixels[x*w.width+y] & 0xFF
-				after := w.pixels[(x+1)*w.width+y] & 0xFF
-				above := w.pixels[x*w.width+y+1] & 0xFF
-				below := w.pixels[x*w.width+y-1] & 0xFF
-
-				// Roof
-				if point == 0xFF && (below == wBackground8 || below == wShadow8) {
-					pcgGen.MetalFlat(x, y, false)
-				}
-				// Walls
-				if point == 0xFF && (after == wBackground8 || after == wShadow8) {
-					pcgGen.MetalWall(x, y, false)
-				}
-				if point == 0xFF && (before == wBackground8 || before == wShadow8) {
-					pcgGen.MetalWall(x, y, true)
-				}
-				// Floor
-				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
-					pcgGen.MetalFlat(x, y, true)
-				}
-				// Colored floor
-				if point == 0xFF && (above == wBackground8 || above == wShadow8) {
-					pcgGen.MetalFloor(x, y)
-				}
-			}
-		}
-	}
-
-	// Corners
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			if y+1 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				before := w.pixels[(x-1)*w.width+y] & 0xFF
-				point := w.pixels[x*w.width+y] & 0xFF
-				after := w.pixels[(x+1)*w.width+y] & 0xFF
-				above := w.pixels[x*w.width+y+1] & 0xFF
-				below := w.pixels[x*w.width+y-1] & 0xFF
-				cornerRight := w.pixels[(x+1)*w.width+y-1] & 0xFF
-				cornerLeft := w.pixels[(x-1)*w.width+y+1] & 0xFF
-				cornerRight2 := w.pixels[(x+1)*w.width+y+1] & 0xFF
-				cornerLeft2 := w.pixels[(x-1)*w.width+y-1] & 0xFF
-
-				// corner to the left downwards
-				if point == 0xFF && (below == wBackground8 || below == wShadow8) && (before == wBackground8 || before == wShadow8) {
-					pcgGen.MetalCornerDown(x, y, true)
-				}
-				if point == 0xFF && (below == wBackground8 || below == wShadow8) && (after == wBackground8 || after == wShadow8) {
-					pcgGen.MetalCornerDown(x, y, false)
-				}
-				if point == 0xFF && (above == wBackground8 || above == wShadow8) && (after == wBackground8 || after == wShadow8) {
-					pcgGen.MetalCornerUp(x, y, true)
-				}
-				if point == 0xFF && (above == wBackground8 || above == wShadow8) && (before == wBackground8 || before == wShadow8) {
-					pcgGen.MetalCornerUp(x, y, false)
-				}
-				if point == 0xFF && after == 0xFF && (cornerRight == wShadow8 || cornerRight == wBackground8) && below == 0xFF && cornerLeft == 0xFF && above == 0xFF {
-					pcgGen.MetalCornerRight(x, y, false)
-				}
-				if point == 0xFF && before == 0xFF && (cornerLeft2 == wShadow8 || cornerLeft2 == wBackground8) && below == 0xFF && cornerRight2 == 0xFF && above == 0xFF {
-					pcgGen.MetalCornerRight(x, y, true)
-				}
-				if point == 0xFF && after == 0xFF && (cornerRight2 == wShadow8 || cornerRight2 == wBackground8) && above == 0xFF && cornerLeft2 == 0xFF && below == 0xFF {
-					pcgGen.MetalCornerLeft(x, y, false)
-				}
-				if point == 0xFF && before == 0xFF && after == 0xFF && (cornerLeft == wShadow8 || cornerLeft == wBackground8) && above == 0xFF && cornerRight == 0xFF && below == 0xFF {
-					pcgGen.MetalCornerLeft(x, y, true)
-				}
-			}
-		}
-	}
-	// Cracks in the wall?
-	// for x := 0; x < w.width; x++ {
-	// 	for y := 0; y < w.height; y++ {
-	// 		p := w.pixels[x*w.width+y] & 0xFF
-
-	// 		if p == wShadow8 || p == wBackground8 {
-	// 			if rand.Float64() < 0.0001 {
-	// 				pcgGen.GenerateBricks(x, y)
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// Background gfx
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			if y+30 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				p := w.pixels[x*w.width+y] & 0xFF
-				pp := w.pixels[x*w.width+y+1] & 0xFF
-				up := w.pixels[x*w.width+y+30] & 0xFF
-				upLow := w.pixels[x*w.width+y+5] & 0xFF
-				if p == 0xFF && (up == wBackground8 || up == wShadow8) && (pp == wShadow8 || pp == wBackground8) {
-					pcgGen.GenerateLine(x, y+30)
-				}
-				if p == 0xFF && (upLow == wBackground8 || upLow == wShadow8) && (pp == wShadow8 || pp == wBackground8) {
-					pcgGen.GenerateBottomLine(x, y+3)
-				}
-			}
-		}
-	}
-	// Air intake on floor
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			if y+30 < w.height && x+1 < w.width && x > 0 && y > 0 {
-				p := w.pixels[x*w.width+y] & 0xFF
-				pp := w.pixels[x*w.width+y+1] & 0xFF
-				upLow := w.pixels[x*w.width+y+5] & 0xFF
-				if p == 0xFF && (upLow == wBackground8 || upLow == wShadow8) && (pp == wShadow8 || pp == wBackground8) {
-					pcgGen.GenerateBottomAirIntake(x, y)
-				}
-			}
-		}
-	}
-	// Background gfx
-	for x := 0; x < w.width; x++ {
-		for y := 0; y < w.height; y++ {
-			if y+wDoorHeight < w.height && x+wDoorLen < w.width && x > 0 && y > 0 {
-				p := w.pixels[x*w.width+y] & 0xFF
-				pafter := w.pixels[(x+wDoorLen)*w.width+y+1] & 0xFF
-				pbelow := w.pixels[(x+wDoorLen)*w.width+y-1] & 0xFF
-				//pbelowLong := w.pixels[x*w.width+y-wDoorHeight-55] & 0xFF
-				pp := w.pixels[x*w.width+y+1] & 0xFF
-				up := w.pixels[x*w.width+y+wDoorHeight] & 0xFF
-				//down := w.pixels[x*w.width+y-1] & 0xFF
-
-				// if p == 0xFF && pbelowLong == 0xFF && (down == wShadow8 || down == wBackground8) {
-				// 	pcgGen.GenerateLamp(x, y-1)
-				// }
-
-				if pbelow != wBackground8 && pafter == wBackground8 && p == 0xFF && up == wBackground8 && pp == wBackground8 {
-					// Check there is no ladder
-					skip := false
-					for i := 0; i < wDoorLen; i++ {
-						if w.pixels[(x+i)*w.width+y+1]&0xFF == wLadder8 {
-							skip = true
-							break
-						}
-					}
-					if !skip {
-						if pcgGen.GenerateDoor(x, y+1) {
-							// save door position
-							w.doors = append(w.doors, pixel.Vec{float64(x + wDoorLen/2), float64(y + 1)})
-						}
-					}
-				}
-			}
-		}
-	}
-
 }

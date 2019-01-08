@@ -77,7 +77,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 
 		m.life -= float64(power * 2)
 		if m.life <= 0 {
-			m.explode()
+			m.die()
 			return
 		}
 	} else {
@@ -202,6 +202,7 @@ func (m *mob) die() {
 	// Drop weapon
 	m.throw()
 	m.life = 0
+	m.explode()
 	global.gWorld.qt.Remove(m.bounds)
 }
 

@@ -42,4 +42,5 @@ func (m *mapColor) create() {
 	m.entityCodes[itemCrate] = entityColor{0xFFFF, 0xFFFF, 0xFFFF, 0}
 	m.entityCodes[weaponAk47] = entityColor{0xFFFF, 0xFFFF, 0, 0}
 	m.entityCodes[mobEnemy1] = entityColor{0, 0, 0xFFFF, 0}
+	m.entityCodes[lampRegular] = entityColor{0, 0, 0xFFFF, 0}
 }

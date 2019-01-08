@@ -1,3 +1,8 @@
+//=============================================================
+// graphics.go
+//-------------------------------------------------------------
+// Graphics for items and mobs
+//=============================================================
 package main
 
 import (
@@ -28,6 +33,9 @@ type graphics struct {
 	scalexy     float64
 }
 
+//=============================================================
+// Create graphics
+//=============================================================
 func (gfx *graphics) createGfx(x, y float64) {
 	gfx.frames = make(map[int][]uint32)
 	gfx.batches = make(map[int]*pixel.Batch)
