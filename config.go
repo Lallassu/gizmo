@@ -60,6 +60,7 @@ const (
 	wAssetObjectsPath    = "assets/objects/"
 	wAssetMobsPath       = "assets/mobs/"
 	wAssetMapsPath       = "assets/maps/"
+	wAssetMixedPath      = "assets/mixed/"
 )
 
 //=============================================================

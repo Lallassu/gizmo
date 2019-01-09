@@ -3,9 +3,6 @@ General
 - Update AI with less FPS when not inside QT bounds bounds.
     -> To make enemies keep moving.
 
-- HP-bars above heads of enemies.
-    - Sprite with fixed image and resize based on HP?
-
 - Ammo-bars above weapons
     -> Max ammo per weapon.
 

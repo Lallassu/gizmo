@@ -6,7 +6,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/faiface/pixel"
+	"image"
 	"math"
 	"math/rand"
 )
@@ -18,6 +20,8 @@ type mob struct {
 	carry    interface{}
 	ai       *AI
 	drawFunc func(dt, elapsed float64)
+	hpBar    *pixel.Sprite
+	hpImg    *pixel.PictureData
 }
 
 //=============================================================
@@ -34,6 +38,12 @@ func (m *mob) create(x, y float64) {
 	}
 	m.mass = 20
 	m.dir = 1
+
+	// Create HP Bar
+	var img image.Image
+	img, _, _, _ = loadTexture(fmt.Sprintf("%v%v", wAssetMixedPath, "hpbar.png"))
+	m.hpImg = pixel.PictureDataFromImage(img)
+	m.hpBar = pixel.NewSprite(m.hpImg, pixel.R(0, 0, 40, 5))
 
 	// Initiate the graphics for the mob
 	m.createGfx(x, y)
@@ -76,6 +86,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 		global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 
 		m.life -= float64(power * 2)
+		m.hpBar.Set(m.hpImg, pixel.R(0, 0, 40*(m.life/100), 5))
 		if m.life <= 0 {
 			m.die()
 			return
@@ -202,16 +213,8 @@ func (m *mob) die() {
 	// Drop weapon
 	m.throw()
 	m.life = 0
-	m.explode()
-	global.gWorld.qt.Remove(m.bounds)
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) explode() {
 	m.explodeGfx(m.bounds.X, m.bounds.Y, true)
-	m.die()
+	global.gWorld.qt.Remove(m.bounds)
 }
 
 //=============================================================
@@ -306,10 +309,15 @@ func (m *mob) draw(dt, elapsed float64) {
 	//m.canvas.SetComposeMethod(pixel.ComposeOver)
 	//m.canvas.SetColorMask(pixel.Alpha(1))
 	m.batches[idx].Draw(m.canvas)
+
+	// Draw hpbar
+	m.hpBar.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, 0.3).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height+5)))
+
 	m.canvas.Draw(global.gWin, (pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2))))
 
 	// Call custom draw
 	if m.drawFunc != nil {
 		m.drawFunc(dt, elapsed)
 	}
+
 }
