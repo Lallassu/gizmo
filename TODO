@@ -5,6 +5,7 @@ General
 
 - Ammo-bars above weapons
     -> Max ammo per weapon.
+    -> Different depending on weapon
 
 - Doors should be connected pairs.
     -> Not random location when entering.
