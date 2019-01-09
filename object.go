@@ -50,7 +50,7 @@ func (o *object) hit(x_, y_, vx, vy float64, pow int) {
 	power := float64(pow)
 	// If distance is close, explode, otherwise push away.
 	dist := distance(pixel.Vec{x_ + power/2, y_ + power/2}, pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2})
-	if dist < float64(power) {
+	if dist < float64(power*2) {
 		o.explode()
 	} else {
 		if vx == 0 && vy == 0 {
@@ -128,6 +128,10 @@ func (o *object) removeOwner() {
 	o.dir = o.owner.dir
 	o.keyMove.X = o.owner.dir
 	o.prevOwner = o.owner
+	o.phys.velo.X += o.speed * o.owner.dir
+	if math.Abs(o.owner.velo.X) > 0 {
+		o.bounds.Y = o.owner.bounds.Y + o.owner.bounds.Height + 5
+	}
 	o.owner = nil
 }
 

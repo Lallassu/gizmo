@@ -63,7 +63,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 	pow := float64(power)
 	// If distance is close, explode, otherwise push away.
 	dist := distance(pixel.Vec{x_ + pow/2, y_ + pow/2}, pixel.Vec{m.bounds.X + m.bounds.Width/2, m.bounds.Y + m.bounds.Height/2})
-	if dist < float64(power) {
+	if dist < float64(power*2) {
 		// If carry somerhing, hit that first!
 		if m.carry != nil {
 			switch item := m.carry.(type) {

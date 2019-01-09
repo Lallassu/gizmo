@@ -3,18 +3,15 @@ General
 - Update AI with less FPS when not inside QT bounds bounds.
     -> To make enemies keep moving.
 
-- Ammo-bars above weapons
-    -> Max ammo per weapon.
-    -> Different depending on weapon
-
 - Doors should be connected pairs.
     -> Not random location when entering.
 
 - Place doors better.
     - Colored. Same color => same teleport.
     - Teleports instead of doors.
+    - Teleport effect around.
+        -> Shader?
 
-- Throwable objects (they just drops now)
 
 - Lights should origin from light and not one point for lamps
 
@@ -42,6 +39,8 @@ General
     -> triangle count?
 
 - AI
+    - Throw weapon towards player if empty ammo.
+        -> swap if finding new weapon with ammo.
     - Follow player
     - Walk speed/run speed
     - "think-bubbles"
@@ -68,6 +67,8 @@ General
     -> Moving certain path
 
 - Sound effect when go through doors
+
+- Different ammo-bars depending on weapon-type
 
 - Configuration support
     - Json file -> struct
