@@ -22,6 +22,7 @@ type mob struct {
 	drawFunc func(dt, elapsed float64)
 	hpBar    *pixel.Sprite
 	hpImg    *pixel.PictureData
+	maxLife  float64
 }
 
 //=============================================================
@@ -38,6 +39,8 @@ func (m *mob) create(x, y float64) {
 	}
 	m.mass = 20
 	m.dir = 1
+
+	m.life = m.maxLife
 
 	// Create HP Bar
 	var img image.Image
@@ -85,12 +88,7 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 		// Blood effect
 		global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
 
-		m.life -= float64(power * 2)
-		m.hpBar.Set(m.hpImg, pixel.R(0, 0, 40*(m.life/100), 5))
-		if m.life <= 0 {
-			m.die()
-			return
-		}
+		m.setLife(-float64(power * 2))
 	} else {
 		if vx == 0 && vy == 0 {
 			if x_ < m.bounds.X {
@@ -106,6 +104,21 @@ func (m *mob) hit(x_, y_, vx, vy float64, power int) {
 		m.phys.throwable = true
 		m.phys.velo.Y += math.Abs(pow * 5 / dist)
 		m.phys.velo.X += m.dir * pow * 5 / dist
+	}
+}
+
+//=============================================================
+// Set Health
+//=============================================================
+func (m *mob) setLife(change float64) {
+	m.life += change
+	if m.life > m.maxLife {
+		m.life = m.maxLife
+	}
+
+	m.hpBar.Set(m.hpImg, pixel.R(0, 0, 40*(m.life/100), 5))
+	if m.life <= 0 {
+		m.die()
 	}
 }
 
@@ -127,20 +140,24 @@ func (m *mob) shoot() {
 //=============================================================
 //func (m *mob) attach(o *object) {
 func (m *mob) attach(o interface{}) {
-	if m.carry == nil {
-		m.carry = o
-	}
-	switch item := m.carry.(type) {
+	switch item := o.(type) {
 	case *weapon:
 		item.setOwner(m)
 	case *object:
 		item.setOwner(m)
 	case *item:
 		item.setOwner(m)
+		// TBD: Handle this better.
+		if item.iType == itemPowerupHealth {
+			return
+		}
 	case *explosive:
 		item.setOwner(m)
 	}
 
+	if m.carry == nil {
+		m.carry = o
+	}
 }
 
 //=============================================================
@@ -164,24 +181,29 @@ func (m *mob) action() {
 //
 //=============================================================
 func (m *mob) pickup() {
+	// TBD: Handle this better...
 	// Check if anything to pickup?
 	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
 		switch item := v.entity.(type) {
 		case *object:
-			if item.isFree() {
+			if item.isFree() && m.carry == nil {
 				m.attach(item)
+				return
 			}
 		case *item:
-			if item.isFree() {
+			if item.isFree() && (m.carry == nil || item.iType == itemPowerupHealth) {
 				m.attach(item)
+				return
 			}
 		case *explosive:
-			if item.isFree() {
+			if item.isFree() && m.carry == nil {
 				m.attach(item)
+				return
 			}
 		case *weapon:
-			if item.isFree() {
+			if item.isFree() && m.carry == nil {
 				m.attach(item)
+				return
 			}
 		}
 	}
@@ -202,8 +224,8 @@ func (m *mob) throw() {
 		case *explosive:
 			item.removeOwner()
 		}
+		m.carry = nil
 	}
-	m.carry = nil
 }
 
 //=============================================================

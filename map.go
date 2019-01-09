@@ -108,9 +108,9 @@ func (m *Map) newMap(level int) {
 				climbFrames: []int{1, 7},
 				frameWidth:  12.0,
 			},
-			life: 100.0,
-			phys: phys{speed: 100},
-			ai:   &AI{},
+			maxLife: 100.0,
+			phys:    phys{speed: 100},
+			ai:      &AI{},
 		}
 		test.create(p.X, p.Y)
 	}
@@ -125,6 +125,11 @@ func (m *Map) newMap(level int) {
 	for _, p := range items[itemCrate] {
 		w := &item{}
 		w.newItem(p.X, p.Y, itemCrate)
+	}
+
+	for _, p := range items[itemPowerupHealth] {
+		w := &item{}
+		w.newItem(p.X, p.Y, itemPowerupHealth)
 	}
 
 	// Place random lamps

@@ -129,7 +129,7 @@ func (u *UI) draw(dt float64) {
 
 	u.lifeText.Clear()
 	u.lifeText.WriteString(fmt.Sprintf("Life: %v", global.gPlayer.life))
-	u.lifeText.Draw(u.canvas, pixel.IM.Moved(pixel.V(1, wViewMax/2+40)))
+	u.lifeText.Draw(u.canvas, pixel.IM.Scaled(pixel.ZV, 0.25).Moved(pixel.V(1, wViewMax/2+40)))
 
 	u.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))
 

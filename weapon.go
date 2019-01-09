@@ -85,9 +85,6 @@ func (w *weapon) newWeapon(x, y float64, wType objectType) {
 	w.ammoImg = pixel.PictureDataFromImage(img)
 	w.ammoBar = pixel.NewSprite(w.ammoImg, pixel.R(0, 0, 40, 5))
 
-	// Animate up/down when idle
-	w.animateIdle = false
-
 	// Must change entity type in bounds for QT lookup
 	w.bounds.entity = Entity(w)
 

@@ -80,7 +80,6 @@ func setup() {
 func gameLoop() {
 	last := time.Now()
 	frameDt := 0.0
-	startTime := time.Now()
 
 	//fps := time.Tick(time.Second / 1000)
 	//second := time.Tick(time.Second)
@@ -92,13 +91,13 @@ func gameLoop() {
 		dt := time.Since(last).Seconds()
 		frameDt += dt
 		last = time.Now()
-		elapsed = float64(time.Now().Unix() - startTime.Unix())
 		//	global.utime += float32(dt)
 
 		for {
 			if frameDt >= wMaxInvFPS {
-				global.gWin.Clear(global.gClearColor)
+				elapsed += wMaxInvFPS
 
+				global.gWin.Clear(global.gClearColor)
 				//	global.gWin.SetComposeMethod(pixel.ComposeOver)
 
 				go global.gController.update(wMaxInvFPS)

@@ -48,4 +48,5 @@ const (
 	weaponP90
 	weaponShotgun
 	lampRegular
+	itemPowerupHealth
 )

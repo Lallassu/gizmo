@@ -55,7 +55,7 @@ const (
 	wDoorHeight          = 40
 	wLightsMax           = 10
 	wMiddleTextSize      = 22
-	wFPSTextSize         = 8
+	wFPSTextSize         = 40
 	wDeathScreenText     = "You Died"
 	wAssetObjectsPath    = "assets/objects/"
 	wAssetMobsPath       = "assets/mobs/"
@@ -117,6 +117,6 @@ var global = &Global{
 			climbFrames: []int{1, 7},
 			frameWidth:  12.0,
 		},
-		life: 100.0,
+		maxLife: 100.0,
 	},
 }

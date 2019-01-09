@@ -170,7 +170,7 @@ func (o *object) draw(dt, elapsed float64) {
 		offset := 0.0
 		if !(o.falling || !o.animateIdle) {
 			// Animate up/down
-			offset = 5 + math.Sin(elapsed)*3
+			offset = 5 + math.Sin(elapsed)*4
 		}
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 	} else {

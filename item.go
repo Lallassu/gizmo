@@ -22,16 +22,41 @@ type item struct {
 //=============================================================
 func (i *item) newItem(x, y float64, iType objectType) {
 	i.iType = iType
+	animateIdle := false
 	switch iType {
 	case itemCrate:
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "crate2.png")
 		i.animated = false
 		i.name = "crate"
 		i.scale = 1
+	case itemPowerupHealth:
+		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "poweruphp.png")
+		i.animated = false
+		animateIdle = true
+		i.name = "Powerup HP"
+		i.scale = 0.3
 	}
-
 	i.create(x, y)
+
+	// Must set this after create
+	i.animateIdle = animateIdle
 	i.bounds.entity = Entity(i)
+}
+
+//=============================================================
+// Attach
+//=============================================================
+func (i *item) setOwner(m *mob) {
+	switch i.iType {
+	case itemPowerupHealth:
+		// TBD: Powerup effect
+		// TBD: Text how much power?
+		// Remove object
+		m.setLife(50) // TBD
+		global.gWorld.qt.Remove(i.bounds)
+		return
+	}
+	i.object.setOwner(m)
 }
 
 //=============================================================
