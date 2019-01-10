@@ -1,5 +1,11 @@
 General
 --------
+- "Hit" objects and destroy them partially + floodfill
+
+- Portal to go through walls.
+    -> Use portal makes it travel through wall until fit on other side.
+    -> Make shader effect when entering (destroy?)
+   
 - Power up effect when taking it.
 - Power up text over mob
 

@@ -40,6 +40,8 @@ type objectType int
 
 const (
 	itemCrate objectType = iota
+	itemPowerupHealth
+	itemPortal
 	mobPlayer
 	mobEnemy1
 	explosiveRegularMine
@@ -48,5 +50,4 @@ const (
 	weaponP90
 	weaponShotgun
 	lampRegular
-	itemPowerupHealth
 )

@@ -6,6 +6,48 @@
 package main
 
 //=============================================================
+// Fragment shader for portals
+//=============================================================
+var fragmentShaderPortal = `
+#version 330 core
+
+in vec2  vTexCoords;
+in vec2  vPosition;
+in vec4  vColor;
+
+out vec4 fragColor;
+
+uniform float uTime;
+uniform float uPosX;
+uniform float uPosY;
+
+uniform vec4 uTexBounds;
+uniform sampler2D uTexture;
+
+void main() {
+   vec4 c = vColor;
+   vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+   vec4 tx = texture(uTexture, t);
+   
+   if (c.r == 0 && c.g == 0 && c.b == 1) {
+       //float dist = distance(vec2(uPosX, uPosY), vPosition)/(uPosY*sin(uTime));
+	   float py = uPosY+cos(uTime*5)*3;
+	   float px = uPosX+sin(uTime*5)*3;
+       float dist = distance(vec2(px, py), vPosition)/uPosY;
+	   float o = clamp(sin(uTime/dist), 0.5, 1.0);
+	   if (dist < 0.1) {
+	       fragColor = vec4(dist*2, dist*2, dist*2,dist);
+	   } else {
+	       fragColor = vec4(dist*o*(1.0-dist), c.g*o*(1.0-dist), (c.b/2)*o*(1.0-dist), c.a*clamp((1.0-dist), 0.2, 0.8));
+	   }
+   } else {
+	   fragColor = c;
+   }
+}
+
+`
+
+//=============================================================
 // Fragment shader for lights
 //=============================================================
 var fragmentShaderLight = `
@@ -26,8 +68,6 @@ void main() {
 
    // Normalized distance where min(0), max(radius)
    float dist = distance(vec2(uPosX, uPosY), vPosition)/uRadius;
-
-   //fragColor = vec4(c.r-(dist/c.r), c.g-(dist/c.g), c.b-(dist/c.b), c.a-dist);
    fragColor = vec4(c.r*(1.0-dist), c.g*(1.0-dist), c.b*(1.0-dist), c.a*(1.0-dist));
    
 }

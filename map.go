@@ -115,16 +115,22 @@ func (m *Map) newMap(level int) {
 		test.create(p.X, p.Y)
 	}
 
-	// // Place weapons
+	// Place weapons
 	for _, p := range items[weaponAk47] {
 		w := &weapon{}
 		w.newWeapon(p.X, p.Y, weaponAk47)
 	}
 
-	// // Place crates
+	// Place crates
 	for _, p := range items[itemCrate] {
 		w := &item{}
 		w.newItem(p.X, p.Y, itemCrate)
+	}
+
+	// Place portals
+	for _, p := range items[itemPortal] {
+		w := &item{}
+		w.newItem(p.X, p.Y, itemPortal)
 	}
 
 	for _, p := range items[itemPowerupHealth] {

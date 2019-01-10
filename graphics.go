@@ -175,6 +175,19 @@ func (gfx *graphics) buildFrames() {
 				(*gfx.triangles[i])[v+3].Position = pixel.Vec{x, y}
 				(*gfx.triangles[i])[v+4].Position = pixel.Vec{x, y + same_y}
 				(*gfx.triangles[i])[v+5].Position = pixel.Vec{x + same_x, y + same_y}
+
+				//(*gfx.triangles[i])[v].Picture = pixel.Vec{x, y}
+				//(*gfx.triangles[i])[v+1].Picture = pixel.Vec{x + same_x, y}
+				//(*gfx.triangles[i])[v+2].Picture = pixel.Vec{x + same_x, y + same_y}
+				//(*gfx.triangles[i])[v+3].Picture = pixel.Vec{x, y}
+				//(*gfx.triangles[i])[v+4].Picture = pixel.Vec{x, y + same_y}
+				//(*gfx.triangles[i])[v+5].Picture = pixel.Vec{x + same_x, y + same_y}
+				//(*gfx.triangles[i])[v].Intensity = 0.5
+				//(*gfx.triangles[i])[v+1].Intensity = 0.5
+				//(*gfx.triangles[i])[v+2].Intensity = 0.5
+				//(*gfx.triangles[i])[v+3].Intensity = 0.5
+				//(*gfx.triangles[i])[v+4].Intensity = 0.5
+				//(*gfx.triangles[i])[v+5].Intensity = 0.5
 				for n := 0; n < 6; n++ {
 					(*gfx.triangles[i])[v+n].Color = pixel.RGBA{r, g, b, a}
 				}

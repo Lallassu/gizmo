@@ -15,6 +15,7 @@ import (
 type item struct {
 	object
 	iType objectType
+	uTime float32
 }
 
 //=============================================================
@@ -23,11 +24,17 @@ type item struct {
 func (i *item) newItem(x, y float64, iType objectType) {
 	i.iType = iType
 	switch iType {
+	case itemPortal:
+		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "portal.png")
+		i.animated = false
+		i.animateIdle = false
+		i.name = "Portal"
+		i.scale = 0.3
 	case itemCrate:
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "crate2.png")
 		i.animated = false
 		i.animateIdle = false
-		i.name = "crate"
+		i.name = "Crate"
 		i.scale = 1
 	case itemPowerupHealth:
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "poweruphp3.png")
@@ -39,6 +46,18 @@ func (i *item) newItem(x, y float64, iType objectType) {
 		i.scale = 0.5
 	}
 	i.create(x, y)
+
+	// Test fragment shader (Must be set after gfx is created)
+	if iType == itemPortal {
+		// TBD: Use mgl32.Vec2
+		// Take scaling into account
+		uPosX := float32((i.bounds.Width / 2) * (1 / i.scale))
+		uPosY := float32((i.bounds.Height / 2) * (1 / i.scale))
+		i.graphics.canvas.SetUniform("uTime", &i.uTime)
+		i.graphics.canvas.SetUniform("uPosX", &uPosX)
+		i.graphics.canvas.SetUniform("uPosY", &uPosY)
+		i.graphics.canvas.SetFragmentShader(fragmentShaderPortal)
+	}
 
 	// Must set this after create
 	i.bounds.entity = Entity(i)
@@ -71,6 +90,8 @@ func (i *item) setOwner(m *mob) {
 // Custom draw function
 //=============================================================
 func (i *item) draw(dt, elapsed float64) {
+	// Set uniform used for shaders
+	i.uTime = float32(elapsed)
 	i.object.draw(dt, elapsed)
 }
 

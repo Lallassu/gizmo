@@ -160,6 +160,7 @@ func (o *object) draw(dt, elapsed float64) {
 	}
 
 	o.batches[idx].Draw(o.canvas)
+
 	if o.owner == nil {
 		o.physics(dt)
 
