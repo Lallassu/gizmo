@@ -22,25 +22,33 @@ type item struct {
 //=============================================================
 func (i *item) newItem(x, y float64, iType objectType) {
 	i.iType = iType
-	animateIdle := false
 	switch iType {
 	case itemCrate:
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "crate2.png")
 		i.animated = false
+		i.animateIdle = false
 		i.name = "crate"
 		i.scale = 1
 	case itemPowerupHealth:
-		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "poweruphp.png")
+		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "poweruphp3.png")
 		i.animated = false
-		animateIdle = true
+		//i.idleFrames = []int{0, 1, 2, 3, 4, 5, 6}
+		//	i.frameWidth = 32
+		i.animateIdle = true
 		i.name = "Powerup HP"
-		i.scale = 0.3
+		i.scale = 0.5
 	}
 	i.create(x, y)
 
 	// Must set this after create
-	i.animateIdle = animateIdle
 	i.bounds.entity = Entity(i)
+}
+
+//=============================================================
+// Get Type
+//=============================================================
+func (i *item) getType() objectType {
+	return i.iType
 }
 
 //=============================================================

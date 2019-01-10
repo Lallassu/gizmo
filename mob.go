@@ -136,27 +136,30 @@ func (m *mob) shoot() {
 }
 
 //=============================================================
-// Attach object to self
+//
 //=============================================================
-//func (m *mob) attach(o *object) {
-func (m *mob) attach(o interface{}) {
-	switch item := o.(type) {
-	case *weapon:
-		item.setOwner(m)
-	case *object:
-		item.setOwner(m)
-	case *item:
-		item.setOwner(m)
-		// TBD: Handle this better.
-		if item.iType == itemPowerupHealth {
-			return
+func (m *mob) pickup() {
+	// Check if anything to pickup?
+	var obj ObjectInterface
+	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
+		switch i := v.entity.(type) {
+		case *object:
+			obj = i
+		case *item:
+			obj = i
+		case *explosive:
+			obj = i
+		case *weapon:
+			obj = i
 		}
-	case *explosive:
-		item.setOwner(m)
 	}
-
-	if m.carry == nil {
-		m.carry = o
+	if obj != nil {
+		if obj.isFree() && m.carry == nil {
+			if obj.getType() != itemPowerupHealth {
+				m.carry = obj
+			}
+			obj.setOwner(m)
+		}
 	}
 }
 
@@ -173,38 +176,6 @@ func (m *mob) action() {
 			m.bounds.X = pos.X
 			m.bounds.Y = pos.Y
 			break
-		}
-	}
-}
-
-//=============================================================
-//
-//=============================================================
-func (m *mob) pickup() {
-	// TBD: Handle this better...
-	// Check if anything to pickup?
-	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
-		switch item := v.entity.(type) {
-		case *object:
-			if item.isFree() && m.carry == nil {
-				m.attach(item)
-				return
-			}
-		case *item:
-			if item.isFree() && (m.carry == nil || item.iType == itemPowerupHealth) {
-				m.attach(item)
-				return
-			}
-		case *explosive:
-			if item.isFree() && m.carry == nil {
-				m.attach(item)
-				return
-			}
-		case *weapon:
-			if item.isFree() && m.carry == nil {
-				m.attach(item)
-				return
-			}
 		}
 	}
 }

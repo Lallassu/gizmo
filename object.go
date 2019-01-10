@@ -31,11 +31,16 @@ type object struct {
 func (o *object) create(x, y float64) {
 	o.mass = 5
 	//o.active = true
-	o.animateIdle = false
-
 	o.createGfx(x, y)
 	o.createPhys(x, y, o.frameWidth, o.frameHeight)
 	o.graphics.scalexy = o.phys.scale
+}
+
+//=============================================================
+//
+//=============================================================
+func (o *object) getType() objectType {
+	return o.oType
 }
 
 //=============================================================
@@ -146,7 +151,15 @@ func (o *object) draw(dt, elapsed float64) {
 	}
 
 	o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	o.batches[0].Draw(o.canvas)
+
+	idx := 0
+	if o.animated {
+		o.animCounter += dt
+		idx = int(math.Floor(o.animCounter / 0.01))
+		idx = o.idleFrames[idx/30%len(o.idleFrames)]
+	}
+
+	o.batches[idx].Draw(o.canvas)
 	if o.owner == nil {
 		o.physics(dt)
 

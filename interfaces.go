@@ -14,3 +14,9 @@ type Entity interface {
 	draw(dt, elapsed float64)
 	getPosition() pixel.Vec
 }
+
+type ObjectInterface interface {
+	setOwner(m *mob)
+	isFree() bool
+	getType() objectType
+}

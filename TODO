@@ -1,19 +1,14 @@
 General
 --------
-- Speed powerup
 - Power up effect when taking it.
 - Power up text over mob
 
-- item.setOwner => item.pickup?
-
-- Fix item pickup code locations
-    - Simplify and re-structure
- 
+- Text-atlas (sprites) to write text/numbers.
 
 - Doors should be connected pairs.
     -> Not random location when entering.
 
-- Update AI with less FPS when not inside QT bounds bounds.
+- Update AI with less FPS when not inside QT bounds.
     -> To make enemies keep moving.
 
 - Place doors better.
