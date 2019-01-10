@@ -100,9 +100,9 @@ func gameLoop() {
 				global.gWin.Clear(global.gClearColor)
 				//	global.gWin.SetComposeMethod(pixel.ComposeOver)
 
-				go global.gController.update(wMaxInvFPS)
+				global.gController.update(wMaxInvFPS)
 				global.gWorld.Draw(wMaxInvFPS, elapsed)
-				go global.gTextures.update(wMaxInvFPS)
+				global.gTextures.update(wMaxInvFPS)
 
 				global.gParticleEngine.update(wMaxInvFPS)
 				global.gAmmoEngine.update(wMaxInvFPS)

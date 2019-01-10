@@ -167,6 +167,14 @@ func (m *mob) pickup() {
 //
 //=============================================================
 func (m *mob) action() {
+	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
+		switch i := v.entity.(type) {
+		case *item:
+			i.action(m)
+			return
+		}
+	}
+
 	// Check if close to doors
 	for _, p := range global.gWorld.doors {
 		d := distance(p, pixel.Vec{m.bounds.X, m.bounds.Y})

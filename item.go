@@ -71,6 +71,38 @@ func (i *item) getType() objectType {
 }
 
 //=============================================================
+// Action (activate)
+//=============================================================
+func (i *item) action(m *mob) {
+	switch i.iType {
+	case itemPortal:
+		// 1. Check if portal is close to a wall
+		dir := 0.0
+		for x := 0.0; x < 50; x++ {
+			if global.gWorld.IsRegular(i.bounds.X+x, i.bounds.Y+i.bounds.Height/2) {
+				dir = 1
+				break
+			} else if global.gWorld.IsRegular(i.bounds.X-x, i.bounds.Y+i.bounds.Height/2) {
+				dir = -1
+				break
+			}
+		}
+		if dir != 0 {
+			// 2. If so, check if there is a position on the other side where the mob fits.
+			for x := 50.0; x < 150; x++ {
+				if global.gWorld.IsBackground(i.bounds.X+(dir*x), i.bounds.Y+i.bounds.Height/2) {
+					// 3. Move player.
+					m.bounds.X = i.bounds.X + (dir * (x + 10))
+					// 4. Destroy portal (explode)
+					i.explode()
+					break
+				}
+			}
+		}
+	}
+}
+
+//=============================================================
 // Attach
 //=============================================================
 func (i *item) setOwner(m *mob) {

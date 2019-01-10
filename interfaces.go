@@ -19,4 +19,5 @@ type ObjectInterface interface {
 	setOwner(m *mob)
 	isFree() bool
 	getType() objectType
+	action(m *mob)
 }

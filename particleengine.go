@@ -8,6 +8,7 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	_ "sync"
 )
 
 type particleEngine struct {
@@ -17,6 +18,7 @@ type particleEngine struct {
 	batch     *pixel.Batch
 	colors    []uint8
 	colormap  map[uint32]int
+	//	cMutex    *sync.Mutex
 }
 
 //=============================================================
@@ -147,8 +149,10 @@ func (pe *particleEngine) addColorToBatch(color uint32) {
 		pe.colors = append(pe.colors, uint8(r), uint8(g), uint8(b), 255.0)
 		pe.colormap[pos] = (len(pe.colors) / 4) - 1
 
+		//	pe.cMutex.Lock()
 		pe.canvas.SetBounds(pixel.R(0, 0, float64(len(pe.colors)/4), 1))
 		pe.canvas.SetPixels(pe.colors)
+		//	pe.cMutex.Unlock()
 	}
 }
 
@@ -158,6 +162,7 @@ func (pe *particleEngine) addColorToBatch(color uint32) {
 func (pe *particleEngine) create() {
 	pe.particles = make([]particle, wParticlesMax)
 	pe.colormap = make(map[uint32]int)
+	//	pe.cMutex = &sync.Mutex{}
 
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)) // Max seems to be 2^14 per row
 	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
@@ -198,6 +203,7 @@ func (pe *particleEngine) newParticle(p particle) {
 func (pe *particleEngine) update(dt float64) {
 	pe.batch.Clear()
 
+	//pe.cMutex.Lock()
 	sprite := pixel.NewSprite(pe.canvas, pixel.R(0, 0, 1, 1))
 	for i, _ := range pe.particles {
 		if pe.particles[i].active {
@@ -227,6 +233,7 @@ func (pe *particleEngine) update(dt float64) {
 			}
 		}
 	}
+	//	pe.cMutex.Unlock()
 
 	pe.batch.Draw(global.gWin)
 }

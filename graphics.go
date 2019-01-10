@@ -262,6 +262,7 @@ func (gfx *graphics) explodeGfx(gx, gy float64, blood bool) {
 	if size < 0.5 {
 		size = 0.5
 	}
+
 	for i := 0; i < len(gfx.frames); i++ {
 		for x := 0.0; x < gfx.frameWidth; x++ {
 			for y := 0.0; y < gfx.frameHeight; y++ {

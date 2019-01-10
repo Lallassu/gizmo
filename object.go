@@ -103,8 +103,8 @@ func (o *object) isFree() bool {
 //
 //=============================================================
 func (o *object) explode() {
-	o.explodeGfx(o.bounds.X, o.bounds.Y, false)
 	global.gWorld.qt.Remove(o.bounds)
+	o.explodeGfx(o.bounds.X, o.bounds.Y, false)
 	if o.owner != nil {
 		o.owner.throw()
 	}
@@ -122,6 +122,12 @@ func (o *object) getPosition() pixel.Vec {
 //=============================================================
 func (o *object) setOwner(m *mob) {
 	o.owner = m
+}
+
+//=============================================================
+// Action (activate)
+//=============================================================
+func (o *object) action(m *mob) {
 }
 
 //=============================================================
