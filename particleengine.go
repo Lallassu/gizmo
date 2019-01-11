@@ -222,6 +222,8 @@ func (pe *particleEngine) update(dt float64) {
 				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, float64(a) / 255.0})
 				if pe.particles[i].pType == particleFire {
 					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.1111})
+				} else if pe.particles[i].pType == particleEvaporate {
+					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.2222})
 				}
 				// if pe.particles[i].pType == particleFire {
 				// 	pe.imd.Color = pixel.RGBA{1, 0, 0, 1.0}

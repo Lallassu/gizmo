@@ -23,6 +23,7 @@ type object struct {
 	owner          *mob
 	prevOwner      *mob
 	animateIdle    bool
+	animateOffset  float64
 }
 
 //=============================================================
@@ -187,12 +188,13 @@ func (o *object) draw(dt, elapsed float64) {
 		} else {
 			o.rotation = 0
 		}
-		offset := 0.0
+		o.animateOffset = 0.0
 		if !(o.falling || !o.animateIdle) {
 			// Animate up/down
-			offset = 5 + math.Sin(elapsed)*4
+			o.animateOffset = 5 + math.Sin(elapsed)*4
+
 		}
-		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, offset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
+		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.animateOffset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 	} else {
 		offset := 0.0
 		switch o.bounds.entity.(type) {

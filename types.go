@@ -16,6 +16,7 @@ const (
 	particleRegular particleType = iota
 	particleBlood
 	particleFire
+	particleEvaporate
 	particleSmoke
 )
 

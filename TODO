@@ -1,14 +1,12 @@
 General
 --------
+- Shader for minimap
+    -> round
+    -> "radar" rings around player position
+
 - "Hit" objects and destroy them partially + floodfill
 
-- Portal to go through walls.
-    -> Use portal makes it travel through wall until fit on other side.
-    -> Make shader effect when entering (destroy?)
-   
-- Power up effect when taking it.
-- Power up text over mob
-
+- Powerup text above player
 - Text-atlas (sprites) to write text/numbers.
 
 - Doors should be connected pairs.
@@ -16,12 +14,6 @@ General
 
 - Update AI with less FPS when not inside QT bounds.
     -> To make enemies keep moving.
-
-- Place doors better.
-    - Colored. Same color => same teleport.
-    - Teleports instead of doors.
-    - Teleport effect around.
-        -> Shader?
 
 
 - Lights should origin from light and not one point for lamps

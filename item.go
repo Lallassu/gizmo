@@ -29,7 +29,7 @@ func (i *item) newItem(x, y float64, iType objectType) {
 		i.animated = false
 		i.animateIdle = false
 		i.name = "Portal"
-		i.scale = 0.3
+		i.scale = 0.25
 	case itemCrate:
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "crate2.png")
 		i.animated = false
@@ -111,6 +111,8 @@ func (i *item) setOwner(m *mob) {
 		// TBD: Powerup effect
 		// TBD: Text how much power?
 		// Remove object
+
+		i.evaporate(i.bounds.X, i.bounds.Y+i.animateOffset)
 		m.setLife(50) // TBD
 		global.gWorld.qt.Remove(i.bounds)
 		return

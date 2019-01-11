@@ -255,6 +255,46 @@ func (gfx *graphics) hitGfx(lx, ly int, gx, gy, vx, vy float64, power int, blood
 }
 
 //=============================================================
+// Evaporate
+//=============================================================
+func (gfx *graphics) evaporate(gx, gy float64) {
+	size := gfx.scalexy
+	if size < 0.5 {
+		size = 0.5
+	}
+
+	for i := 0; i < len(gfx.frames); i++ {
+		for x := 0.0; x < gfx.frameWidth; x++ {
+			for y := 0.0; y < gfx.frameHeight; y++ {
+				pos := int(gfx.size*x + y)
+				if gfx.frames[i][pos] != 0 {
+					// Remove parts (Don't create every particle)
+					if global.gRand.randFloat() < 1 {
+						global.gParticleEngine.newParticle(
+							particle{
+								x:           gx + float64(x)*gfx.scalexy,
+								y:           gy + float64(y)*gfx.scalexy,
+								size:        size,
+								restitution: 0,
+								life:        float64(global.gRand.randFloat() * 3),
+								fx:          float64(5 - global.gRand.rand()/2),
+								fy:          float64(15 - global.gRand.rand()),
+								vx:          float64(5 - global.gRand.rand()),
+								vy:          float64(5 - global.gRand.rand()),
+								mass:        -0.05,
+								pType:       particleEvaporate,
+								color:       gfx.frames[i][pos],
+								static:      false,
+							})
+					}
+					gfx.frames[i][pos] = 0
+				}
+			}
+		}
+	}
+}
+
+//=============================================================
 //
 //=============================================================
 func (gfx *graphics) explodeGfx(gx, gy float64, blood bool) {
