@@ -6,6 +6,45 @@
 package main
 
 //=============================================================
+// Fragment shader for minimap
+//=============================================================
+var fragmentShaderMinimap = `
+#version 330 core
+
+in vec2  vTexCoords;
+in vec2  vPosition;
+in vec4  vColor;
+
+out vec4 fragColor;
+
+uniform float uTime;
+uniform vec2 uPos;
+
+uniform vec4 uTexBounds;
+uniform sampler2D uTexture;
+
+void main() {
+   vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
+   vec4 tx = texture(uTexture, t);
+   vec4 c = vec4(tx.r, tx.g, tx.b, tx.a);
+   float dist = distance(uPos, vPosition)/uPos.y;
+   if (dist < 0.05) {
+   		if (sin(uTime*15) < 0) {
+			fragColor = vec4(1.0, 0, 0, 1.0);
+		} else {
+			fragColor = vec4(0, 0 ,0 ,0);
+		}
+   } else if (dist < 0.8) {
+		fragColor = vec4(c.r/dist, c.g, c.b/dist, c.a/dist);
+   } else if (dist < 0.9) {
+		fragColor = vec4(0.6+dist, 0.3, 0, 0.4+dist);
+   } else {
+		fragColor = vec4(0, 0, 0, 0);
+   }
+}
+`
+
+//=============================================================
 // Fragment shader for portals
 //=============================================================
 var fragmentShaderPortal = `
@@ -42,7 +81,6 @@ void main() {
 	   fragColor = c;
    }
 }
-
 `
 
 //=============================================================
@@ -69,7 +107,6 @@ void main() {
    fragColor = vec4(c.r*(1.0-dist), c.g*(1.0-dist), c.b*(1.0-dist), c.a*(1.0-dist));
    
 }
-
 `
 
 //=============================================================
@@ -123,5 +160,4 @@ void main() {
        }
    }
 }
-
 `

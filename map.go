@@ -139,6 +139,8 @@ func (m *Map) newMap(level int) {
 	}
 
 	// Place random lamps
+	//lamps := 20
+	// pcgGen := pcg{}
 	// for lamps != 0 {
 	// 	radius := float64(100 + global.gRand.rand()*5)
 	// 	if p, fit := global.gWorld.fitInWorld(10); fit {

@@ -1,13 +1,26 @@
 General
 --------
+- Randomly drop particleFire from lamps.
+
 - Shader for minimap
-    -> round
-    -> "radar" rings around player position
+    -> Set map correct position compared to player.
+    -> Have a image frame around the shader.
+
+- Elevators
+    -> Object
+    -> Moving certain path
+
 
 - "Hit" objects and destroy them partially + floodfill
 
 - Powerup text above player
+
 - Text-atlas (sprites) to write text/numbers.
+    -> set(x,y, string)
+    -> each char in string lookup char.
+    -> each char is part of a sprite.
+    -> map["char"] = position in sprite.
+    -> Draw to a canvas
 
 - Doors should be connected pairs.
     -> Not random location when entering.
@@ -60,10 +73,6 @@ General
     - Quit
 
 - Own animations + sprites
-
-- Elevators
-    -> Object
-    -> Moving certain path
 
 - Different ammo-bars depending on weapon-type
 

@@ -10,6 +10,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font/gofont/goregular"
 	"strconv"
@@ -24,9 +25,12 @@ type UI struct {
 	middleText       *text.Text
 	lifeText         *text.Text
 	canvas           *pixelgl.Canvas
+	miniMapCanvas    *pixelgl.Canvas
 	miniMapScale     float64
 	middleTextStr    string
 	deathScreenTimer float64
+	uPos             mgl32.Vec2
+	uTime            float32
 }
 
 //=============================================================
@@ -34,7 +38,14 @@ type UI struct {
 //=============================================================
 func (u *UI) create() {
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
+
+	u.canvas.SetUniform("uPos", &u.uPos)
+	u.canvas.SetUniform("uTime", &u.uTime)
+	u.canvas.SetFragmentShader(fragmentShaderMinimap)
+
 	u.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+
+	u.miniMapCanvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
 
 	ttf, err := truetype.Parse(goregular.TTF)
 	if err != nil {
@@ -73,14 +84,19 @@ func (u *UI) create() {
 // Mini map
 //=============================================================
 func (u *UI) updateMiniMap() {
-	u.miniMapScale = 0.08 / (float64(global.gWorld.width) / 1024)
+	u.miniMapScale = 0.15 / (float64(global.gWorld.width) / 1024)
 	pos := global.gPlayer.getPosition()
-	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
-	canvas.Clear(pixel.RGBA{1.0, 0, 0, 0.5})
+	//canvas := pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
+	//canvas.Clear(pixel.RGBA{1.0, 0, 0, 0.5})
+
 	offset_x := float64(global.gWorld.width/2) * u.miniMapScale
 	offset_y := float64(global.gWorld.height/2) * u.miniMapScale
-	global.gWorld.bgSprite.Draw(u.canvas, pixel.IM.ScaledXY(pixel.V(u.miniMapScale, u.miniMapScale), pixel.V(u.miniMapScale, u.miniMapScale)).Moved(pixel.V(offset_x, offset_y)))
-	canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
+
+	u.uPos = mgl32.Vec2{float32(offset_x / 2), float32(offset_y / 2)}
+
+	global.gWorld.bgSprite.Draw(u.canvas, pixel.IM.ScaledXY(pixel.V(u.miniMapScale, u.miniMapScale), pixel.V(u.miniMapScale/2, u.miniMapScale/2)).Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
+	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
+	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(offset_x, offset_y)))
 }
 
 //=============================================================
@@ -104,6 +120,8 @@ func (u *UI) updateFPS(fps int) {
 //
 //=============================================================
 func (u *UI) draw(dt float64) {
+
+	u.uTime += float32(dt)
 
 	// Draw death screen
 	color := pixel.RGBA{}

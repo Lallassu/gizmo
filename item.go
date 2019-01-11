@@ -50,7 +50,6 @@ func (i *item) newItem(x, y float64, iType objectType) {
 	// Test fragment shader (Must be set after gfx is created)
 	if iType == itemPortal {
 		// TBD: Use mgl32.Vec2
-		// Take scaling into account
 		uPosX := float32((i.bounds.Width / 2) * (1 / i.scale))
 		uPosY := float32((i.bounds.Height / 2) * (1 / i.scale))
 		i.graphics.canvas.SetUniform("uTime", &i.uTime)
