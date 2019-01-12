@@ -91,6 +91,18 @@ func (m *Map) newMap(level int) {
 	// NOTE: Z-order is applied depending on QT adding order.
 	// Hence we add player + enemies first.
 
+	for _, p := range items[itemDoor] {
+		w := &item{}
+		// Find floor.
+		for {
+			if global.gWorld.IsRegular(p.X, p.Y) {
+				w.newItem(p.X, p.Y+1, itemDoor)
+				break
+			}
+			p.Y--
+		}
+	}
+
 	// Should only be one player though.
 	for _, p := range items[mobPlayer] {
 		global.gPlayer.create(float64(p.X), float64(p.Y))
@@ -433,19 +445,19 @@ func (m *Map) paintMap() {
 
 				if pbelow != wBackground8 && pafter == wBackground8 && p == 0xFF && up == wBackground8 && pp == wBackground8 {
 					// Check there is no ladder
-					skip := false
-					for i := 0; i < wDoorLen; i++ {
-						if global.gWorld.pixels[(x+i)*global.gWorld.width+y+1]&0xFF == wLadder8 {
-							skip = true
-							break
-						}
-					}
-					if !skip {
-						if pcgGen.GenerateDoor(x, y+1) {
-							// save door position
-							global.gWorld.doors = append(global.gWorld.doors, pixel.Vec{float64(x + wDoorLen/2), float64(y + 1)})
-						}
-					}
+					//skip := false
+					//for i := 0; i < wDoorLen; i++ {
+					//	if global.gWorld.pixels[(x+i)*global.gWorld.width+y+1]&0xFF == wLadder8 {
+					//		skip = true
+					//		break
+					//	}
+					//}
+					// if !skip {
+					// 	if pcgGen.GenerateDoor(x, y+1) {
+					// 		// save door position
+					// 		global.gWorld.doors = append(global.gWorld.doors, pixel.Vec{float64(x + wDoorLen/2), float64(y + 1)})
+					// 	}
+					// }
 				}
 			}
 		}

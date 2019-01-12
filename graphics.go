@@ -27,58 +27,72 @@ type graphics struct {
 	batches     map[int]*pixel.Batch
 	triangles   map[int]*pixel.TrianglesData
 	frames      map[int][]uint32
+	sprite      *pixel.Sprite
 	img         image.Image
 	canvas      *pixelgl.Canvas
 	animated    bool
 	scalexy     float64
+	static      bool
 }
 
 //=============================================================
 // Create graphics
 //=============================================================
-func (gfx *graphics) createGfx(x, y float64) {
-	gfx.frames = make(map[int][]uint32)
-	gfx.batches = make(map[int]*pixel.Batch)
-	gfx.triangles = make(map[int]*pixel.TrianglesData)
-
+func (gfx *graphics) createGfx(x, y float64, static bool) {
 	if gfx.scalexy == 0 {
 		gfx.scalexy = 1.0
 	}
-	gfx.animRate = 0.1
-	gfx.currentAnim = animIdle
-	fullWidth := 0.0
+	// Static is just a sprite drawn to an image.
+	if static {
+		img, _, _, _ := loadTexture(gfx.sheetFile)
+		pic := pixel.PictureDataFromImage(img)
+		gfx.sprite = pixel.NewSprite(pic, pic.Bounds())
+		gfx.canvas = pixelgl.NewCanvas(pic.Bounds())
 
-	gfx.img, fullWidth, gfx.frameHeight, gfx.size = loadTexture(gfx.sheetFile)
+		//	gfx.sprite.Draw(gfx.canvas, pixel.IM.Moved(pixel.V(0, 0)))
 
-	if !gfx.animated {
-		gfx.frameWidth = fullWidth
-		if gfx.frameWidth == gfx.frameHeight {
-			gfx.size += 1
-		}
-	}
+		gfx.frameWidth = pic.Bounds().Max.X
+		gfx.frameHeight = pic.Bounds().Max.Y
+	} else {
+		gfx.frames = make(map[int][]uint32)
+		gfx.batches = make(map[int]*pixel.Batch)
+		gfx.triangles = make(map[int]*pixel.TrianglesData)
 
-	f := 0
-	for w := 0.0; w < fullWidth; w += gfx.frameWidth {
-		gfx.frames[f] = make([]uint32, int(gfx.size)*int(gfx.size))
-		for x := 0.0; x <= gfx.frameWidth; x++ {
-			for y := 0.0; y <= gfx.frameHeight; y++ {
-				r, g, b, a := gfx.img.At(int(w+x), int(gfx.frameHeight-y)).RGBA()
-				if r == 0 && g == 0 && b == 0 && a == 0 {
-					continue
-				}
-				gfx.frames[f][int(x*gfx.size+y-1)] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+		gfx.animRate = 0.1
+		gfx.currentAnim = animIdle
+		fullWidth := 0.0
+
+		gfx.img, fullWidth, gfx.frameHeight, gfx.size = loadTexture(gfx.sheetFile)
+
+		if !gfx.animated {
+			gfx.frameWidth = fullWidth
+			if gfx.frameWidth == gfx.frameHeight {
+				gfx.size += 1
 			}
 		}
-		gfx.triangles[f] = pixel.MakeTrianglesData(100)
-		gfx.batches[f] = pixel.NewBatch(gfx.triangles[f], nil)
-		f++
+
+		f := 0
+		for w := 0.0; w < fullWidth; w += gfx.frameWidth {
+			gfx.frames[f] = make([]uint32, int(gfx.size)*int(gfx.size))
+			for x := 0.0; x <= gfx.frameWidth; x++ {
+				for y := 0.0; y <= gfx.frameHeight; y++ {
+					r, g, b, a := gfx.img.At(int(w+x), int(gfx.frameHeight-y)).RGBA()
+					if r == 0 && g == 0 && b == 0 && a == 0 {
+						continue
+					}
+					gfx.frames[f][int(x*gfx.size+y-1)] = r&0xFF<<24 | g&0xFF<<16 | b&0xFF<<8 | a&0xFF
+				}
+			}
+			gfx.triangles[f] = pixel.MakeTrianglesData(100)
+			gfx.batches[f] = pixel.NewBatch(gfx.triangles[f], nil)
+			f++
+		}
+
+		gfx.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(gfx.frameWidth), float64(gfx.frameHeight)))
+
+		// Build all frames
+		gfx.buildFrames()
 	}
-
-	gfx.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(gfx.frameWidth), float64(gfx.frameHeight)))
-
-	// Build all frames
-	gfx.buildFrames()
-
 }
 
 //=============================================================

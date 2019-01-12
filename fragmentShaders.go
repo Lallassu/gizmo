@@ -6,6 +6,40 @@
 package main
 
 //=============================================================
+// Fragment shader for doors
+//=============================================================
+var fragmentShaderDoor = `
+#version 330 core
+
+in vec2  vTexCoords;
+in vec2  vPosition;
+in vec4  vColor;
+
+out vec4 fragColor;
+
+uniform float uTime;
+uniform vec2 uPos;
+
+uniform vec4 uTexBounds;
+uniform sampler2D uTexture;
+
+void main() 
+{
+	
+    vec2 t = gl_FragCoord.xy / uTexBounds.zw;
+	   vec4 c_ = texture(uTexture, t);
+   if (c_.r == 0 && c_.g == 0 && c_.b == 1) {
+       float dist = distance(uPos, vPosition)/uPos.y;
+	   float o = sin(dist);
+	   vec4 c = texture(uTexture, t*o*cos(uTime));
+	   fragColor = vec4(dist*c.r*o, dist*c.g*o, 0, c.a*clamp((1.0-dist), 0.2, 0.8));
+   } else {
+	   fragColor = c_;
+   }
+}
+`
+
+//=============================================================
 // Fragment shader for minimap
 //=============================================================
 var fragmentShaderMinimap = `
@@ -28,16 +62,16 @@ void main() {
    vec4 tx = texture(uTexture, t);
    vec4 c = vec4(tx.r, tx.g, tx.b, tx.a);
    float dist = distance(uPos, vPosition)/uPos.y;
-   if (dist < 0.05) {
+   if (dist < 0.02) {
    		if (sin(uTime*15) < 0) {
 			fragColor = vec4(1.0, 0, 0, 1.0);
 		} else {
 			fragColor = vec4(0, 0 ,0 ,0);
 		}
-   } else if (dist < 0.8) {
-		fragColor = vec4(c.r/dist, c.g, c.b/dist, c.a/dist);
-   } else if (dist < 0.9) {
-		fragColor = vec4(0.6+dist, 0.3, 0, 0.4+dist);
+ //  } else if (dist < 0.5) {
+ //       fragColor = vec4(c.r/dist/2, c.g, c.b/dist/2, c.a/dist/2);
+   } else if (dist < 0.6) {
+		fragColor = c;
    } else {
 		fragColor = vec4(0, 0, 0, 0);
    }
@@ -57,8 +91,7 @@ in vec4  vColor;
 out vec4 fragColor;
 
 uniform float uTime;
-uniform float uPosX;
-uniform float uPosY;
+uniform vec2 uPos;
 
 uniform vec4 uTexBounds;
 uniform sampler2D uTexture;
@@ -67,9 +100,9 @@ void main() {
    vec4 c = vColor;
    
    if (c.r == 0 && c.g == 0 && c.b == 1) {
-	   float py = uPosY+cos(uTime*5)*3;
-	   float px = uPosX+sin(uTime*5)*5;
-       float dist = distance(vec2(px, py), vPosition)/uPosY;
+	   float py = uPos.y+cos(uTime*5)*3;
+	   float px = uPos.x+sin(uTime*5)*5;
+       float dist = distance(vec2(px, py), vPosition)/uPos.y;
 	   float o = clamp(sin(uTime/dist), 0.5, 1.0);
 	   if (dist < 0.2) {
 	   	   float t = dist*2;

@@ -49,7 +49,7 @@ func (m *mob) create(x, y float64) {
 	m.hpBar = pixel.NewSprite(m.hpImg, pixel.R(0, 0, 40, 5))
 
 	// Initiate the graphics for the mob
-	m.createGfx(x, y)
+	m.createGfx(x, y, false)
 	m.createPhys(x, y, m.frameWidth, m.frameHeight)
 
 	m.graphics.scalexy = m.phys.scale

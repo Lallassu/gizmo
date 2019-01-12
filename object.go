@@ -24,6 +24,7 @@ type object struct {
 	prevOwner      *mob
 	animateIdle    bool
 	animateOffset  float64
+	static         bool
 }
 
 //=============================================================
@@ -32,7 +33,7 @@ type object struct {
 func (o *object) create(x, y float64) {
 	o.mass = 5
 	//o.active = true
-	o.createGfx(x, y)
+	o.createGfx(x, y, o.static)
 	o.createPhys(x, y, o.frameWidth, o.frameHeight)
 	o.graphics.scalexy = o.phys.scale
 }
@@ -53,6 +54,10 @@ func (o *object) getType() objectType {
 //
 //=============================================================
 func (o *object) hit(x_, y_, vx, vy float64, pow int) {
+	if o.static {
+		return
+	}
+
 	power := float64(pow)
 	// If distance is close, explode, otherwise push away.
 	dist := distance(pixel.Vec{x_ + power/2, y_ + power/2}, pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2})
@@ -157,18 +162,19 @@ func (o *object) draw(dt, elapsed float64) {
 		o.light.bounds.Y = o.bounds.Y + o.light_offset_y
 	}
 
-	o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	if !o.static {
+		o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+		idx := 0
+		if o.animated {
+			o.animCounter += dt
+			idx = int(math.Floor(o.animCounter / 0.01))
+			idx = o.idleFrames[idx/30%len(o.idleFrames)]
+		}
 
-	idx := 0
-	if o.animated {
-		o.animCounter += dt
-		idx = int(math.Floor(o.animCounter / 0.01))
-		idx = o.idleFrames[idx/30%len(o.idleFrames)]
+		o.batches[idx].Draw(o.canvas)
 	}
 
-	o.batches[idx].Draw(o.canvas)
-
-	if o.owner == nil {
+	if o.owner == nil && !o.static {
 		o.physics(dt)
 
 		// Check if thrown.
@@ -196,21 +202,26 @@ func (o *object) draw(dt, elapsed float64) {
 		}
 		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.animateOffset+o.bounds.Y+o.bounds.Height/2)).Rotated(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2), o.rotation))
 	} else {
-		offset := 0.0
-		switch o.bounds.entity.(type) {
-		case *item:
-			if !o.owner.duck {
-				offset = 10.0
-			} else {
-				offset = 5.0
+		if !o.static {
+			offset := 0.0
+			switch o.bounds.entity.(type) {
+			case *item:
+				if !o.owner.duck {
+					offset = 10.0
+				} else {
+					offset = 5.0
+				}
 			}
+			o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*o.owner.dir, o.scale)).
+				Moved(pixel.V(o.owner.bounds.X+o.owner.bounds.Width/2, offset+o.owner.bounds.Y+o.owner.bounds.Height/2-2)).
+				Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*o.owner.dir))
+			// Update oect positions based on mob
+			o.bounds.X = o.owner.bounds.X
+			o.bounds.Y = o.owner.bounds.Y
+		} else {
+			o.graphics.sprite.Draw(o.graphics.canvas, pixel.IM.Moved(pixel.V(o.bounds.Width/2, o.bounds.Height/2)))
+			o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale, o.scale)).Moved(pixel.V(o.bounds.X+o.bounds.Width/2, o.bounds.Y+o.bounds.Height/2)))
 		}
-		o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*o.owner.dir, o.scale)).
-			Moved(pixel.V(o.owner.bounds.X+o.owner.bounds.Width/2, offset+o.owner.bounds.Y+o.owner.bounds.Height/2-2)).
-			Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*o.owner.dir))
-		// Update oect positions based on mob
-		o.bounds.X = o.owner.bounds.X
-		o.bounds.Y = o.owner.bounds.Y
 	}
 
 }

@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 //=============================================================
@@ -36,6 +37,11 @@ func (i *item) newItem(x, y float64, iType objectType) {
 		i.animateIdle = false
 		i.name = "Crate"
 		i.scale = 1
+	case itemDoor:
+		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "door.png")
+		i.static = true
+		i.name = "Door"
+		i.scale = 1
 	case itemPowerupHealth:
 		i.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "poweruphp3.png")
 		i.animated = false
@@ -48,14 +54,15 @@ func (i *item) newItem(x, y float64, iType objectType) {
 	i.create(x, y)
 
 	// Test fragment shader (Must be set after gfx is created)
+	uPos := mgl32.Vec2{float32((i.bounds.Width / 2) * (1 / i.scale)), float32((i.bounds.Height / 2) * (1 / i.scale))}
 	if iType == itemPortal {
-		// TBD: Use mgl32.Vec2
-		uPosX := float32((i.bounds.Width / 2) * (1 / i.scale))
-		uPosY := float32((i.bounds.Height / 2) * (1 / i.scale))
 		i.graphics.canvas.SetUniform("uTime", &i.uTime)
-		i.graphics.canvas.SetUniform("uPosX", &uPosX)
-		i.graphics.canvas.SetUniform("uPosY", &uPosY)
+		i.graphics.canvas.SetUniform("uPos", &uPos)
 		i.graphics.canvas.SetFragmentShader(fragmentShaderPortal)
+	} else if iType == itemDoor {
+		i.graphics.canvas.SetUniform("uTime", &i.uTime)
+		i.graphics.canvas.SetUniform("uPos", &uPos)
+		i.graphics.canvas.SetFragmentShader(fragmentShaderDoor)
 	}
 
 	// Must set this after create

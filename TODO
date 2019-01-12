@@ -1,15 +1,23 @@
 General
 --------
-- Randomly drop particleFire from lamps.
+- Object som endast är en canvas. 
+    -> No frames, just loaded img to canvas
+    -> Draw method.
+
+- Dörrar ska genereras till egen canvas.
+    -> Shader för att visa "ljus" i dörren
 
 - Shader for minimap
+    -> Own canvas for map-shader.
+        -> Middle of the frame canvas.
     -> Set map correct position compared to player.
-    -> Have a image frame around the shader.
+    -> Add enemies to minimap?
 
 - Elevators
     -> Object
     -> Moving certain path
 
+- Key to zoom in minimap instantly.
 
 - "Hit" objects and destroy them partially + floodfill
 

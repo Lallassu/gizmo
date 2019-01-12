@@ -43,6 +43,7 @@ const (
 	itemCrate objectType = iota
 	itemPowerupHealth
 	itemPortal
+	itemDoor
 	mobPlayer
 	mobEnemy1
 	explosiveRegularMine
