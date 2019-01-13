@@ -33,12 +33,15 @@ type UI struct {
 	deathScreenTimer   float64
 	uPos               mgl32.Vec2
 	uTime              float32
+	lifeCanvas         *pixelgl.Canvas
 }
 
 //=============================================================
 //
 //=============================================================
 func (u *UI) create() {
+	u.lifeCanvas = global.gFont.write("100")
+
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
 	u.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
 
@@ -168,6 +171,9 @@ func (u *UI) draw(dt float64) {
 	//u.lifeText.Clear()
 	//u.lifeText.WriteString(fmt.Sprintf("Life: %v", global.gPlayer.life))
 	//u.lifeText.Draw(u.canvas, pixel.IM.Scaled(pixel.ZV, 0.25).Moved(pixel.V(1, wViewMax/2+40)))
+
+	u.lifeCanvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(100, wViewMax/2+40)))
+
 	bounds := u.miniMapFrameCanvas.Bounds()
 	u.miniMapFrameCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+bounds.Max.X/2, global.gCamera.pos.Y+bounds.Max.Y/2)))
 	bounds = u.miniMapCanvas.Bounds()

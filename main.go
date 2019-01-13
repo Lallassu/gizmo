@@ -52,6 +52,7 @@ func run() {
 // Setup map, world, player etc.
 //=============================================================
 func setup() {
+	global.gFont.create()
 	global.gUI.create()
 	global.gMapColor.create()
 	global.gRand.create(100000)

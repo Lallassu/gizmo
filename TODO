@@ -1,12 +1,5 @@
 General
 --------
-- Object som endast är en canvas. 
-    -> No frames, just loaded img to canvas
-    -> Draw method.
-
-- Dörrar ska genereras till egen canvas.
-    -> Shader för att visa "ljus" i dörren
-
 - Shader for minimap
     -> Own canvas for map-shader.
         -> Middle of the frame canvas.

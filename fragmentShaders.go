@@ -31,8 +31,8 @@ void main()
    if (c_.r == 0 && c_.g == 0 && c_.b == 1) {
        float dist = distance(uPos, vPosition)/uPos.y;
 	   float o = sin(dist);
-	   vec4 c = texture(uTexture, t*o*cos(uTime));
-	   fragColor = vec4(dist*c.r*o, dist*c.g*o, 0, c.a*clamp((1.0-dist), 0.2, 0.8));
+	   vec4 c = texture(uTexture, clamp(t*o, 0.5, 0.8));
+	   fragColor = vec4(dist/clamp(cos(uTime),0.4, 0.6)*c.r*o, dist*c.g*o, c.b/2, c.a*clamp((1.0-dist), 0.2, 0.8));
    } else {
 	   fragColor = c_;
    }

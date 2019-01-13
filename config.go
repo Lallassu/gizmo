@@ -85,6 +85,7 @@ type Global struct {
 	gUI             *UI
 	gMap            *Map
 	gMapColor       *mapColor
+	gFont           *font
 	//utime           float32
 }
 
@@ -106,6 +107,7 @@ var global = &Global{
 	gUI:             &UI{},
 	gMap:            &Map{},
 	gMapColor:       &mapColor{},
+	gFont:           &font{},
 	gPlayer: &mob{
 		graphics: graphics{
 			animated:    true,
