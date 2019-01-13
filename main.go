@@ -108,7 +108,7 @@ func gameLoop() {
 				global.gParticleEngine.update(wMaxInvFPS)
 				global.gAmmoEngine.update(wMaxInvFPS)
 
-				go global.gCamera.update(wMaxInvFPS)
+				global.gCamera.update(wMaxInvFPS)
 
 				global.gUI.draw(wMaxInvFPS)
 
@@ -116,8 +116,6 @@ func gameLoop() {
 				//	drawLights(wMaxInvFPS)
 
 				global.gWin.Update()
-				//uPosX = float32(test.bounds.X)
-				//uPosY = float32(test.bounds.Y)
 			} else {
 				break
 			}

@@ -1,5 +1,20 @@
 General
 --------
+- Menu
+    - New Game
+    - Continue
+    - Configuration
+    - About
+    - Quit
+
+- Handle restart of maps?
+    -> Regenerate everything.
+    -> Test call main.Init()
+- Handle respawn when dead.
+
+
+- global.uTime for all shaders timer.
+
 - Shader for minimap
     -> Own canvas for map-shader.
         -> Middle of the frame canvas.
@@ -15,13 +30,6 @@ General
 - "Hit" objects and destroy them partially + floodfill
 
 - Powerup text above player
-
-- Text-atlas (sprites) to write text/numbers.
-    -> set(x,y, string)
-    -> each char in string lookup char.
-    -> each char is part of a sprite.
-    -> map["char"] = position in sprite.
-    -> Draw to a canvas
 
 - Doors should be connected pairs.
     -> Not random location when entering.
@@ -65,13 +73,6 @@ General
     - AI Can pick up objecst and throw towards player
     - If ducking with object, hide from AI.
 
-
-- Menu
-    - New Game
-    - Continue
-    - Configuration
-    - About
-    - Quit
 
 - Own animations + sprites
 

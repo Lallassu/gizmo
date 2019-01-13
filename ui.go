@@ -9,21 +9,13 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/faiface/pixel/text"
 	"github.com/go-gl/mathgl/mgl32"
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font/gofont/goregular"
-	"strconv"
-	"unicode"
 )
 
 //=============================================================
 //
 //=============================================================
 type UI struct {
-	fps                *text.Text
-	middleText         *text.Text
-	lifeText           *text.Text
 	canvas             *pixelgl.Canvas
 	miniMapSprite      *pixel.Sprite
 	miniMapFrameCanvas *pixelgl.Canvas
@@ -34,13 +26,13 @@ type UI struct {
 	uPos               mgl32.Vec2
 	uTime              float32
 	lifeCanvas         *pixelgl.Canvas
+	playerLife         float64
 }
 
 //=============================================================
 //
 //=============================================================
 func (u *UI) create() {
-	u.lifeCanvas = global.gFont.write("100")
 
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
 	u.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
@@ -55,37 +47,7 @@ func (u *UI) create() {
 	u.miniMapSprite = pixel.NewSprite(pic, pic.Bounds())
 	u.miniMapFrameCanvas = pixelgl.NewCanvas(pic.Bounds())
 
-	ttf, err := truetype.Parse(goregular.TTF)
-	if err != nil {
-		panic(err)
-	}
-	fface := truetype.NewFace(ttf, &truetype.Options{
-		Size:              wFPSTextSize,
-		GlyphCacheEntries: 1,
-	})
-
-	ffaceMiddle := truetype.NewFace(ttf, &truetype.Options{
-		Size:              wMiddleTextSize,
-		GlyphCacheEntries: 1,
-	})
-
-	regularMiddle := text.NewAtlas(
-		ffaceMiddle,
-		text.ASCII, text.RangeTable(unicode.Latin),
-	)
-
-	regular := text.NewAtlas(
-		fface,
-		text.ASCII, text.RangeTable(unicode.Latin),
-	)
-	u.fps = text.New(pixel.ZV, regular)
-	u.fps.Color = pixel.RGBA{1, 0, 1, 1}
-
-	u.middleText = text.New(pixel.ZV, regularMiddle)
-	u.middleText.Color = pixel.RGBA{1, 1, 1, 1}
-
-	u.lifeText = text.New(pixel.ZV, regular)
-	u.lifeText.Color = pixel.RGBA{1, 0, 0, 1}
+	u.updatePlayerLife()
 }
 
 //=============================================================
@@ -124,17 +86,27 @@ func (u *UI) updateMiniMap() {
 //
 //=============================================================
 func (u *UI) setMiddleText(text string) {
-	u.middleTextStr = text
-	u.middleText.Clear()
-	u.middleText.WriteString(fmt.Sprintf("%v", text))
+	//u.middleTextStr = text
+	//u.middleText.Clear()
+	//u.middleText.WriteString(fmt.Sprintf("%v", text))
 }
 
 //=============================================================
 //
 //=============================================================
 func (u *UI) updateFPS(fps int) {
-	u.fps.Clear()
-	u.fps.WriteString(fmt.Sprintf("FPS: %v", strconv.Itoa(fps)))
+	//u.fps.Clear()
+	//u.fps.WriteString(fmt.Sprintf("FPS: %v", strconv.Itoa(fps)))
+}
+
+//=============================================================
+//
+//=============================================================
+func (u *UI) updatePlayerLife() {
+	if u.playerLife != global.gPlayer.life {
+		u.playerLife = global.gPlayer.life
+		u.lifeCanvas = global.gFont.write(fmt.Sprintf("Life: %v", u.playerLife))
+	}
 }
 
 //=============================================================
@@ -159,20 +131,13 @@ func (u *UI) draw(dt float64) {
 		u.deathScreenTimer = 0
 	}
 	u.canvas.Clear(color)
-	u.miniMapCanvas.Clear(color)
-	u.miniMapFrameCanvas.Clear(color)
+	u.miniMapCanvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	u.miniMapFrameCanvas.Clear(pixel.RGBA{0, 0, 0, 0})
 
 	u.updateMiniMap()
 
-	u.fps.Draw(u.canvas, pixel.IM.Moved(pixel.V(1, wViewMax/2+22)))
-
-	u.middleText.Draw(u.canvas, pixel.IM.Moved(pixel.V(float64(wViewMax/2-((len(u.middleTextStr)/3)*wMiddleTextSize)), wViewMax/3)))
-
-	//u.lifeText.Clear()
-	//u.lifeText.WriteString(fmt.Sprintf("Life: %v", global.gPlayer.life))
-	//u.lifeText.Draw(u.canvas, pixel.IM.Scaled(pixel.ZV, 0.25).Moved(pixel.V(1, wViewMax/2+40)))
-
-	u.lifeCanvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(100, wViewMax/2+40)))
+	u.updatePlayerLife()
+	u.lifeCanvas.Draw(u.canvas, pixel.IM.Scaled(pixel.ZV, 0.5).Moved(pixel.V(50, wViewMax/2+40)))
 
 	bounds := u.miniMapFrameCanvas.Bounds()
 	u.miniMapFrameCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+bounds.Max.X/2, global.gCamera.pos.Y+bounds.Max.Y/2)))
