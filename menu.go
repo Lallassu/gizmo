@@ -45,30 +45,26 @@ func (m *menu) create() {
 //
 //=============================================================
 func (m *menu) addItem(str string, f func()) {
-	canvas := pixelgl.NewCanvas(pixel.R(0, 0, 100, 100))
-	canvas.SetUniform("uTime", &m.uTime)
-	canvas.SetFragmentShader(fragmentShaderMenuItem)
-	global.gFont.writeToCanvas(str, canvas)
 	item := &menuItem{
-		canvas:   canvas,
+		canvas:   pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)),
 		name:     str,
 		action:   f,
 		selected: 0,
 	}
-
-	//item.canvas.SetUniform("uSelected", &item.selected)
+	item.canvas.SetUniform("uSelected", &item.selected)
+	item.canvas.SetUniform("uTime", &m.uTime)
+	item.canvas.SetFragmentShader(fragmentShaderMenuItem)
 
 	m.items = append(m.items, item)
-
 }
 
 //=============================================================
 //
 //=============================================================
 func (m *menu) selectItem() {
-	for _, item := range m.items {
+	for i, item := range m.items {
 		if item.selected == 1 {
-			item.action()
+			m.items[i].action()
 			return
 		}
 	}
@@ -111,14 +107,15 @@ func (m *menu) moveDown() {
 //=============================================================
 //
 //=============================================================
-func (m *menu) draw(dt float64) {
+func (m *menu) draw(dt, elapsed float64) {
 	if m.visible {
 		m.uTime += float32(dt)
 		offset_y := 40.0
 		offset_x := 30.0
-		// Draw in the middle of the screen.
-		for i, item := range m.items {
-			item.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offset_x, global.gCamera.pos.Y+wViewMax/2-float64(i)*offset_y)))
+		for i, _ := range m.items {
+			m.items[i].canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+			global.gFont.writeToCanvas(m.items[i].name, m.items[i].canvas)
+			m.items[i].canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offset_x, global.gCamera.pos.Y+wViewMax/2-float64(i)*offset_y)))
 		}
 	}
 }

@@ -111,7 +111,7 @@ func gameLoop() {
 				global.gCamera.update(wMaxInvFPS)
 
 				global.gUI.draw(wMaxInvFPS)
-				global.gMenu.draw(wMaxInvFPS)
+				global.gMenu.draw(wMaxInvFPS, elapsed)
 
 				// TEST
 				//	drawLights(wMaxInvFPS)

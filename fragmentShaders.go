@@ -26,9 +26,14 @@ uniform sampler2D uTexture;
 void main() 
 {
 	
-   vec2 t = gl_FragCoord.xy / uTexBounds.zw;
+   vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
    vec4 c = texture(uTexture, t);
-   fragColor = vec4(c.r*sin(uTime), c.g, c.b*sin(uTime), c.a);
+   if (uSelected != 0 ) {
+   		 float add = clamp(sin(uTime*7), 0.5,1.0);
+         fragColor = vec4(c.rg * add, c.b/add, c.a);
+   } else {
+		fragColor = c;
+   }
 }
 `
 
