@@ -53,6 +53,7 @@ func run() {
 //=============================================================
 func setup() {
 	global.gFont.create()
+	global.gMenu.create()
 	global.gUI.create()
 	global.gMapColor.create()
 	global.gRand.create(100000)
@@ -92,7 +93,6 @@ func gameLoop() {
 		dt := time.Since(last).Seconds()
 		frameDt += dt
 		last = time.Now()
-		//	global.utime += float32(dt)
 
 		for {
 			if frameDt >= wMaxInvFPS {
@@ -111,6 +111,7 @@ func gameLoop() {
 				global.gCamera.update(wMaxInvFPS)
 
 				global.gUI.draw(wMaxInvFPS)
+				global.gMenu.draw(wMaxInvFPS)
 
 				// TEST
 				//	drawLights(wMaxInvFPS)

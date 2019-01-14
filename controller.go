@@ -17,6 +17,7 @@ type controller struct {
 	moveRightKey pixelgl.Button
 	moveClimbKey pixelgl.Button
 	moveJumpKey  pixelgl.Button
+	menuMoveDt   float64
 	lightDt      float64
 }
 
@@ -41,12 +42,31 @@ func (c *controller) create() {
 // Handle input for both mouse and keyboard
 //=============================================================
 func (c *controller) update(dt float64) {
+	if global.gWin.Pressed(pixelgl.KeyQ) {
+		c.quit = true
+	}
+
+	// If menu is visible, just stear the menu and not char.
+	if global.gMenu.visible {
+		c.menuMoveDt += dt
+		if c.menuMoveDt > 0.1 {
+			if global.gWin.Pressed(pixelgl.KeyUp) {
+				global.gMenu.moveUp()
+			}
+			if global.gWin.Pressed(pixelgl.KeyDown) {
+				global.gMenu.moveDown()
+			}
+			if global.gWin.Pressed(pixelgl.KeyEnter) {
+				global.gMenu.selectItem()
+			}
+			c.menuMoveDt = 0
+		}
+		return
+	}
+
 	// Global not bound to entity
 	if global.gWin.Pressed(pixelgl.KeyM) {
 		PrintMemoryUsage()
-	}
-	if global.gWin.Pressed(pixelgl.KeyQ) {
-		c.quit = true
 	}
 	if global.gWin.Pressed(pixelgl.KeyP) {
 		global.gCamera.setFollow(nil)

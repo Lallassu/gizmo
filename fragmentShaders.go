@@ -6,6 +6,33 @@
 package main
 
 //=============================================================
+// Fragment shader for menu items
+//=============================================================
+var fragmentShaderMenuItem = `
+#version 330 core
+
+in vec2  vTexCoords;
+in vec2  vPosition;
+in vec4  vColor;
+
+out vec4 fragColor;
+
+uniform float uTime;
+uniform int uSelected;
+
+uniform vec4 uTexBounds;
+uniform sampler2D uTexture;
+
+void main() 
+{
+	
+   vec2 t = gl_FragCoord.xy / uTexBounds.zw;
+   vec4 c = texture(uTexture, t);
+   fragColor = vec4(c.r*sin(uTime), c.g, c.b*sin(uTime), c.a);
+}
+`
+
+//=============================================================
 // Fragment shader for doors
 //=============================================================
 var fragmentShaderDoor = `

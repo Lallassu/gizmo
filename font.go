@@ -65,3 +65,15 @@ func (f *font) write(text string) *pixelgl.Canvas {
 	}
 	return canvas
 }
+
+//=============================================================
+// Draw text to given canvas (pre-created canvas for shaders)
+//=============================================================
+func (f *font) writeToCanvas(text string, canvas *pixelgl.Canvas) {
+	canvas.SetBounds(pixel.R(0, 0, float64(len(text))*f.cWidth, f.cHeight))
+	for i, c := range text {
+		if f.chars[string(unicode.ToLower(c))] != nil {
+			f.chars[string(unicode.ToLower(c))].Draw(canvas, pixel.IM.Moved(pixel.V(float64(i)*f.cWidth+f.cWidth/2, f.cHeight/2)))
+		}
+	}
+}
