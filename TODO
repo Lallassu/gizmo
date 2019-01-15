@@ -1,19 +1,6 @@
 General
 --------
-- Menu
-    - New Game
-    - Continue
-    - Configuration
-    - About
-    - Quit
-
-- Handle restart of maps?
-    -> Regenerate everything.
-    -> Test call main.Init()
 - Handle respawn when dead.
-
-
-- global.uTime for all shaders timer.
 
 - Shader for minimap
     -> Own canvas for map-shader.

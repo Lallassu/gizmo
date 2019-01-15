@@ -24,7 +24,6 @@ type UI struct {
 	middleTextStr      string
 	deathScreenTimer   float64
 	uPos               mgl32.Vec2
-	uTime              float32
 	lifeCanvas         *pixelgl.Canvas
 	playerLife         float64
 }
@@ -39,7 +38,7 @@ func (u *UI) create() {
 
 	u.miniMapCanvas = pixelgl.NewCanvas(pixel.R(0, 0, 100, 100))
 	u.miniMapCanvas.SetUniform("uPos", &u.uPos)
-	u.miniMapCanvas.SetUniform("uTime", &u.uTime)
+	u.miniMapCanvas.SetUniform("uTime", &global.uTime)
 	u.miniMapCanvas.SetFragmentShader(fragmentShaderMinimap)
 
 	img, _, _, _ := loadTexture(fmt.Sprintf("%v%v", wAssetObjectsPath, "minimap.png"))
@@ -113,8 +112,6 @@ func (u *UI) updatePlayerLife() {
 //
 //=============================================================
 func (u *UI) draw(dt float64) {
-
-	u.uTime += float32(dt)
 
 	// Draw death screen
 	color := pixel.RGBA{}

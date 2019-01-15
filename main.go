@@ -53,7 +53,8 @@ func run() {
 //=============================================================
 func setup() {
 	global.gFont.create()
-	global.gMenu.create()
+	global.gMainMenu.createMain()
+	global.gOptionsMenu.createOptions()
 	global.gUI.create()
 	global.gMapColor.create()
 	global.gRand.create(100000)
@@ -97,6 +98,7 @@ func gameLoop() {
 		for {
 			if frameDt >= wMaxInvFPS {
 				elapsed += wMaxInvFPS
+				global.uTime += wMaxInvFPS
 
 				global.gWin.Clear(global.gClearColor)
 				//	global.gWin.SetComposeMethod(pixel.ComposeOver)
@@ -111,7 +113,8 @@ func gameLoop() {
 				global.gCamera.update(wMaxInvFPS)
 
 				global.gUI.draw(wMaxInvFPS)
-				global.gMenu.draw(wMaxInvFPS, elapsed)
+				global.gMainMenu.draw(wMaxInvFPS, elapsed)
+				global.gOptionsMenu.draw(wMaxInvFPS, elapsed)
 
 				// TEST
 				//	drawLights(wMaxInvFPS)

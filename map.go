@@ -103,6 +103,20 @@ func (m *Map) newMap(level int) {
 		}
 	}
 
+	pcgGen := pcg{}
+	for _, p := range items[lampRegular] {
+		// Find floor.
+		for {
+			if global.gWorld.IsRegular(p.X, p.Y) {
+				l := &light{}
+				pcgGen.GenerateLamp(int(p.X), int(p.Y))
+				l.create(p.X, p.Y+1, -90, 100, 50, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
+				break
+			}
+			p.Y++
+		}
+	}
+
 	// Should only be one player though.
 	for _, p := range items[mobPlayer] {
 		global.gPlayer.create(float64(p.X), float64(p.Y))

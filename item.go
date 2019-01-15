@@ -16,7 +16,6 @@ import (
 type item struct {
 	object
 	iType objectType
-	uTime float32
 }
 
 //=============================================================
@@ -56,11 +55,11 @@ func (i *item) newItem(x, y float64, iType objectType) {
 	// Test fragment shader (Must be set after gfx is created)
 	uPos := mgl32.Vec2{float32((i.bounds.Width / 2) * (1 / i.scale)), float32((i.bounds.Height / 2) * (1 / i.scale))}
 	if iType == itemPortal {
-		i.graphics.canvas.SetUniform("uTime", &i.uTime)
+		i.graphics.canvas.SetUniform("uTime", &global.uTime)
 		i.graphics.canvas.SetUniform("uPos", &uPos)
 		i.graphics.canvas.SetFragmentShader(fragmentShaderPortal)
 	} else if iType == itemDoor {
-		i.graphics.canvas.SetUniform("uTime", &i.uTime)
+		i.graphics.canvas.SetUniform("uTime", &global.uTime)
 		i.graphics.canvas.SetUniform("uPos", &uPos)
 		i.graphics.canvas.SetFragmentShader(fragmentShaderDoor)
 	}
@@ -131,7 +130,6 @@ func (i *item) setOwner(m *mob) {
 //=============================================================
 func (i *item) draw(dt, elapsed float64) {
 	// Set uniform used for shaders
-	i.uTime = float32(elapsed)
 	i.object.draw(dt, elapsed)
 }
 

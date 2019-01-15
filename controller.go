@@ -46,18 +46,38 @@ func (c *controller) update(dt float64) {
 		c.quit = true
 	}
 
-	// If menu is visible, just stear the menu and not char.
-	if global.gMenu.visible {
+	// If main menu is visible, just stear the menu and not char.
+	if global.gMainMenu.visible {
 		c.menuMoveDt += dt
-		if c.menuMoveDt > 0.1 {
+		if c.menuMoveDt > 0.15 {
 			if global.gWin.Pressed(pixelgl.KeyUp) {
-				global.gMenu.moveUp()
+				global.gMainMenu.moveUp()
 			}
 			if global.gWin.Pressed(pixelgl.KeyDown) {
-				global.gMenu.moveDown()
+				global.gMainMenu.moveDown()
 			}
 			if global.gWin.Pressed(pixelgl.KeyEnter) {
-				global.gMenu.selectItem()
+				global.gMainMenu.selectItem()
+			}
+			if global.gWin.Pressed(pixelgl.KeyEscape) {
+				global.gMainMenu.visible = false
+			}
+			c.menuMoveDt = 0
+		}
+		return
+	}
+	// If options menu is visible, just stear the menu and not char.
+	if global.gOptionsMenu.visible {
+		c.menuMoveDt += dt
+		if c.menuMoveDt > 0.15 {
+			if global.gWin.Pressed(pixelgl.KeyUp) {
+				global.gOptionsMenu.moveUp()
+			}
+			if global.gWin.Pressed(pixelgl.KeyDown) {
+				global.gOptionsMenu.moveDown()
+			}
+			if global.gWin.Pressed(pixelgl.KeyEnter) {
+				global.gOptionsMenu.selectItem()
 			}
 			c.menuMoveDt = 0
 		}
@@ -66,7 +86,8 @@ func (c *controller) update(dt float64) {
 
 	// Global not bound to entity
 	if global.gWin.Pressed(pixelgl.KeyM) {
-		PrintMemoryUsage()
+		//	PrintMemoryUsage()
+		global.gMainMenu.visible = true
 	}
 	if global.gWin.Pressed(pixelgl.KeyP) {
 		global.gCamera.setFollow(nil)
