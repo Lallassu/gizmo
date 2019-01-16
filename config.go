@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"io/ioutil"
 	"os"
 )
 
@@ -103,10 +104,6 @@ type Global struct {
 
 var global = &Global{
 	gVariableConfig: &variableConfig{},
-	//gWindowHeight:   468,
-	//gWindowWidth:    1024,
-	//gVsync:          false,
-	//gUndecorated:    false,
 	gWorld:          &world{},
 	gCamera:         &camera{},
 	gController:     &controller{},
@@ -138,6 +135,10 @@ var global = &Global{
 	},
 }
 
+//=============================================================
+// Variable configuration file that are possible to configure
+// by the player from the menues.
+//=============================================================
 type variableConfig struct {
 	Vsync             bool `json:"Vsync"`
 	Fullscreen        bool `json:"Fullscreen"`
@@ -176,5 +177,8 @@ func (v *variableConfig) LoadConfiguration() {
 // Configuration file loading
 //=============================================================
 func (v *variableConfig) SaveConfiguration() {
-	// TBD
+	json, _ := json.Marshal(global.gVariableConfig)
+	if err := ioutil.WriteFile(wConfigFile, json, 0644); err != nil {
+		panic("Failed to save configuration")
+	}
 }
