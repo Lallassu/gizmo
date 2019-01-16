@@ -1,9 +1,17 @@
+//=============================================================
+// config.go
+//-------------------------------------------------------------
+// Configuration for the game. Loaded both from config file
+// and static configuration.
+//=============================================================
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"os"
 )
 
 //=============================================================
@@ -61,6 +69,7 @@ const (
 	wAssetMobsPath       = "assets/mobs/"
 	wAssetMapsPath       = "assets/maps/"
 	wAssetMixedPath      = "assets/mixed/"
+	wConfigFile          = "configuration.json"
 )
 
 //=============================================================
@@ -88,14 +97,16 @@ type Global struct {
 	gFont           *font
 	gMainMenu       *menu
 	gOptionsMenu    *menu
+	gVariableConfig *variableConfig
 	uTime           float32
 }
 
 var global = &Global{
-	gWindowHeight:   468,
-	gWindowWidth:    1024,
-	gVsync:          false,
-	gUndecorated:    false,
+	gVariableConfig: &variableConfig{},
+	//gWindowHeight:   468,
+	//gWindowWidth:    1024,
+	//gVsync:          false,
+	//gUndecorated:    false,
 	gWorld:          &world{},
 	gCamera:         &camera{},
 	gController:     &controller{},
@@ -125,4 +136,45 @@ var global = &Global{
 		},
 		maxLife: 100.0,
 	},
+}
+
+type variableConfig struct {
+	Vsync             bool `json:"Vsync"`
+	Fullscreen        bool `json:"Fullscreen"`
+	WindowHeight      int  `json:"WindowHeight"`
+	WindowWidth       int  `json:"WindowWidth"`
+	UndecoratedWindow bool `json:"UndecoratedWindow"`
+	currentMap        int  `json:"CurrentMap"`
+	KeyShoot          int  `json:"KeyShoot"`
+	KeyJump           int  `json:"KeyJump"`
+	KeyLeft           int  `json:"KeyLeft"`
+	KeyRight          int  `json:"KeyRight"`
+	KeyClimb          int  `json:"KeyClimb"`
+	KeyAction         int  `json:"KeyAction"`
+	KeyDrop           int  `json:"KeyDrop"`
+	KeyPickup         int  `json:"KeyPickup"`
+	KeyDuck           int  `json:"KeyDuck"`
+}
+
+//=============================================================
+// Configuration file loading
+//=============================================================
+func (v *variableConfig) LoadConfiguration() {
+	configFile, err := os.Open(wConfigFile)
+	defer configFile.Close()
+	if err != nil {
+		panic(err)
+	}
+	jsonParser := json.NewDecoder(configFile)
+	err = jsonParser.Decode(v)
+	if err != nil {
+		panic("Configuration file not valid.")
+	}
+}
+
+//=============================================================
+// Configuration file loading
+//=============================================================
+func (v *variableConfig) SaveConfiguration() {
+	// TBD
 }

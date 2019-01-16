@@ -1,6 +1,18 @@
 General
 --------
+- Configuration support
+    - Json file -> struct
+    - Add fullscreen support
+    - Controllers
+    - Features (vsync etc)
+    - Number of particles
+        -> Explode of objects/mobs
+
+- Explode of mobs
+    -> Leave bloody parts (flood fill)
+
 - Handle respawn when dead.
+    - Reset of player
 
 - Shader for minimap
     -> Own canvas for map-shader.
@@ -17,6 +29,7 @@ General
 - "Hit" objects and destroy them partially + floodfill
 
 - Powerup text above player
+    - Green shader text
 
 - Doors should be connected pairs.
     -> Not random location when entering.
@@ -67,13 +80,6 @@ General
 
 - sound effects
 
-- Configuration support
-    - Json file -> struct
-    - Add fullscreen support
-    - Controllers
-    - Features (vsync etc)
-    - Number of particles
-        -> Explode of objects/mobs
 
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
 

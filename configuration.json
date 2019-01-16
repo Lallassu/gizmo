@@ -1,0 +1,19 @@
+{
+    "Vsync": true,
+    "Fullscreen": false,
+    "WindowWidth": 1024,
+    "WindowHeight": 764,
+    "UndecoratedWindow": false,
+    "KeyShoot": 0,
+    "KeyJump": 0,
+    "KeyJump": 0,
+    "KeyLeft": 0,
+    "KeyRight": 0,
+    "KeyClimb": 0,
+    "KeyAction": 0,
+    "KeyDrop": 0,
+    "KeyPickup": 0,
+    "KeyDuck": 0,
+    "currentMap": 1
+}
+

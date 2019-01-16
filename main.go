@@ -23,12 +23,16 @@ func main() {
 // Setup game window etc.
 //=============================================================
 func run() {
+	global.gVariableConfig.LoadConfiguration()
+
 	cfg := pixelgl.WindowConfig{
 		Title:       GameTitle,
-		Bounds:      pixel.R(0, 0, 1024, 768),
-		VSync:       global.gVsync,
-		Undecorated: global.gUndecorated,
-		//	Monitor:     pixelgl.PrimaryMonitor(), // Fullscreen
+		Bounds:      pixel.R(0, 0, float64(global.gVariableConfig.WindowWidth), float64(global.gVariableConfig.WindowHeight)),
+		VSync:       global.gVariableConfig.Vsync,
+		Undecorated: global.gVariableConfig.UndecoratedWindow,
+	}
+	if global.gVariableConfig.Fullscreen {
+		cfg.Monitor = pixelgl.PrimaryMonitor()
 	}
 	gWin, err := pixelgl.NewWindow(cfg)
 	//gWin.SetBounds(pixel.R(0, 0, 800, 600))
@@ -101,7 +105,6 @@ func gameLoop() {
 				global.uTime += wMaxInvFPS
 
 				global.gWin.Clear(global.gClearColor)
-				//	global.gWin.SetComposeMethod(pixel.ComposeOver)
 
 				global.gController.update(wMaxInvFPS)
 				global.gWorld.Draw(wMaxInvFPS, elapsed)
@@ -115,9 +118,6 @@ func gameLoop() {
 				global.gUI.draw(wMaxInvFPS)
 				global.gMainMenu.draw(wMaxInvFPS, elapsed)
 				global.gOptionsMenu.draw(wMaxInvFPS, elapsed)
-
-				// TEST
-				//	drawLights(wMaxInvFPS)
 
 				global.gWin.Update()
 			} else {

@@ -103,14 +103,14 @@ func (m *Map) newMap(level int) {
 		}
 	}
 
-	pcgGen := pcg{}
+	//pcgGen := pcg{}
 	for _, p := range items[lampRegular] {
 		// Find floor.
 		for {
 			if global.gWorld.IsRegular(p.X, p.Y) {
 				l := &light{}
-				pcgGen.GenerateLamp(int(p.X), int(p.Y))
-				l.create(p.X, p.Y+1, -90, 100, 50, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
+				//	pcgGen.GenerateLamp(int(p.X), int(p.Y-10))
+				l.create(p.X, p.Y-1, -90, 100, 50, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
 				break
 			}
 			p.Y++
