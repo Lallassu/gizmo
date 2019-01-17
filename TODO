@@ -1,12 +1,8 @@
 General
 --------
 - Configuration support
-    - Json file -> struct
-    - Add fullscreen support
-    - Controllers
-    - Features (vsync etc)
-    - Number of particles
-        -> Explode of objects/mobs
+    - Calculate position to draw so whole menu is visible.
+    - Add functionality to menu
 
 - Explode of mobs
     -> Leave bloody parts (flood fill)

@@ -160,14 +160,14 @@ func (pe *particleEngine) addColorToBatch(color uint32) {
 // Create the particle engine pool
 //=============================================================
 func (pe *particleEngine) create() {
-	pe.particles = make([]particle, wParticlesMax)
+	pe.particles = make([]particle, global.gVariableConfig.MaxParticles)
 	pe.colormap = make(map[uint32]int)
 	//	pe.cMutex = &sync.Mutex{}
 
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)) // Max seems to be 2^14 per row
 	pe.batch = pixel.NewBatch(&pixel.TrianglesData{}, pe.canvas)
 
-	for i := 0; i < wParticlesMax; i++ {
+	for i := 0; i < global.gVariableConfig.MaxParticles; i++ {
 		p := particle{active: false}
 		pe.particles = append(pe.particles, p)
 	}

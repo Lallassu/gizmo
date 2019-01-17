@@ -28,9 +28,9 @@ void main()
 	
    vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
    vec4 c = texture(uTexture, t);
-   if (uSelected != 0 ) {
-   		 float add = clamp(sin(uTime*10), 0.2,0.8);
-         fragColor = vec4(c.rg, c.b+add, c.a-add);
+   if (uSelected != 0 && c.r != 0) {
+   		 float add = clamp(sin(uTime*15), 0.2,0.8);
+         fragColor = vec4(c.rg, tan(c.b+add), c.a-add);
    } else {
 		fragColor = c;
    }

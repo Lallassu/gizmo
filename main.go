@@ -59,6 +59,13 @@ func setup() {
 	global.gFont.create()
 	global.gMainMenu.createMain()
 	global.gOptionsMenu.createOptions()
+	global.gControllerMenu.createController()
+	global.gDisplayMenu.createDisplay()
+	global.gGameMenu.createGame()
+
+	// Initialize with menu
+	global.gActiveMenu = global.gMainMenu
+
 	global.gUI.create()
 	global.gMapColor.create()
 	global.gRand.create(100000)
@@ -116,8 +123,10 @@ func gameLoop() {
 				global.gCamera.update(wMaxInvFPS)
 
 				global.gUI.draw(wMaxInvFPS)
-				global.gMainMenu.draw(wMaxInvFPS, elapsed)
-				global.gOptionsMenu.draw(wMaxInvFPS, elapsed)
+
+				if global.gActiveMenu != nil {
+					global.gActiveMenu.draw(wMaxInvFPS, elapsed)
+				}
 
 				global.gWin.Update()
 			} else {

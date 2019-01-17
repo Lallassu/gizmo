@@ -1,4 +1,5 @@
 {
+    "MaxParticles": 5000,
     "Vsync": true,
     "Fullscreen": false,
     "WindowWidth": 1024,

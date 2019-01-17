@@ -52,8 +52,8 @@ func (c *camera) update(dt float64) {
 	pos := c.pos
 	if c.follow != nil {
 		pos = c.follow.getPosition()
-		pos.X -= float64(global.gWindowWidth) / 2 / c.zoom
-		pos.Y -= float64(global.gWindowHeight) / 2 / c.zoom
+		pos.X -= float64(global.gVariableConfig.WindowWidth) / 2 / c.zoom
+		pos.Y -= float64(global.gVariableConfig.WindowHeight) / 2 / c.zoom
 	}
 
 	if c.shakeDt > 0 {

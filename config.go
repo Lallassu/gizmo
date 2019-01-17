@@ -58,7 +58,6 @@ const (
 	wViewMax             = 400 // 450
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
-	wParticlesMax        = 5000
 	wAmmoMax             = 1000
 	wDoorLen             = 30
 	wDoorHeight          = 40
@@ -98,7 +97,11 @@ type Global struct {
 	gFont           *font
 	gMainMenu       *menu
 	gOptionsMenu    *menu
+	gControllerMenu *menu
+	gDisplayMenu    *menu
+	gGameMenu       *menu
 	gVariableConfig *variableConfig
+	gActiveMenu     *menu
 	uTime           float32
 }
 
@@ -120,6 +123,9 @@ var global = &Global{
 	gFont:           &font{},
 	gMainMenu:       &menu{},
 	gOptionsMenu:    &menu{},
+	gControllerMenu: &menu{},
+	gDisplayMenu:    &menu{},
+	gGameMenu:       &menu{},
 	gPlayer: &mob{
 		graphics: graphics{
 			animated:    true,
@@ -155,6 +161,7 @@ type variableConfig struct {
 	KeyDrop           int  `json:"KeyDrop"`
 	KeyPickup         int  `json:"KeyPickup"`
 	KeyDuck           int  `json:"KeyDuck"`
+	MaxParticles      int  `json:"MaxParticles"`
 }
 
 //=============================================================
