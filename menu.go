@@ -93,19 +93,62 @@ func (m *menu) createController() {
 }
 
 //=============================================================
-//
+// Handle display settings
 //=============================================================
 func (m *menu) createDisplay() {
 	m.create()
-	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)), func() {})
-	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "V-sync", global.gVariableConfig.Vsync), func() {})
-	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Fullscreen", global.gVariableConfig.Fullscreen), func() {})
-	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Undecorated Window", global.gVariableConfig.UndecoratedWindow), func() {})
+	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)),
+		func() {
+			// TBD: List of resolutions to toggle between
+			global.gVariableConfig.SaveConfiguration()
+		})
+	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "V-sync", global.gVariableConfig.Vsync),
+		func() {
+			if global.gVariableConfig.Vsync {
+				global.gVariableConfig.Vsync = false
+			} else {
+				global.gVariableConfig.Vsync = true
+			}
+			m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "V-sync", global.gVariableConfig.Vsync))
+			global.gVariableConfig.SaveConfiguration()
+		})
+	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Fullscreen", global.gVariableConfig.Fullscreen),
+		func() {
+			if global.gVariableConfig.Fullscreen {
+				global.gVariableConfig.Fullscreen = false
+			} else {
+				global.gVariableConfig.Fullscreen = true
+			}
+			m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Fullscreen", global.gVariableConfig.Fullscreen))
+			global.gVariableConfig.SaveConfiguration()
+		})
+	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Undecorated Window", global.gVariableConfig.UndecoratedWindow),
+		func() {
+			if global.gVariableConfig.UndecoratedWindow {
+				global.gVariableConfig.UndecoratedWindow = false
+			} else {
+				global.gVariableConfig.UndecoratedWindow = true
+			}
+			m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Undecorated Window", global.gVariableConfig.UndecoratedWindow))
+			global.gVariableConfig.SaveConfiguration()
+		})
 	m.addItem(0.7, "Back", func() {
 		global.gActiveMenu = global.gOptionsMenu
 
 	})
 	m.items[0].selected = 1
+}
+
+//=============================================================
+//
+//=============================================================
+func (m *menu) updateSelectedItemText(text string) {
+	for i, v := range m.items {
+		if v.selected == 1 {
+			m.items[i].name = text
+			break
+		}
+	}
 }
 
 //=============================================================
