@@ -28,9 +28,18 @@ void main()
 	
    vec2 t = (vTexCoords - uTexBounds.xy) / uTexBounds.zw;
    vec4 c = texture(uTexture, t);
-   if (uSelected != 0 && c.r != 0) {
+   if (uSelected == 1 && c.r != 0) {
    		 float add = clamp(sin(uTime*15), 0.2,0.8);
          fragColor = vec4(c.rg, tan(c.b+add), c.a-add);
+   } else if (uSelected == 2 && c.r != 0 && c.g != 0 && c.b != 0) {
+		// Logotype
+		float dist = distance(vPosition, vec2(30+tan(uTime)*20, 10+sin(uTime)*5));
+		float a = clamp(sin(uTime)*dist/10, 0.0,0.4);
+		if (a > 0.3) {
+	         fragColor = vec4(sin(dist*uTime)/5, c.g/2+a, sin(dist*uTime)/2+c.b+a, c.a/dist);
+		} else {
+	         fragColor = vec4(c.r+a, c.g+a, c.b+a, c.a/a);
+		}
    } else {
 		fragColor = c;
    }

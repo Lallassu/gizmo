@@ -1,7 +1,5 @@
 General
 --------
-- Game logo with different font + animation (shader)
-
 - UI Positioning should work for different size of windows
     -> Not working for fullscreen right now.
 

@@ -122,10 +122,10 @@ func gameLoop() {
 
 				global.gCamera.update(wMaxInvFPS)
 
-				global.gUI.draw(wMaxInvFPS)
-
 				if global.gActiveMenu != nil {
 					global.gActiveMenu.draw(wMaxInvFPS, elapsed)
+				} else {
+					global.gUI.draw(wMaxInvFPS)
 				}
 
 				global.gWin.Update()
