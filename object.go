@@ -8,23 +8,24 @@
 package main
 
 import (
-	"github.com/faiface/pixel"
 	"math"
+
+	"github.com/faiface/pixel"
 )
 
 type object struct {
 	phys
 	graphics
-	light          *light
-	light_offset_x float64
-	light_offset_y float64
-	name           string
-	oType          objectType
-	owner          *mob
-	prevOwner      *mob
-	animateIdle    bool
-	animateOffset  float64
-	static         bool
+	light         *light
+	lightOffsetX  float64
+	lightOffsetY  float64
+	name          string
+	oType         objectType
+	owner         *mob
+	prevOwner     *mob
+	animateIdle   bool
+	animateOffset float64
+	static        bool
 }
 
 //=============================================================
@@ -53,19 +54,19 @@ func (o *object) getType() objectType {
 //=============================================================
 //
 //=============================================================
-func (o *object) hit(x_, y_, vx, vy float64, pow int) {
+func (o *object) hit(posX, posY, vx, vy float64, pow int) {
 	if o.static {
 		return
 	}
 
 	power := float64(pow)
 	// If distance is close, explode, otherwise push away.
-	dist := distance(pixel.Vec{x_ + power/2, y_ + power/2}, pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2})
+	dist := distance(pixel.Vec{X: posX + power/2, Y: posY + power/2}, pixel.Vec{X: o.bounds.X + o.bounds.Width/2, Y: o.bounds.Y + o.bounds.Height/2})
 	if dist < float64(power*2) {
 		o.explode()
 	} else {
 		if vx == 0 && vy == 0 {
-			if x_ < o.bounds.X {
+			if posX < o.bounds.X {
 				o.dir = 1
 				vx = power
 			} else {
@@ -91,8 +92,8 @@ func (o *object) hit(x_, y_, vx, vy float64, pow int) {
 //=============================================================
 func (o *object) AddLight(x, y float64, l *light) {
 	o.light = l
-	o.light_offset_x = x
-	o.light_offset_y = y
+	o.lightOffsetX = x
+	o.lightOffsetY = y
 }
 
 //=============================================================
@@ -120,7 +121,7 @@ func (o *object) explode() {
 //
 //=============================================================
 func (o *object) getPosition() pixel.Vec {
-	return pixel.Vec{o.bounds.X, o.bounds.Y}
+	return pixel.Vec{X: o.bounds.X, Y: o.bounds.Y}
 }
 
 //=============================================================
@@ -158,12 +159,12 @@ func (o *object) removeOwner() {
 func (o *object) draw(dt, elapsed float64) {
 
 	if o.light != nil {
-		o.light.bounds.X = o.bounds.X + o.light_offset_x
-		o.light.bounds.Y = o.bounds.Y + o.light_offset_y
+		o.light.bounds.X = o.bounds.X + o.lightOffsetX
+		o.light.bounds.Y = o.bounds.Y + o.lightOffsetY
 	}
 
 	if !o.static {
-		o.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+		o.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 		idx := 0
 		if o.animated {
 			o.animCounter += dt
@@ -214,7 +215,7 @@ func (o *object) draw(dt, elapsed float64) {
 			}
 			o.canvas.Draw(global.gWin, pixel.IM.ScaledXY(pixel.ZV, pixel.V(o.scale*o.owner.dir, o.scale)).
 				Moved(pixel.V(o.owner.bounds.X+o.owner.bounds.Width/2, offset+o.owner.bounds.Y+o.owner.bounds.Height/2-2)).
-				Rotated(pixel.Vec{o.bounds.X + o.bounds.Width/2, o.bounds.Y + o.bounds.Height/2}, o.rotation*o.owner.dir))
+				Rotated(pixel.Vec{X: o.bounds.X + o.bounds.Width/2, Y: o.bounds.Y + o.bounds.Height/2}, o.rotation*o.owner.dir))
 			// Update oect positions based on mob
 			o.bounds.X = o.owner.bounds.X
 			o.bounds.Y = o.owner.bounds.Y

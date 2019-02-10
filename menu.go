@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -243,18 +244,18 @@ func (m *menu) moveDown() {
 //
 //=============================================================
 func (m *menu) draw(dt, elapsed float64) {
-	offset_x := 30.0
-	extra_offset := 0.0
+	offsetX := 30.0
+	extraOffset := 0.0
 	if m.logo != nil {
-		m.logo.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+		m.logo.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 		global.gFont.writeToCanvas(m.logo.name, m.logo.canvas)
-		m.logo.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.logo.scale).Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offset_x, global.gCamera.pos.Y+wViewMax/20+200)))
-		extra_offset = 50
+		m.logo.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.logo.scale).Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offsetX, global.gCamera.pos.Y+wViewMax/20+200)))
+		extraOffset = 50
 	}
-	for i, _ := range m.items {
-		m.items[i].canvas.Clear(pixel.RGBA{0, 0, 0, 0})
-		offset_y := 30 * m.items[i].scale
+	for i := range m.items {
+		m.items[i].canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
+		offsetY := 30 * m.items[i].scale
 		global.gFont.writeToCanvas(m.items[i].name, m.items[i].canvas)
-		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.items[i].scale).Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offset_x, global.gCamera.pos.Y+wViewMax/2-float64(i)*offset_y-extra_offset)))
+		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.items[i].scale).Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offsetX, global.gCamera.pos.Y+wViewMax/2-float64(i)*offsetY-extraOffset)))
 	}
 }

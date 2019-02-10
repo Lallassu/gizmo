@@ -65,7 +65,7 @@ func (i *item) newItem(x, y float64, iType objectType) {
 	}
 
 	// Must set this after create
-	i.bounds.entity = Entity(i)
+	i.bounds.entity = entity(i)
 }
 
 //=============================================================
@@ -119,6 +119,7 @@ func (i *item) setOwner(m *mob) {
 
 		i.evaporate(i.bounds.X, i.bounds.Y+i.animateOffset)
 		m.setLife(50) // TBD
+		m.graphics.hitTexts = append(m.graphics.hitTexts, &hitText{global.gFont.write(fmt.Sprintf("+%v", 50)), 3.0})
 		global.gWorld.qt.Remove(i.bounds)
 		return
 	}

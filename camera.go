@@ -6,15 +6,16 @@
 package main
 
 import (
-	"github.com/faiface/pixel"
 	"math"
+
+	"github.com/faiface/pixel"
 )
 
 type camera struct {
 	zoom       float64
 	pos        pixel.Vec
 	scale      pixel.Vec
-	follow     Entity
+	follow     entity
 	cam        pixel.Matrix
 	shakeDt    float64
 	shakePower float64
@@ -26,12 +27,12 @@ func (c *camera) create() {
 	c.zoom = 1
 }
 
-func (c *camera) setFollow(e Entity) {
+func (c *camera) setFollow(e entity) {
 	c.follow = e
 }
 
 func (c *camera) setPosition(x, y float64) {
-	c.pos = pixel.Vec{x, y}
+	c.pos = pixel.Vec{X: x, Y: y}
 }
 
 func (c *camera) shake(pos pixel.Vec, power int) {
@@ -59,7 +60,7 @@ func (c *camera) update(dt float64) {
 	if c.shakeDt > 0 {
 		pos.Y += c.shakePower/2 - global.gRand.randFloat()*c.shakePower
 		pos.X += c.shakePower/2 - global.gRand.randFloat()*c.shakePower
-		c.shakeDt -= 1
+		c.shakeDt--
 	} else {
 		c.shakeDt = 0
 	}

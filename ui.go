@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/go-gl/mathgl/mgl32"
@@ -15,7 +16,7 @@ import (
 //=============================================================
 //
 //=============================================================
-type UI struct {
+type ui struct {
 	canvas             *pixelgl.Canvas
 	miniMapSprite      *pixel.Sprite
 	miniMapFrameCanvas *pixelgl.Canvas
@@ -31,10 +32,10 @@ type UI struct {
 //=============================================================
 //
 //=============================================================
-func (u *UI) create() {
+func (u *ui) create() {
 
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
-	u.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	u.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
 	u.miniMapCanvas = pixelgl.NewCanvas(pixel.R(0, 0, 100, 100))
 	u.miniMapCanvas.SetUniform("uPos", &u.uPos)
@@ -52,18 +53,18 @@ func (u *UI) create() {
 //=============================================================
 // Mini map
 //=============================================================
-func (u *UI) updateMiniMap() {
+func (u *ui) updateMiniMap() {
 	u.miniMapScale = 0.25 / (float64(global.gWorld.width) / 1024)
 	pos := global.gPlayer.getPosition()
 	//canvas := pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
 	//canvas.Clear(pixel.RGBA{1.0, 0, 0, 0.5})
 
-	offset_x := float64(global.gWorld.width/2) * u.miniMapScale
-	offset_y := float64(global.gWorld.height/2) * u.miniMapScale
+	offsetX := float64(global.gWorld.width/2) * u.miniMapScale
+	offsetY := float64(global.gWorld.height/2) * u.miniMapScale
 	//offset_x2 := offset_x //- float64(global.gWorld.width/2)*u.miniMapScale
 	//offset_y2 := offset_y //- float64(global.gWorld.height/2)*u.miniMapScale
 
-	u.uPos = mgl32.Vec2{float32(offset_x / 2), float32(offset_y / 2)}
+	u.uPos = mgl32.Vec2{float32(offsetX / 2), float32(offsetY / 2)}
 
 	bounds := u.miniMapFrameCanvas.Bounds()
 	//u.miniMapSprite.Draw(u.miniMapFrameCanvas, pixel.IM.Moved(pixel.V(offset_x2, offset_y2)).ScaledXY(pixel.V(0.8, 0.8), pixel.V(0.8, 0.8)))
@@ -84,7 +85,7 @@ func (u *UI) updateMiniMap() {
 //=============================================================
 //
 //=============================================================
-func (u *UI) setMiddleText(text string) {
+func (u *ui) setMiddleText(text string) {
 	//u.middleTextStr = text
 	//u.middleText.Clear()
 	//u.middleText.WriteString(fmt.Sprintf("%v", text))
@@ -93,7 +94,7 @@ func (u *UI) setMiddleText(text string) {
 //=============================================================
 //
 //=============================================================
-func (u *UI) updateFPS(fps int) {
+func (u *ui) updateFPS(fps int) {
 	//u.fps.Clear()
 	//u.fps.WriteString(fmt.Sprintf("FPS: %v", strconv.Itoa(fps)))
 }
@@ -101,7 +102,7 @@ func (u *UI) updateFPS(fps int) {
 //=============================================================
 //
 //=============================================================
-func (u *UI) updatePlayerLife() {
+func (u *ui) updatePlayerLife() {
 	if u.playerLife != global.gPlayer.life {
 		u.playerLife = global.gPlayer.life
 		u.lifeCanvas = global.gFont.write(fmt.Sprintf("Life: %v", u.playerLife))
@@ -111,7 +112,7 @@ func (u *UI) updatePlayerLife() {
 //=============================================================
 //
 //=============================================================
-func (u *UI) draw(dt float64) {
+func (u *ui) draw(dt float64) {
 
 	// Draw death screen
 	color := pixel.RGBA{}
@@ -123,13 +124,13 @@ func (u *UI) draw(dt float64) {
 		if red > 0.5 {
 			red = 0.5
 		}
-		color = pixel.RGBA{red, 0, 0, u.deathScreenTimer / 10}
+		color = pixel.RGBA{R: red, G: 0, B: 0, A: u.deathScreenTimer / 10}
 	} else {
 		u.deathScreenTimer = 0
 	}
 	u.canvas.Clear(color)
-	u.miniMapCanvas.Clear(pixel.RGBA{0, 0, 0, 0})
-	u.miniMapFrameCanvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	u.miniMapCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
+	u.miniMapFrameCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
 	u.updateMiniMap()
 

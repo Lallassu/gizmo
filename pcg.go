@@ -205,11 +205,11 @@ func (p *pcg) MetalCornerLeft(x, y int, left bool) {
 	}
 }
 
-func (p *pcg) MetalWall(x, y int, leftSide bool) {
+func (p *pcg) MetalWall(posX, posY int, leftSide bool) {
 	r := 0
 	g := 0
 	b := 0
-	x_ := 0
+	x := 0
 	for i := 0; i < 6; i++ {
 		switch i {
 		case 0:
@@ -234,13 +234,13 @@ func (p *pcg) MetalWall(x, y int, leftSide bool) {
 			b = 0x26
 		}
 		if leftSide {
-			x_ = x + i
+			x = posX + i
 		} else {
-			x_ = x - i
+			x = posX - i
 		}
 		global.gWorld.SetPixel(
-			x_,
-			y,
+			x,
+			posY,
 			uint32(r&0xFF<<24|g&0xFF<<16|b&0xFF<<8|0xFF),
 		)
 		// for n := 0; n < wShadowLength; n++ {
@@ -296,7 +296,7 @@ func (p *pcg) MetalFloor(x, y int) {
 	r := 0
 	g := 0
 	b := 0
-	p.floorCnt += 1
+	p.floorCnt++
 	for i := 0; i < 4; i++ {
 		switch i {
 		case 0:
@@ -660,16 +660,16 @@ func (p *pcg) GrassFloor(x, y int) {
 	b := 0x33
 	a := 0xFF
 	for i := 0; i < p.floorHeight; i++ {
-		g_ := g
+		g2 := g
 		if i == p.floorHeight-1 {
-			g_ -= 100
+			g2 -= 100
 		} else if i == p.floorHeight-2 {
-			g_ -= 50
+			g2 -= 50
 		}
 		global.gWorld.SetPixel(
 			x,
 			y-i,
-			uint32(r&0xFF<<24|g_&0xFF<<16|b&0xFF<<8|a&0xFF),
+			uint32(r&0xFF<<24|g2&0xFF<<16|b&0xFF<<8|a&0xFF),
 		)
 	}
 }

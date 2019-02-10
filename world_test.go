@@ -1,11 +1,12 @@
 package main
 
 import (
-	_ "github.com/faiface/pixel"
-	_ "github.com/faiface/pixel/pixelgl"
 	"math/rand"
 	"os"
 	"testing"
+
+	_ "github.com/faiface/pixel"
+	_ "github.com/faiface/pixel/pixelgl"
 )
 
 var w world
@@ -29,7 +30,7 @@ func TestMain(m *testing.M) {
 
 func BenchmarkOwnRand(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		global.gRand.rand10()
+		global.gRand.rand()
 	}
 }
 

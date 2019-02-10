@@ -86,7 +86,7 @@ func (w *weapon) newWeapon(x, y float64, wType objectType) {
 	w.ammoBar = pixel.NewSprite(w.ammoImg, pixel.R(0, 0, 40, 5))
 
 	// Must change entity type in bounds for QT lookup
-	w.bounds.entity = Entity(w)
+	w.bounds.entity = entity(w)
 
 	w.currentAmmoCount = w.ammoCount
 }

@@ -11,9 +11,10 @@
 package main
 
 import (
-	"github.com/faiface/pixel"
 	"math"
 	"math/rand"
+
+	"github.com/faiface/pixel"
 )
 
 //=============================================================
@@ -86,10 +87,10 @@ func (w *world) buildAllChunks() {
 }
 
 func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
-	x_ := rand.Intn(w.width - 1)
-	y_ := rand.Intn(w.height - 1)
-	for x := x_ - size/2; x < x_+size/2; x++ {
-		for y := y_ - size/2; y < y_+size/2; y++ {
+	posX := rand.Intn(w.width - 1)
+	posY := rand.Intn(w.height - 1)
+	for x := posX - size/2; x < posX+size/2; x++ {
+		for y := posY - size/2; y < posY+size/2; y++ {
 			pos := x*w.width + y
 			if pos < len(w.pixels) && pos >= 0 {
 				p := w.pixels[pos]
@@ -99,7 +100,7 @@ func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
 			}
 		}
 	}
-	return pixel.Vec{float64(x_), float64(y_)}, true
+	return pixel.Vec{X: float64(posX), Y: float64(posY)}, true
 }
 
 //func loadPicture(path string) (pixel.Picture, error) {
@@ -125,16 +126,16 @@ func (w *world) AddObject(obj *Bounds) {
 //=============================================================
 // Remove object from world (QT)
 //=============================================================
-func (w *world) RemoveObject(obj Entity) {
+func (w *world) RemoveObject(obj entity) {
 
 }
 
 //=============================================================
 // Check if pixel is a background
 //=============================================================
-func (w *world) IsBackground(x_, y_ float64) bool {
-	x := int(x_)
-	y := int(y_)
+func (w *world) IsBackground(posX, posY float64) bool {
+	x := int(posX)
+	y := int(posY)
 	pos := w.width*x + y
 	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == wBackground8 ||
@@ -148,9 +149,9 @@ func (w *world) IsBackground(x_, y_ float64) bool {
 //=============================================================
 // Check if pixel is a shadow
 //=============================================================
-func (w *world) IsShadow(x_, y_ float64) bool {
-	x := int(x_)
-	y := int(y_)
+func (w *world) IsShadow(posX, posY float64) bool {
+	x := int(posX)
+	y := int(posY)
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF == wShadow8 {

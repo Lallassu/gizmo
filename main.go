@@ -5,10 +5,11 @@
 package main
 
 import (
+	"time"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	_ "github.com/pkg/profile"
-	"time"
 )
 
 //=============================================================
@@ -40,13 +41,13 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
-	CenterWindow(gWin)
+	centerWindow(gWin)
 	global.gWin = gWin
 
 	// Setup world etc.
 	setup()
 
-	PrintMemoryUsage()
+	printMemoryUsage()
 
 	// Start game loop
 	gameLoop()

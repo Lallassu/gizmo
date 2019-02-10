@@ -7,17 +7,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/faiface/pixel"
 	"image"
 	"math"
+
+	"github.com/faiface/pixel"
 )
 
-type Map struct {
+type gameMap struct {
 }
 
 var colorDefinitions map[string]pixel.RGBA
 
-func (m *Map) newMap(level int) {
+func (m *gameMap) newMap(level int) {
 	mapFile := ""
 	switch level {
 	case 1:
@@ -75,13 +76,13 @@ func (m *Map) newMap(level int) {
 					tooClose := false
 					// This way we can add crates based on many pixels in the same place w/o floodfilling.
 					for _, c := range items[t] {
-						if distance(c, pixel.Vec{x, y}) < 20 {
+						if distance(c, pixel.Vec{X: x, Y: y}) < 20 {
 							tooClose = true
 							break
 						}
 					}
 					if !tooClose {
-						items[t] = append(items[t], pixel.Vec{x, y})
+						items[t] = append(items[t], pixel.Vec{X: x, Y: y})
 					}
 				}
 			}
@@ -110,7 +111,7 @@ func (m *Map) newMap(level int) {
 			if global.gWorld.IsRegular(p.X, p.Y) {
 				l := &light{}
 				//	pcgGen.GenerateLamp(int(p.X), int(p.Y-10))
-				l.create(p.X, p.Y-1, -90, 100, 50, pixel.RGBA{0.8, 0.6, 0, 0.3}, false, 0)
+				l.create(p.X, p.Y-1, -90, 100, 50, pixel.RGBA{R: 0.8, G: 0.6, B: 0, A: 0.3}, false, 0)
 				break
 			}
 			p.Y++
@@ -136,7 +137,7 @@ func (m *Map) newMap(level int) {
 			},
 			maxLife: 100.0,
 			phys:    phys{speed: 100},
-			ai:      &AI{},
+			ai:      &ai{},
 		}
 		test.create(p.X, p.Y)
 	}
@@ -159,6 +160,13 @@ func (m *Map) newMap(level int) {
 		w.newItem(p.X, p.Y, itemPortal)
 	}
 
+	// Cluster mines
+	for _, p := range items[explosiveClusterMine] {
+		w := &explosive{}
+		w.newExplosive(p.X, p.Y, explosiveClusterMine)
+	}
+
+	// Health Power ups
 	for _, p := range items[itemPowerupHealth] {
 		w := &item{}
 		w.newItem(p.X, p.Y, itemPowerupHealth)
@@ -209,7 +217,7 @@ func (m *Map) newMap(level int) {
 // paint generated map
 // everything has to be performed in a specific order.
 //=============================================================
-func (m *Map) paintMap() {
+func (m *gameMap) paintMap() {
 	pcgGen := &pcg{}
 
 	for x := 0; x < global.gWorld.width; x++ {
@@ -241,12 +249,12 @@ func (m *Map) paintMap() {
 				above := global.gWorld.pixels[x*global.gWorld.width+y+1] & 0xFF
 				long := global.gWorld.pixels[(x+60)*global.gWorld.width+y] & 0xFF
 
-				long2_above := global.gWorld.pixels[(x+22)*global.gWorld.width+y+1] & 0xFF
-				long2_before := global.gWorld.pixels[(x+21)*global.gWorld.width+y] & 0xFF
+				long2Above := global.gWorld.pixels[(x+22)*global.gWorld.width+y+1] & 0xFF
+				long2Before := global.gWorld.pixels[(x+21)*global.gWorld.width+y] & 0xFF
 				long2 := global.gWorld.pixels[(x+22)*global.gWorld.width+y] & 0xFF
 
 				if ((above == wBackground8 || above == wShadow8) && point == 0xFF && before == 0xFF && (after == wBackground8 || after == wShadow8) && long == 0xFF) ||
-					(above == wBackground8 && point == wBackground8 && after == wBackground8 && before == wBackground8 && long2 == 0xFF && long2_above == wBackground8 && long2_before == wBackground8) {
+					(above == wBackground8 && point == wBackground8 && after == wBackground8 && before == wBackground8 && long2 == 0xFF && long2Above == wBackground8 && long2Before == wBackground8) {
 					for i := 5; i < 18; i++ {
 						if i == 5 || i == 17 {
 							for n := 0; n < 500000; n++ {

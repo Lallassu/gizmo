@@ -10,21 +10,21 @@ import (
 )
 
 type generator struct {
-	cell      [][]uint32
-	minx      int
-	maxx      int
-	minz      int
-	maxz      int
-	wide      int
-	deep      int
-	cell_size int
+	cell     [][]uint32
+	minx     int
+	maxx     int
+	minz     int
+	maxz     int
+	wide     int
+	deep     int
+	cellSize int
 }
 
-func (g *generator) NewWorld(size_x, size_z, num_steps, step_length int) []uint32 {
+func (g *generator) NewWorld(sizeX, sizeZ, numSteps, stepLength int) []uint32 {
 	rand.Seed(time.Now().Unix())
-	g.cell_size = 20
-	g.wide = size_x / g.cell_size
-	g.deep = size_z / g.cell_size
+	g.cellSize = 20
+	g.wide = sizeX / g.cellSize
+	g.deep = sizeZ / g.cellSize
 	g.minx, g.minz = 1, 1
 	g.maxx = g.wide - 2
 	g.maxz = g.deep - 2
@@ -35,7 +35,7 @@ func (g *generator) NewWorld(size_x, size_z, num_steps, step_length int) []uint3
 		g.cell[x] = make([]uint32, g.deep)
 	}
 
-	g.randomWalk(num_steps, step_length)
+	g.randomWalk(numSteps, stepLength)
 	g.cleanDeadEnds()
 	g.cleanDeadEnds()
 
@@ -43,11 +43,11 @@ func (g *generator) NewWorld(size_x, size_z, num_steps, step_length int) []uint3
 	for x := 0; x < g.wide; x++ {
 		for z := 0; z < g.deep; z++ {
 			if g.cell[x][z] == 1 {
-				for i := 0; i < g.cell_size; i++ {
-					for j := 0; j < g.cell_size; j++ {
+				for i := 0; i < g.cellSize; i++ {
+					for j := 0; j < g.cellSize; j++ {
 						//world_.AddPixel(x*g.cell_size+i, z*g.cell_size+j, uint32(0xFF0000FF))
-						pixels = append(pixels, uint32(x*g.cell_size+i))
-						pixels = append(pixels, uint32(z*g.cell_size+j))
+						pixels = append(pixels, uint32(x*g.cellSize+i))
+						pixels = append(pixels, uint32(z*g.cellSize+j))
 					}
 				}
 			}
@@ -56,15 +56,15 @@ func (g *generator) NewWorld(size_x, size_z, num_steps, step_length int) []uint3
 	return pixels
 }
 
-func (g *generator) randomWalk(num_steps, step_length int) {
+func (g *generator) randomWalk(numSteps, stepLength int) {
 	px := g.wide / 2
 	pz := g.deep / 2
 
-	for i := 0; i < num_steps; i++ {
+	for i := 0; i < numSteps; i++ {
 		g.cell[px][pz] = 1
 
 		if rand.Float64() < 0.5 {
-			g.makeRoom(px, pz, 1, step_length/2+1)
+			g.makeRoom(px, pz, 1, stepLength/2+1)
 		}
 
 		dx := []int{0, 1, 0, -1}
@@ -72,14 +72,14 @@ func (g *generator) randomWalk(num_steps, step_length int) {
 
 		d := rand.Intn(4)
 
-		nx := px + dx[d]*step_length
-		nz := pz + dz[d]*step_length
+		nx := px + dx[d]*stepLength
+		nz := pz + dz[d]*stepLength
 
 		for !g.validCell(nx, nz) {
 			d = rand.Intn(4)
 
-			nx = px + dx[d]*step_length
-			nz = pz + dz[d]*step_length
+			nx = px + dx[d]*stepLength
+			nz = pz + dz[d]*stepLength
 		}
 
 		for x := px; x != nx; x += dx[d] {
@@ -110,11 +110,11 @@ func (g *generator) validCell(x, z int) bool {
 }
 
 func (g *generator) makeRoom(x, z, minw, maxw int) {
-	room_width := g.random(minw, maxw)
-	room_depth := g.random(minw, maxw)
+	roomWidth := g.random(minw, maxw)
+	roomDepth := g.random(minw, maxw)
 
-	for cx := x - room_width; cx <= x+room_width; cx++ {
-		for cz := z; cz <= z+room_depth; cz++ {
+	for cx := x - roomWidth; cx <= x+roomWidth; cx++ {
+		for cz := z; cz <= z+roomDepth; cz++ {
 			if g.validCell(cx, cz) {
 				g.cell[cx][cz] = 1
 			}

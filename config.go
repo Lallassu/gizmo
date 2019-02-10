@@ -9,10 +9,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 	"io/ioutil"
 	"os"
+
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 )
 
 //=============================================================
@@ -72,9 +73,7 @@ const (
 	wConfigFile          = "configuration.json"
 )
 
-//=============================================================
-// Global variables
-//=============================================================
+// Global variables struct used throughtout the game.
 type Global struct {
 	gWindowHeight   int
 	gWindowWidth    int
@@ -91,8 +90,8 @@ type Global struct {
 	gRand           *fRand
 	gPlayer         *mob
 	gSounds         *sound
-	gUI             *UI
-	gMap            *Map
+	gUI             *ui
+	gMap            *gameMap
 	gMapColor       *mapColor
 	gFont           *font
 	gMainMenu       *menu
@@ -111,14 +110,14 @@ var global = &Global{
 	gCamera:         &camera{},
 	gController:     &controller{},
 	gParticleEngine: &particleEngine{},
-	gClearColor:     pixel.RGBA{0, 0, 0, 1.0},
+	gClearColor:     pixel.RGBA{R: 0, G: 0, B: 0, A: 1.0},
 	gWin:            &pixelgl.Window{},
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},
 	gRand:           &fRand{},
 	gSounds:         &sound{},
-	gUI:             &UI{},
-	gMap:            &Map{},
+	gUI:             &ui{},
+	gMap:            &gameMap{},
 	gMapColor:       &mapColor{},
 	gFont:           &font{},
 	gMainMenu:       &menu{},
@@ -151,7 +150,7 @@ type variableConfig struct {
 	WindowHeight      int  `json:"WindowHeight"`
 	WindowWidth       int  `json:"WindowWidth"`
 	UndecoratedWindow bool `json:"UndecoratedWindow"`
-	currentMap        int  `json:"CurrentMap"`
+	CurrentMap        int  `json:"CurrentMap"`
 	KeyShoot          int  `json:"KeyShoot"`
 	KeyJump           int  `json:"KeyJump"`
 	KeyLeft           int  `json:"KeyLeft"`

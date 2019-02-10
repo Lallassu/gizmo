@@ -7,13 +7,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 	"image"
 	"image/png"
 	"math"
 	"os"
 	"runtime"
+
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 )
 
 //=============================================================
@@ -60,10 +61,8 @@ func distance(p1, p2 pixel.Vec) float64 {
 	return math.Sqrt(math.Pow(float64(p1.X-p2.X), 2) + math.Pow(float64(p1.Y-p2.Y), 2))
 }
 
-//=============================================================
 // Just print current memory usage
-//=============================================================
-func PrintMemoryUsage() {
+func printMemoryUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	Debug(fmt.Sprintf("Alloc = %v MiB", m.Alloc/1024/1024))
@@ -78,7 +77,7 @@ func PrintMemoryUsage() {
 // Must move window a bit in order to make it draw the first
 // time.
 //=============================================================
-func CenterWindow(win *pixelgl.Window) {
+func centerWindow(win *pixelgl.Window) {
 	x, y := pixelgl.PrimaryMonitor().Size()
 	width, height := win.Bounds().Size().XY()
 	win.SetPos(

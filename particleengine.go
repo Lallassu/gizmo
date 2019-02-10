@@ -6,9 +6,10 @@
 package main
 
 import (
+	_ "sync"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	_ "sync"
 )
 
 type particleEngine struct {
@@ -205,7 +206,7 @@ func (pe *particleEngine) update(dt float64) {
 
 	//pe.cMutex.Lock()
 	sprite := pixel.NewSprite(pe.canvas, pixel.R(0, 0, 1, 1))
-	for i, _ := range pe.particles {
+	for i := range pe.particles {
 		if pe.particles[i].active {
 			pe.particles[i].update(dt)
 			color := pe.particles[i].color
@@ -219,11 +220,11 @@ func (pe *particleEngine) update(dt float64) {
 			if pe.particles[i].pType == particleRegular {
 				sprite.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)))
 			} else {
-				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, float64(a) / 255.0})
+				sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{R: float64(r) / 255.0, G: float64(g) / 255.0, B: float64(b) / 255.0, A: float64(a) / 255.0})
 				if pe.particles[i].pType == particleFire {
-					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.1111})
+					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{R: float64(r) / 255.0, G: float64(g) / 255.0, B: float64(b) / 255.0, A: 0.1111})
 				} else if pe.particles[i].pType == particleEvaporate {
-					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0, 0.2222})
+					sprite.DrawColorMask(pe.batch, pixel.IM.Scaled(pixel.ZV, pe.particles[i].size*pe.particles[i].life*2).Moved(pixel.V(pe.particles[i].x, pe.particles[i].y)), pixel.RGBA{R: float64(r) / 255.0, G: float64(g) / 255.0, B: float64(b) / 255.0, A: 0.2222})
 				}
 				// if pe.particles[i].pType == particleFire {
 				// 	pe.imd.Color = pixel.RGBA{1, 0, 0, 1.0}

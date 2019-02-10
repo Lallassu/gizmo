@@ -7,10 +7,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/faiface/pixel"
 	"image"
 	"math"
 	"math/rand"
+
+	"github.com/faiface/pixel"
 )
 
 type mob struct {
@@ -18,7 +19,7 @@ type mob struct {
 	graphics
 	life     float64
 	carry    interface{}
-	ai       *AI
+	ai       *ai
 	drawFunc func(dt, elapsed float64)
 	hpBar    *pixel.Sprite
 	hpImg    *pixel.PictureData
@@ -62,36 +63,39 @@ func (m *mob) create(x, y float64) {
 //=============================================================
 //
 //=============================================================
-func (m *mob) hit(x_, y_, vx, vy float64, power int) {
+func (m *mob) hit(posX, posY, vx, vy float64, power int) {
+	// Create some text above the mob.
+	m.graphics.hitTexts = append(m.graphics.hitTexts, &hitText{global.gFont.write(fmt.Sprintf("-%v", power*2)), 3.0})
+
 	pow := float64(power)
 	// If distance is close, explode, otherwise push away.
-	dist := distance(pixel.Vec{x_ + pow/2, y_ + pow/2}, pixel.Vec{m.bounds.X + m.bounds.Width/2, m.bounds.Y + m.bounds.Height/2})
+	dist := distance(pixel.Vec{X: posX + pow/2, Y: posY + pow/2}, pixel.Vec{X: m.bounds.X + m.bounds.Width/2, Y: m.bounds.Y + m.bounds.Height/2})
 	if dist < float64(power*2) {
 		// If carry somerhing, hit that first!
 		if m.carry != nil {
 			switch item := m.carry.(type) {
 			case *weapon:
-				item.hit(x_, y_, vx, vy, power)
+				item.hit(posX, posY, vx, vy, power)
 				return
 			case *object:
-				item.hit(x_, y_, vx, vy, power)
+				item.hit(posX, posY, vx, vy, power)
 				return
 			}
 		}
 
-		x := int(math.Abs(float64(m.bounds.X - x_)))
-		y := int(math.Abs(float64(m.bounds.Y - y_)))
+		x := int(math.Abs(float64(m.bounds.X - posX)))
+		y := int(math.Abs(float64(m.bounds.Y - posY)))
 
 		// Gfx update
-		m.hitGfx(x, y, x_, y_, vx, vy, power, true)
+		m.hitGfx(x, y, posX, posY, vx, vy, power, true)
 
 		// Blood effect
-		global.gParticleEngine.effectBlood(x_, y_, vx, vy, 1)
+		global.gParticleEngine.effectBlood(posX, posY, vx, vy, 1)
 
 		m.setLife(-float64(power * 2))
 	} else {
 		if vx == 0 && vy == 0 {
-			if x_ < m.bounds.X {
+			if posX < m.bounds.X {
 				m.dir = 1
 				vx = pow
 			} else {
@@ -140,7 +144,7 @@ func (m *mob) shoot() {
 //=============================================================
 func (m *mob) pickup() {
 	// Check if anything to pickup?
-	var obj ObjectInterface
+	var obj objectInterface
 	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
 		switch i := v.entity.(type) {
 		case *object:
@@ -177,7 +181,7 @@ func (m *mob) action() {
 
 	// Check if close to doors
 	for _, p := range global.gWorld.doors {
-		d := distance(p, pixel.Vec{m.bounds.X, m.bounds.Y})
+		d := distance(p, pixel.Vec{X: m.bounds.X, Y: m.bounds.Y})
 		if d < 10 {
 			// Get a random new door position for player.
 			pos := global.gWorld.doors[rand.Intn(len(global.gWorld.doors)-1)]
@@ -239,7 +243,7 @@ func (m *mob) move(x, y float64) {
 //
 //=============================================================
 func (m *mob) getPosition() pixel.Vec {
-	return pixel.Vec{m.bounds.X, m.bounds.Y}
+	return pixel.Vec{X: m.bounds.X, Y: m.bounds.Y}
 }
 
 //=============================================================
@@ -249,6 +253,13 @@ func (m *mob) draw(dt, elapsed float64) {
 	shooting := false
 	if m.currentAnim == animShoot {
 		shooting = true
+	}
+
+	for _, c := range m.graphics.hitTexts {
+		if c.ttl >= 0 {
+			c.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, 0.1*c.ttl).Moved(pixel.V(m.bounds.X+10, m.bounds.Y+m.bounds.Height+10)))
+			c.ttl -= dt * 2
+		}
 	}
 
 	if m.velo.Y < -6 {
@@ -306,7 +317,7 @@ func (m *mob) draw(dt, elapsed float64) {
 	}
 
 	//m.batches[idx].SetMatrix(pixel.IM.ScaledXY(pixel.ZV, pixel.V(-m.dir, 1)).Moved(pixel.V(m.bounds.X+m.bounds.Width/2, m.bounds.Y+m.bounds.Height/2)))
-	m.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+	m.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 	//m.canvas.SetComposeMethod(pixel.ComposeOver)
 	//m.canvas.SetColorMask(pixel.Alpha(1))
 	m.batches[idx].Draw(m.canvas)

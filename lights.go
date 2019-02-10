@@ -6,11 +6,12 @@
 package main
 
 import (
+	"math"
+	_ "time"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
-	"math"
-	_ "time"
 )
 
 //=============================================================
@@ -62,7 +63,7 @@ func (l *light) create(x, y, angle, spread, radius float64, color pixel.RGBA, dy
 		Y:      y,
 		Width:  float64(radius * 2),
 		Height: float64(radius * 2),
-		entity: Entity(l),
+		entity: entity(l),
 	}
 
 	l.uPosX = float32(l.bounds.Width / 2)
@@ -93,7 +94,7 @@ func (l *light) destroy() {
 // Get position
 //=============================================================
 func (l *light) getPosition() pixel.Vec {
-	return pixel.Vec{l.bounds.X, l.bounds.Y}
+	return pixel.Vec{X: l.bounds.X, Y: l.bounds.Y}
 }
 
 //=============================================================
@@ -131,7 +132,7 @@ func (l *light) draw(dt, elapsed float64) {
 				return
 			}
 		}
-		l.canvas.Clear(pixel.RGBA{0, 0, 0, 0})
+		l.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 		l.shine()
 	}
 	if l.blinkFrequency > 0 {
@@ -173,14 +174,14 @@ func (l *light) shine() {
 	addTo := float64(1 / l.radius)
 
 	l.imd.Clear()
-	l.imd.Push(pixel.Vec{l.bounds.Width / 2, l.bounds.Height / 2})
+	l.imd.Push(pixel.Vec{X: l.bounds.Width / 2, Y: l.bounds.Height / 2})
 	l.imd.Color = l.color
-	last := pixel.Vec{-1, -1}
+	last := pixel.Vec{X: -1, Y: -1}
 
 	// Raytrace around position (Using a bit of non-granular approach to speed up things)
 	for curAngle := l.angle - (l.angleSpread / 2); curAngle < l.angle+(l.angleSpread/2); curAngle += addTo * (180 / math.Pi) * 7 {
 		rads := curAngle * (math.Pi / 180)
-		end := pixel.Vec{l.bounds.X, l.bounds.Y}
+		end := pixel.Vec{X: l.bounds.X, Y: l.bounds.Y}
 
 		// Find next foreground.
 		for !global.gWorld.IsRegular(end.X, end.Y) && math.Abs((end.X-l.bounds.X)) < float64(l.radius) && math.Abs(end.Y-l.bounds.Y) < float64(l.radius) {
@@ -205,12 +206,12 @@ func (l *light) shine() {
 		if last.X == -1 {
 			last = end
 		}
-		l.imd.Push(pixel.Vec{end.X - l.bounds.X + l.bounds.Width/2, end.Y - l.bounds.Y + l.bounds.Height/2})
+		l.imd.Push(pixel.Vec{X: end.X - l.bounds.X + l.bounds.Width/2, Y: end.Y - l.bounds.Y + l.bounds.Height/2})
 	}
 
 	// Add the first position again so we close the polygon if its 360 degrees
 	if l.angleSpread == 360 {
-		l.imd.Push(pixel.Vec{last.X - l.bounds.X + l.bounds.Width/2, last.Y - l.bounds.Y + l.bounds.Height/2})
+		l.imd.Push(pixel.Vec{X: last.X - l.bounds.X + l.bounds.Width/2, Y: last.Y - l.bounds.Y + l.bounds.Height/2})
 	}
 
 	l.imd.Polygon(0)

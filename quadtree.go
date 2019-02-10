@@ -24,7 +24,7 @@ type Bounds struct {
 	Y      float64
 	Width  float64
 	Height float64
-	entity Entity
+	entity entity
 }
 
 //IsPoint - Checks if a bounds object is a point or not (has no width or height)
@@ -78,7 +78,7 @@ func (qt *Quadtree) TotalNodes() int {
 
 	if len(qt.Nodes) > 0 {
 		for i := 0; i < len(qt.Nodes); i++ {
-			total += 1
+			total++
 			total += qt.Nodes[i].TotalNodes()
 		}
 	}
@@ -200,15 +200,15 @@ func (qt *Quadtree) getIndex(pRect *Bounds) int {
 
 }
 
-// Public method to remove an obj from the quadtree.
+// Remove is a public method to remove an obj from the quadtree.
 func (qt *Quadtree) Remove(o *Bounds) {
-	qt.remove_obj(qt, o)
+	qt.removeObj(qt, o)
 }
 
 // Recusive removal of object from quadtree
-func (qt *Quadtree) remove_obj(t *Quadtree, o *Bounds) bool {
+func (qt *Quadtree) removeObj(t *Quadtree, o *Bounds) bool {
 	index := -1
-	for i, _ := range t.Objects {
+	for i := range t.Objects {
 		if t.Objects[i] == o {
 			index = i
 			break
@@ -219,8 +219,8 @@ func (qt *Quadtree) remove_obj(t *Quadtree, o *Bounds) bool {
 		t.Objects = append(t.Objects[:index], t.Objects[index+1:]...)
 		return true
 	}
-	for i, _ := range t.Nodes {
-		if qt.remove_obj(&t.Nodes[i], o) == true {
+	for i := range t.Nodes {
+		if qt.removeObj(&t.Nodes[i], o) == true {
 			break
 		}
 	}

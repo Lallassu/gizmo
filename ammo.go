@@ -6,10 +6,11 @@
 package main
 
 import (
-	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 	"math"
 	_ "reflect"
+
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 )
 
 type ammoEngine struct {
@@ -30,7 +31,7 @@ type ammo struct {
 	fx     float64
 	fy     float64
 	power  int
-	owner  Entity
+	owner  entity
 
 	vx    float64
 	vy    float64
@@ -45,7 +46,7 @@ type ammo struct {
 func (pe *ammoEngine) create() {
 	pe.bullets = make([]ammo, wAmmoMax)
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
-	pe.canvas.Clear(pixel.RGBA{0, 0, 0, 1})
+	pe.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 1})
 	// var fragmentShader = `
 	//    #version 330 core
 	//
@@ -95,14 +96,14 @@ func (pe *ammoEngine) newAmmo(p ammo) {
 //=============================================================
 func (pe *ammoEngine) update(dt float64) {
 	pe.batch.Clear()
-	for i, _ := range pe.bullets {
+	for i := range pe.bullets {
 		if pe.bullets[i].active {
 			pe.bullets[i].update(dt)
 			pe.canvas.Clear(pixel.RGBA{
-				float64((pe.bullets[i].color >> 24 & 0xFF)) / 255.0,
-				float64((pe.bullets[i].color >> 16 & 0xFF)) / 255.0,
-				float64((pe.bullets[i].color >> 8 & 0xFF)) / 255.0,
-				0.1111})
+				R: float64((pe.bullets[i].color >> 24 & 0xFF)) / 255.0,
+				G: float64((pe.bullets[i].color >> 16 & 0xFF)) / 255.0,
+				B: float64((pe.bullets[i].color >> 8 & 0xFF)) / 255.0,
+				A: 0.1111})
 			pe.canvas.Draw(pe.batch, pixel.IM.Scaled(pixel.ZV, 1).Moved(pixel.V(pe.bullets[i].x, pe.bullets[i].y)))
 		}
 	}

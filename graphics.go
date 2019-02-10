@@ -6,9 +6,10 @@
 package main
 
 import (
+	"image"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"image"
 )
 
 type graphics struct {
@@ -33,6 +34,12 @@ type graphics struct {
 	animated    bool
 	scalexy     float64
 	static      bool
+	hitTexts    []*hitText
+}
+
+type hitText struct {
+	canvas *pixelgl.Canvas
+	ttl    float64
 }
 
 //=============================================================
@@ -67,7 +74,7 @@ func (gfx *graphics) createGfx(x, y float64, static bool) {
 		if !gfx.animated {
 			gfx.frameWidth = fullWidth
 			if gfx.frameWidth == gfx.frameHeight {
-				gfx.size += 1
+				gfx.size++
 			}
 		}
 
@@ -108,8 +115,8 @@ func (gfx *graphics) buildFrames() {
 	g1 := uint32(0)
 	b1 := uint32(0)
 	draw := 0
-	same_x := 1.0
-	same_y := 1.0
+	sameX := 1.0
+	sameY := 1.0
 	pos := 0
 
 	// Build batch for each frame.
@@ -123,8 +130,8 @@ func (gfx *graphics) buildFrames() {
 				rc = p >> 24 & 0xFF
 				gc = p >> 16 & 0xFF
 				bc = p >> 8 & 0xFF
-				same_x = 1.0
-				same_y = 1.0
+				sameX = 1.0
+				sameY = 1.0
 
 				for l := x + 1; l < gfx.frameWidth; l++ {
 					// Check color
@@ -140,8 +147,8 @@ func (gfx *graphics) buildFrames() {
 					if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
 						// Same color and not yet visited!
 						gfx.frames[i][pos] &= 0xFFFFFF7F
-						same_x++
-						new_y := 1.0
+						sameX++
+						newY := 1.0
 						for k := y; k < gfx.frameHeight; k++ {
 							pos = int(l*gfx.size + k)
 							p2 = gfx.frames[i][pos]
@@ -154,15 +161,15 @@ func (gfx *graphics) buildFrames() {
 
 							if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
 								gfx.frames[i][pos] &= 0xFFFFFF7F
-								new_y++
+								newY++
 							} else {
 								break
 							}
 						}
-						if new_y < same_y {
+						if newY < sameY {
 							break
 						} else {
-							same_y = new_y
+							sameY = newY
 						}
 					} else {
 						break
@@ -183,12 +190,12 @@ func (gfx *graphics) buildFrames() {
 				}
 
 				// Size of triangle is given by how large the greedy algorithm found out.
-				(*gfx.triangles[i])[v].Position = pixel.Vec{x, y}
-				(*gfx.triangles[i])[v+1].Position = pixel.Vec{x + same_x, y}
-				(*gfx.triangles[i])[v+2].Position = pixel.Vec{x + same_x, y + same_y}
-				(*gfx.triangles[i])[v+3].Position = pixel.Vec{x, y}
-				(*gfx.triangles[i])[v+4].Position = pixel.Vec{x, y + same_y}
-				(*gfx.triangles[i])[v+5].Position = pixel.Vec{x + same_x, y + same_y}
+				(*gfx.triangles[i])[v].Position = pixel.Vec{X: x, Y: y}
+				(*gfx.triangles[i])[v+1].Position = pixel.Vec{X: x + sameX, Y: y}
+				(*gfx.triangles[i])[v+2].Position = pixel.Vec{X: x + sameX, Y: y + sameY}
+				(*gfx.triangles[i])[v+3].Position = pixel.Vec{X: x, Y: y}
+				(*gfx.triangles[i])[v+4].Position = pixel.Vec{X: x, Y: y + sameY}
+				(*gfx.triangles[i])[v+5].Position = pixel.Vec{X: x + sameX, Y: y + sameY}
 
 				//(*gfx.triangles[i])[v].Picture = pixel.Vec{x, y}
 				//(*gfx.triangles[i])[v+1].Picture = pixel.Vec{x + same_x, y}
@@ -203,7 +210,7 @@ func (gfx *graphics) buildFrames() {
 				//(*gfx.triangles[i])[v+4].Intensity = 0.5
 				//(*gfx.triangles[i])[v+5].Intensity = 0.5
 				for n := 0; n < 6; n++ {
-					(*gfx.triangles[i])[v+n].Color = pixel.RGBA{r, g, b, a}
+					(*gfx.triangles[i])[v+n].Color = pixel.RGBA{R: r, G: g, B: b, A: a}
 				}
 
 				v += 6

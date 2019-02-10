@@ -12,7 +12,7 @@ import (
 
 type controller struct {
 	quit         bool
-	entity       Entity
+	entity       entity
 	moveLeftKey  pixelgl.Button
 	moveRightKey pixelgl.Button
 	moveClimbKey pixelgl.Button
@@ -24,7 +24,7 @@ type controller struct {
 //=============================================================
 // Set which entity to control
 //=============================================================
-func (c *controller) setActiveEntity(e Entity) {
+func (c *controller) setActiveEntity(e entity) {
 	switch item := e.(type) {
 	case *mob:
 		c.entity = item
@@ -87,7 +87,7 @@ func (c *controller) update(dt float64) {
 		return
 	}
 
-	move := pixel.Vec{0, 0}
+	move := pixel.Vec{X: 0, Y: 0}
 
 	// TEST
 	if global.gWin.Pressed(pixelgl.KeyK) {
@@ -98,7 +98,7 @@ func (c *controller) update(dt float64) {
 		if c.lightDt > 1 {
 			l := &light{}
 			pos := global.gPlayer.getPosition()
-			l.create(pos.X, pos.Y, 300, 360, 100, pixel.RGBA{0.8, 0.6, 0, 0.3}, true, 1)
+			l.create(pos.X, pos.Y, 300, 360, 100, pixel.RGBA{R: 0.8, G: 0.6, B: 0, A: 0.3}, true, 1)
 			c.lightDt = 0
 		}
 	}

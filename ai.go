@@ -6,17 +6,15 @@
 package main
 
 import (
-	"github.com/faiface/pixel"
 	"math/rand"
+
+	"github.com/faiface/pixel"
 )
 
-//=============================================================
-//
-//=============================================================
-type AI struct {
-	entity     Entity
-	dir_x      float64
-	dir_y      float64
+type ai struct {
+	entity     entity
+	dirX       float64
+	dirY       float64
 	objList    []pixel.Vec
 	updateTime float64
 }
@@ -24,16 +22,16 @@ type AI struct {
 //=============================================================
 //
 //=============================================================
-func (a *AI) create(e Entity) {
+func (a *ai) create(e entity) {
 	a.entity = e
-	a.dir_x = 0.01
+	a.dirX = 0.01
 	a.objList = []pixel.Vec{}
 }
 
 //=============================================================
 // Update the information where weapons/objects exists in the world.
 //=============================================================
-func (a *AI) updateObjectList() {
+func (a *ai) updateObjectList() {
 	// Get all weapons within view range.
 	m := a.entity.(*mob)
 	a.objList = []pixel.Vec{}
@@ -53,7 +51,7 @@ func (a *AI) updateObjectList() {
 //=============================================================
 // Try to find a weapon and go towards it.
 //=============================================================
-func (a *AI) findWeapon(dt float64) {
+func (a *ai) findWeapon(dt float64) {
 
 	// If at weapon position. Call m.pickup()
 	closest := 0.0
@@ -77,15 +75,15 @@ func (a *AI) findWeapon(dt float64) {
 
 	// Go towards closest
 	if ePos.X > a.objList[find].X {
-		a.dir_x = -dt
+		a.dirX = -dt
 	} else {
-		a.dir_x = dt
+		a.dirX = dt
 	}
 
 	if ePos.Y > a.objList[find].Y {
-		a.dir_y = -dt
+		a.dirY = -dt
 	} else {
-		a.dir_y = dt
+		a.dirY = dt
 	}
 
 }
@@ -93,7 +91,7 @@ func (a *AI) findWeapon(dt float64) {
 //=============================================================
 // Update AI
 //=============================================================
-func (a *AI) update(dt, time float64) {
+func (a *ai) update(dt, time float64) {
 	// TBD: assumes mob, handle with reflection
 	m := a.entity.(*mob)
 
@@ -116,19 +114,19 @@ func (a *AI) update(dt, time float64) {
 	}
 
 	if m.hitLeftWall {
-		a.dir_x = -dt
+		a.dirX = -dt
 	} else if m.hitRightWall {
-		a.dir_x = dt
+		a.dirX = dt
 		//} else if m.IsOnLadder() {
 		//a.dir_y = dt
 	} else {
-		a.dir_y = -dt
+		a.dirY = -dt
 	}
 
 	// Jump randomly
 	if rand.Float64() < 0.01 {
-		a.dir_y = dt
+		a.dirY = dt
 	}
 
-	m.move(a.dir_x, a.dir_y)
+	m.move(a.dirX, a.dirY)
 }

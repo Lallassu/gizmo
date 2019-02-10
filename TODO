@@ -1,5 +1,6 @@
 General
 --------
+- Smoother (de)acceleration?
 - UI Positioning should work for different size of windows
     -> Not working for fullscreen right now.
 
@@ -12,26 +13,22 @@ General
 
 - Explode of mobs
     -> Leave bloody parts (flood fill)
+    -> "Hit" objects and destroy them partially + floodfill
 
 - Handle respawn when dead.
     - Reset of player
 
-- Shader for minimap
+- Shader for minimap (SKIP MINIMAP?)
     -> Own canvas for map-shader.
         -> Middle of the frame canvas.
     -> Set map correct position compared to player.
     -> Add enemies to minimap?
+- Key to zoom in minimap instantly.
 
 - Elevators
     -> Object
     -> Moving certain path
 
-- Key to zoom in minimap instantly.
-
-- "Hit" objects and destroy them partially + floodfill
-
-- Powerup text above player
-    - Green shader text
 
 - Doors should be connected pairs.
     -> Not random location when entering.
@@ -43,7 +40,6 @@ General
 - Lights should origin from light and not one point for lamps
 
 - Update minimap/ui not that frequent.
-
 
 - UI
     -> Deaths/lives
@@ -82,10 +78,7 @@ General
 
 - sound effects
 
-
 - Rename wPixelsPerChunk (wPixelsPerChunkSide)
-
-- Pixel density (as in urho3d?)
 
 - Right left wall functions in phys is 
   strangly named (opposite?)

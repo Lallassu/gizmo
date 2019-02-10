@@ -29,7 +29,7 @@ func (c *chunk) hit(x, y, vx, vy float64, power int) {
 }
 
 func (c *chunk) getPosition() pixel.Vec {
-	return pixel.Vec{c.bounds.X, c.bounds.Y}
+	return pixel.Vec{X: c.bounds.X, Y: c.bounds.Y}
 }
 
 //=============================================================
@@ -44,7 +44,7 @@ func (c *chunk) create(x, y float64, pixels int) {
 		Y:      y,
 		Width:  float64(pixels),
 		Height: float64(pixels),
-		entity: Entity(c),
+		entity: entity(c),
 	}
 }
 
@@ -76,8 +76,8 @@ func (c *chunk) build() {
 	g1 := uint32(0)
 	b1 := uint32(0)
 	draw := 0
-	same_x := 1.0
-	same_y := 1.0
+	sameX := 1.0
+	sameY := 1.0
 	pos := 0
 	px := 0.0
 	py := 0.0
@@ -100,8 +100,8 @@ func (c *chunk) build() {
 			rc = p >> 24 & 0xFF
 			gc = p >> 16 & 0xFF
 			bc = p >> 8 & 0xFF
-			same_x = 1.0
-			same_y = 1.0
+			sameX = 1.0
+			sameY = 1.0
 
 			// Greedy algorithm to check for range of colors.
 			// Use first bit in alpha to check for if it has been visited or not.
@@ -127,8 +127,8 @@ func (c *chunk) build() {
 					}
 					// Same color and not yet visited!
 					global.gWorld.pixels[pos] &= 0xFFFFFF7F
-					same_x++
-					new_y := 1.0
+					sameX++
+					newY := 1.0
 					for k := y; k < c.bounds.Height; k++ {
 						pos = int(xpos + (k + c.bounds.Y))
 						p2 = global.gWorld.pixels[pos]
@@ -141,15 +141,15 @@ func (c *chunk) build() {
 								break
 							}
 							global.gWorld.pixels[pos] &= 0xFFFFFF7F
-							new_y++
+							newY++
 						} else {
 							break
 						}
 					}
-					if new_y < same_y {
+					if newY < sameY {
 						break
 					} else {
-						same_y = new_y
+						sameY = newY
 					}
 				} else {
 					break
@@ -174,14 +174,14 @@ func (c *chunk) build() {
 			}
 
 			// Size of triangle is given by how large the greedy algorithm found out.
-			(*c.triangles)[i].Position = pixel.Vec{px, py}
-			(*c.triangles)[i+1].Position = pixel.Vec{px + same_x, py}
-			(*c.triangles)[i+2].Position = pixel.Vec{px + same_x, py + same_y}
-			(*c.triangles)[i+3].Position = pixel.Vec{px, py}
-			(*c.triangles)[i+4].Position = pixel.Vec{px, py + same_y}
-			(*c.triangles)[i+5].Position = pixel.Vec{px + same_x, py + same_y}
+			(*c.triangles)[i].Position = pixel.Vec{X: px, Y: py}
+			(*c.triangles)[i+1].Position = pixel.Vec{X: px + sameX, Y: py}
+			(*c.triangles)[i+2].Position = pixel.Vec{X: px + sameX, Y: py + sameY}
+			(*c.triangles)[i+3].Position = pixel.Vec{X: px, Y: py}
+			(*c.triangles)[i+4].Position = pixel.Vec{X: px, Y: py + sameY}
+			(*c.triangles)[i+5].Position = pixel.Vec{X: px + sameX, Y: py + sameY}
 			for n := 0; n < 6; n++ {
-				(*c.triangles)[i+n].Color = pixel.RGBA{r, g, b, a}
+				(*c.triangles)[i+n].Color = pixel.RGBA{R: r, G: g, B: b, A: a}
 			}
 
 			i += 6
