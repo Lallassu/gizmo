@@ -19,18 +19,14 @@ type ai struct {
 	updateTime float64
 }
 
-//=============================================================
-//
-//=============================================================
+// creates initiates a new ai entity.
 func (a *ai) create(e entity) {
 	a.entity = e
 	a.dirX = 0.01
 	a.objList = []pixel.Vec{}
 }
 
-//=============================================================
-// Update the information where weapons/objects exists in the world.
-//=============================================================
+//updateObjectList updates the information where weapons/objects exists in the world.
 func (a *ai) updateObjectList() {
 	// Get all weapons within view range.
 	m := a.entity.(*mob)
@@ -48,9 +44,7 @@ func (a *ai) updateObjectList() {
 	}
 }
 
-//=============================================================
-// Try to find a weapon and go towards it.
-//=============================================================
+// findWeapon let the AI try to find a weapon
 func (a *ai) findWeapon(dt float64) {
 
 	// If at weapon position. Call m.pickup()
@@ -88,9 +82,6 @@ func (a *ai) findWeapon(dt float64) {
 
 }
 
-//=============================================================
-// Update AI
-//=============================================================
 func (a *ai) update(dt, time float64) {
 	// TBD: assumes mob, handle with reflection
 	m := a.entity.(*mob)

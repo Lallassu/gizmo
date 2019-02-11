@@ -164,9 +164,9 @@ func (w *world) IsShadow(posX, posY float64) bool {
 //=============================================================
 // Check if pixel is regular
 //=============================================================
-func (w *world) IsRegular(x_, y_ float64) bool {
-	x := int(x_)
-	y := int(y_)
+func (w *world) IsRegular(posX, posY float64) bool {
+	x := int(posX)
+	y := int(posY)
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF == 0xFF {
@@ -179,9 +179,9 @@ func (w *world) IsRegular(x_, y_ float64) bool {
 //=============================================================
 // Check if it's a wall
 //=============================================================
-func (w *world) IsWall(x_, y_ float64) bool {
-	x := int(x_)
-	y := int(y_)
+func (w *world) IsWall(posX, posY float64) bool {
+	x := int(posX)
+	y := int(posY)
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos] != 0 && w.pixels[pos]&0xFF != wBackgroundNew8 && w.pixels[pos]&0xFF != wBackground8 && w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != wLadder8 {
@@ -194,9 +194,9 @@ func (w *world) IsWall(x_, y_ float64) bool {
 //=============================================================
 // Check if it's a ladder
 //=============================================================
-func (w *world) IsLadder(x_, y_ float64) bool {
-	x := int(x_)
-	y := int(y_)
+func (w *world) IsLadder(posX, posY float64) bool {
+	x := int(posX)
+	y := int(posY)
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
 		if w.pixels[pos]&0xFF == wLadder8 {
@@ -232,7 +232,7 @@ func (w *world) Draw(dt, elapsed float64) {
 	w.bgSprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(w.width)/2, float64(w.height)/2)))
 
 	// Draw objects in QT around player position only.
-	pos := pixel.Vec{0, 0}
+	pos := pixel.Vec{X: 0, Y: 0}
 	if global.gCamera.follow != nil {
 		pos = global.gCamera.follow.getPosition()
 	}
@@ -318,12 +318,12 @@ func (w *world) RemovePixel(x, y int) {
 // Explode in world
 // Also hits objects in the world.
 //=============================================================
-func (w *world) Explode(x_, y_ float64, power int) {
+func (w *world) Explode(posX, posY float64, power int) {
 	//	global.gSounds.play("explosion")
 
-	global.gCamera.shake(pixel.V(x_, y_), power)
-	x := int(x_)
-	y := int(y_)
+	global.gCamera.shake(pixel.V(posX, posY), power)
+	x := int(posX)
+	y := int(posY)
 	pow := power * power
 	ff := make([]pixel.Vec, 50)
 	for rx := x - power; rx <= x+power; rx++ {
@@ -346,8 +346,8 @@ func (w *world) Explode(x_, y_ float64, power int) {
 	}
 
 	// Retrieve with power * 4 for shockwave effect.
-	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: x_ - float64(power*4), Y: y_ - float64(power*4), Width: float64(power * 8), Height: float64(power * 8)}) {
-		v.entity.hit(x_, y_, 0, 0, power)
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: posX - float64(power*4), Y: posY - float64(power*4), Width: float64(power * 8), Height: float64(power * 8)}) {
+		v.entity.hit(posX, posY, 0, 0, power)
 	}
 
 	// Add shadows
@@ -371,7 +371,7 @@ func (w *world) Explode(x_, y_ float64, power int) {
 	}
 	l := light{}
 	if power > 10 {
-		l.create(x_, y_, 300, 360, float64(2*power), pixel.RGBA{0.8, 0.3, 0, 0.1}, true, 0.1)
+		l.create(posX, posY, 300, 360, float64(2*power), pixel.RGBA{R: 0.8, G: 0.3, B: 0, A: 0.1}, true, 0.1)
 	}
 
 	// Floodfill

@@ -10,9 +10,6 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-//=============================================================
-// Chunk Structure
-//=============================================================
 type chunk struct {
 	dirty     bool
 	batch     *pixel.Batch
@@ -22,9 +19,7 @@ type chunk struct {
 	sprite    *pixel.Sprite
 }
 
-//=============================================================
 // Impl. the Entity interface
-//=============================================================
 func (c *chunk) hit(x, y, vx, vy float64, power int) {
 }
 
@@ -32,9 +27,7 @@ func (c *chunk) getPosition() pixel.Vec {
 	return pixel.Vec{X: c.bounds.X, Y: c.bounds.Y}
 }
 
-//=============================================================
 // Create a new chunk
-//=============================================================
 func (c *chunk) create(x, y float64, pixels int) {
 	c.dirty = true
 	c.triangles = pixel.MakeTrianglesData(400) // Init with some suitable value
@@ -48,9 +41,7 @@ func (c *chunk) create(x, y float64, pixels int) {
 	}
 }
 
-//=============================================================
 // Draw the chunk
-//=============================================================
 func (c *chunk) draw(dt, elapsed float64) {
 	if c.cType == fgChunk {
 		if c.dirty {
@@ -62,9 +53,7 @@ func (c *chunk) draw(dt, elapsed float64) {
 	}
 }
 
-//=============================================================
 // Rebuild/Build the chunk.
-//=============================================================
 func (c *chunk) build() {
 	//	start := time.Now()
 	i := 0

@@ -40,9 +40,7 @@ type ammo struct {
 	mdt   float64
 }
 
-//=============================================================
-// Create the ammo engine pool
-//=============================================================
+// create the ammo engine pool
 func (pe *ammoEngine) create() {
 	pe.bullets = make([]ammo, wAmmoMax)
 	pe.canvas = pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
@@ -76,9 +74,7 @@ func (pe *ammoEngine) create() {
 	pe.idx = 0
 }
 
-//=============================================================
-// Get new ammo
-//=============================================================
+// newAmmo initiates a new ammo from ammo pool
 func (pe *ammoEngine) newAmmo(p ammo) {
 	pe.idx++
 	if pe.idx >= len(pe.bullets) {
@@ -91,9 +87,7 @@ func (pe *ammoEngine) newAmmo(p ammo) {
 	pe.bullets[pe.idx : pe.idx+1][0] = newp
 }
 
-//=============================================================
-// Draw the canvas
-//=============================================================
+// update renders the ammo pool
 func (pe *ammoEngine) update(dt float64) {
 	pe.batch.Clear()
 	for i := range pe.bullets {
@@ -110,9 +104,7 @@ func (pe *ammoEngine) update(dt float64) {
 	pe.batch.Draw(global.gWin)
 }
 
-//=============================================================
-// Explode
-//=============================================================
+// explode explodes an ammo at current position
 func (p *ammo) explode() {
 	global.gWorld.Explode(p.x, p.y, p.power)
 	p.active = false
@@ -120,9 +112,7 @@ func (p *ammo) explode() {
 	global.gParticleEngine.effectExplosion(p.x, p.y, p.power)
 }
 
-//=============================================================
-// Update ammo
-//=============================================================
+// update individual ammunition
 func (p *ammo) update(dt float64) {
 	if p.life <= 0 || !p.active {
 		p.active = false

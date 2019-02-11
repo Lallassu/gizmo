@@ -163,9 +163,7 @@ type variableConfig struct {
 	MaxParticles      int  `json:"MaxParticles"`
 }
 
-//=============================================================
-// Configuration file loading
-//=============================================================
+// loadConfiguration Configuration file loading
 func (v *variableConfig) LoadConfiguration() {
 	configFile, err := os.Open(wConfigFile)
 	defer configFile.Close()
@@ -179,9 +177,7 @@ func (v *variableConfig) LoadConfiguration() {
 	}
 }
 
-//=============================================================
-// Configuration file loading
-//=============================================================
+// SaveConfiguration Configuration file save to disk
 func (v *variableConfig) SaveConfiguration() {
 	json, _ := json.Marshal(global.gVariableConfig)
 	if err := ioutil.WriteFile(wConfigFile, json, 0644); err != nil {
