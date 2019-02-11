@@ -1,10 +1,6 @@
-//=============================================================
-// object.go
-//-------------------------------------------------------------
 // Different objects that are subject to physics and flood fill
 // for destuction into pieces. Much like mob, but special adds
 // like FF and different physics and actions.
-//=============================================================
 package main
 
 import (
@@ -28,9 +24,6 @@ type object struct {
 	static        bool
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) create(x, y float64) {
 	o.mass = 5
 	//o.active = true
@@ -39,21 +32,10 @@ func (o *object) create(x, y float64) {
 	o.graphics.scalexy = o.phys.scale
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) getType() objectType {
 	return o.oType
 }
 
-//=============================================================
-//
-//  Function to implement Entity interface
-//
-//=============================================================
-//=============================================================
-//
-//=============================================================
 func (o *object) hit(posX, posY, vx, vy float64, pow int) {
 	if o.static {
 		return
@@ -86,19 +68,13 @@ func (o *object) hit(posX, posY, vx, vy float64, pow int) {
 	return
 }
 
-//=============================================================
 // Add light to object
-// x,y =>
-//=============================================================
 func (o *object) AddLight(x, y float64, l *light) {
 	o.light = l
 	o.lightOffsetX = x
 	o.lightOffsetY = y
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) isFree() bool {
 	if o.owner == nil {
 		return true
@@ -106,9 +82,6 @@ func (o *object) isFree() bool {
 	return false
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) explode() {
 	global.gWorld.qt.Remove(o.bounds)
 	o.explodeGfx(o.bounds.X, o.bounds.Y, false)
@@ -117,29 +90,18 @@ func (o *object) explode() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) getPosition() pixel.Vec {
 	return pixel.Vec{X: o.bounds.X, Y: o.bounds.Y}
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) setOwner(m *mob) {
 	o.owner = m
 }
 
-//=============================================================
 // Action (activate)
-//=============================================================
 func (o *object) action(m *mob) {
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) removeOwner() {
 	o.throwable = true
 	o.speed = 300
@@ -153,9 +115,6 @@ func (o *object) removeOwner() {
 	o.owner = nil
 }
 
-//=============================================================
-//
-//=============================================================
 func (o *object) draw(dt, elapsed float64) {
 
 	if o.light != nil {

@@ -1,8 +1,3 @@
-//=============================================================
-// particleengine.go
-//-------------------------------------------------------------
-// Particles of different kinds.
-//=============================================================
 package main
 
 import (
@@ -22,9 +17,7 @@ type particleEngine struct {
 	//	cMutex    *sync.Mutex
 }
 
-//=============================================================
 // Blood effect
-//=============================================================
 func (pe *particleEngine) effectBlood(x, y, vx, vy float64, size int) {
 	//	for i := 0; i < 1; i++ {
 	r := 175 + global.gRand.rand()*5
@@ -138,9 +131,7 @@ func (pe *particleEngine) effectExplosion(x, y float64, size int) {
 	}
 }
 
-//=============================================================
 // Add or verify that the color exists in batch canvas.
-//=============================================================
 func (pe *particleEngine) addColorToBatch(color uint32) {
 	pos := color | 0xFF
 	if _, ok := pe.colormap[pos]; !ok {
@@ -157,9 +148,7 @@ func (pe *particleEngine) addColorToBatch(color uint32) {
 	}
 }
 
-//=============================================================
 // Create the particle engine pool
-//=============================================================
 func (pe *particleEngine) create() {
 	pe.particles = make([]particle, global.gVariableConfig.MaxParticles)
 	pe.colormap = make(map[uint32]int)
@@ -175,9 +164,7 @@ func (pe *particleEngine) create() {
 	pe.idx = 0
 }
 
-//=============================================================
 // Get new particle
-//=============================================================
 func (pe *particleEngine) newParticle(p particle) {
 	pe.idx++
 	if pe.idx >= len(pe.particles) {
@@ -198,9 +185,7 @@ func (pe *particleEngine) newParticle(p particle) {
 	pe.particles[pe.idx : pe.idx+1][0] = newp
 }
 
-//=============================================================
 // Draw the canvas
-//=============================================================
 func (pe *particleEngine) update(dt float64) {
 	pe.batch.Clear()
 

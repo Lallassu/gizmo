@@ -1,8 +1,3 @@
-//=============================================================
-// ui.go
-//-------------------------------------------------------------
-// User Interface (HUD) for the game
-//=============================================================
 package main
 
 import (
@@ -13,9 +8,6 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-//=============================================================
-//
-//=============================================================
 type ui struct {
 	canvas             *pixelgl.Canvas
 	miniMapSprite      *pixel.Sprite
@@ -29,9 +21,6 @@ type ui struct {
 	playerLife         float64
 }
 
-//=============================================================
-//
-//=============================================================
 func (u *ui) create() {
 
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
@@ -50,9 +39,7 @@ func (u *ui) create() {
 	u.updatePlayerLife()
 }
 
-//=============================================================
 // Mini map
-//=============================================================
 func (u *ui) updateMiniMap() {
 	u.miniMapScale = 0.25 / (float64(global.gWorld.width) / 1024)
 	pos := global.gPlayer.getPosition()
@@ -82,26 +69,17 @@ func (u *ui) updateMiniMap() {
 	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(offset_x, offset_y)))
 }
 
-//=============================================================
-//
-//=============================================================
 func (u *ui) setMiddleText(text string) {
 	//u.middleTextStr = text
 	//u.middleText.Clear()
 	//u.middleText.WriteString(fmt.Sprintf("%v", text))
 }
 
-//=============================================================
-//
-//=============================================================
 func (u *ui) updateFPS(fps int) {
 	//u.fps.Clear()
 	//u.fps.WriteString(fmt.Sprintf("FPS: %v", strconv.Itoa(fps)))
 }
 
-//=============================================================
-//
-//=============================================================
 func (u *ui) updatePlayerLife() {
 	if u.playerLife != global.gPlayer.life {
 		u.playerLife = global.gPlayer.life
@@ -109,9 +87,6 @@ func (u *ui) updatePlayerLife() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (u *ui) draw(dt float64) {
 
 	// Draw death screen

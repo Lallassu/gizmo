@@ -6,8 +6,9 @@
 package main
 
 import (
-	"github.com/faiface/pixel"
 	"math"
+
+	"github.com/faiface/pixel"
 )
 
 type phys struct {

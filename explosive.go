@@ -1,8 +1,3 @@
-//=============================================================
-// explosive.go
-//-------------------------------------------------------------
-// Implements different types of explosives
-//=============================================================
 package main
 
 import (
@@ -11,9 +6,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
-//=============================================================
-//
-//=============================================================
+// explosive  implements different types of explosives
 type explosive struct {
 	object
 	eType     objectType
@@ -67,9 +60,6 @@ func (e *explosive) newExplosive(x, y float64, eType objectType) {
 	e.bounds.entity = entity(e)
 }
 
-//=============================================================
-//
-//=============================================================
 func (e *explosive) draw(dt, elapsed float64) {
 	e.object.draw(dt, elapsed)
 	if distance(global.gPlayer.getPosition(), pixel.Vec{X: e.bounds.X, Y: e.bounds.Y}) < 10 {
@@ -109,9 +99,6 @@ func (e *explosive) draw(dt, elapsed float64) {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (e *explosive) explode() {
 
 }

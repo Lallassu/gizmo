@@ -1,6 +1,12 @@
 General
 --------
-- Smoother (de)acceleration?
+- Better UI movement.
+- Changes in options menu should take effect directly. (eg. fullscreen)
+- Smoother (de)acceleration for mobs?
+
+- Scale of everything should be affected by fullscreen/resolution
+    -> Right now everything is scaled differently in fullscreen.
+
 - UI Positioning should work for different size of windows
     -> Not working for fullscreen right now.
 
@@ -11,14 +17,10 @@ General
             -> Enter => change value
             -> Update text for the item
 
-- Explode of mobs
-    -> Leave bloody parts (flood fill)
-    -> "Hit" objects and destroy them partially + floodfill
-
 - Handle respawn when dead.
     - Reset of player
 
-- Shader for minimap (SKIP MINIMAP?)
+- Shader for minimap
     -> Own canvas for map-shader.
         -> Middle of the frame canvas.
     -> Set map correct position compared to player.
@@ -82,3 +84,9 @@ General
 
 - Right left wall functions in phys is 
   strangly named (opposite?)
+
+PRIO2
+-----------------
+- Explode of mobs
+    -> Leave bloody parts (flood fill)
+    -> "Hit" objects and destroy them partially + floodfill

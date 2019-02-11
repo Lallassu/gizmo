@@ -1,19 +1,12 @@
-//=============================================================
-// weapon.go
-//-------------------------------------------------------------
-// Implements different types of weapons
-//=============================================================
 package main
 
 import (
 	"fmt"
-	"github.com/faiface/pixel"
 	"image"
+
+	"github.com/faiface/pixel"
 )
 
-//=============================================================
-//
-//=============================================================
 type weapon struct {
 	object
 	shot             ammo
@@ -28,9 +21,6 @@ type weapon struct {
 	currentAmmoCount int
 }
 
-//=============================================================
-//
-//=============================================================
 func (w *weapon) newWeapon(x, y float64, wType objectType) {
 	w.reloadTime = 0
 	w.wType = wType
@@ -91,22 +81,15 @@ func (w *weapon) newWeapon(x, y float64, wType objectType) {
 	w.currentAmmoCount = w.ammoCount
 }
 
-//=============================================================
 // Get Type
-//=============================================================
 func (w *weapon) getType() objectType {
 	return w.wType
 }
 
-//=============================================================
 // Action (activate)
-//=============================================================
 func (w *weapon) action(m *mob) {
 }
 
-//=============================================================
-//
-//=============================================================
 func (w *weapon) draw(dt, elapsed float64) {
 	w.reloadTime += dt
 	w.object.draw(dt, elapsed)
@@ -119,9 +102,6 @@ func (w *weapon) draw(dt, elapsed float64) {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (w *weapon) shoot() {
 	// Use mass = 5 and fx/fy = 0.5 for missile
 	if w.owner == nil {

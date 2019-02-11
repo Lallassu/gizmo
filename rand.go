@@ -1,11 +1,7 @@
-//=============================================================
-// rand.go
-//-------------------------------------------------------------
 // Fast Rand
 // On-start generated random values used to speed up performance
 // of rand() instead of using math.rand().
 // Only used when performance is critical.
-//=============================================================
 package main
 
 import (

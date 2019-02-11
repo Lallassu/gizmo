@@ -1,8 +1,3 @@
-//=============================================================
-// chunk.go
-//-------------------------------------------------------------
-// Part of the world. Handles its part of world pixels.
-//=============================================================
 package main
 
 import (
@@ -10,6 +5,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+// chunk handles triangle data and batch drawing
 type chunk struct {
 	dirty     bool
 	batch     *pixel.Batch

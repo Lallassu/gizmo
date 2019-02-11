@@ -1,8 +1,3 @@
-//=============================================================
-// menu.go
-//-------------------------------------------------------------
-// Menu for the game
-//=============================================================
 package main
 
 import (
@@ -12,17 +7,11 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-//=============================================================
-//
-//=============================================================
 type menu struct {
 	items []*menuItem
 	logo  *menuItem
 }
 
-//=============================================================
-//
-//=============================================================
 type menuItem struct {
 	action   func()
 	name     string
@@ -31,16 +20,10 @@ type menuItem struct {
 	selected int32
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) create() {
 	m.items = make([]*menuItem, 0)
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) createMain() {
 	m.logo = &menuItem{
 		canvas:   pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)),
@@ -63,9 +46,6 @@ func (m *menu) createMain() {
 	m.items[0].selected = 1
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) createOptions() {
 	m.create()
 	m.addItem(0.7, "Controls", func() {
@@ -84,9 +64,6 @@ func (m *menu) createOptions() {
 	m.items[0].selected = 1
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) createController() {
 	m.create()
 	m.addItem(0.5, fmt.Sprintf("%10v: %-10v", "Shoot", "KEY-X"), func() {})
@@ -104,9 +81,7 @@ func (m *menu) createController() {
 	m.items[0].selected = 1
 }
 
-//=============================================================
 // Handle display settings
-//=============================================================
 func (m *menu) createDisplay() {
 	m.create()
 	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)),
@@ -151,9 +126,6 @@ func (m *menu) createDisplay() {
 	m.items[0].selected = 1
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) updateSelectedItemText(text string) {
 	for i, v := range m.items {
 		if v.selected == 1 {
@@ -163,9 +135,6 @@ func (m *menu) updateSelectedItemText(text string) {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) createGame() {
 	m.create()
 	m.addItem(0.5, fmt.Sprintf("%10v: %-10v", "Max Particles", global.gVariableConfig.MaxParticles), func() {})
@@ -176,9 +145,6 @@ func (m *menu) createGame() {
 	m.items[0].selected = 1
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) addItem(scale float64, str string, f func()) {
 	item := &menuItem{
 		canvas:   pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)),
@@ -194,9 +160,6 @@ func (m *menu) addItem(scale float64, str string, f func()) {
 	m.items = append(m.items, item)
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) selectItem() {
 	for i, item := range m.items {
 		if item.selected == 1 {
@@ -206,9 +169,6 @@ func (m *menu) selectItem() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) moveUp() {
 	for i, item := range m.items {
 		if item.selected == 1 {
@@ -223,9 +183,6 @@ func (m *menu) moveUp() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) moveDown() {
 	for i, item := range m.items {
 		if item.selected == 1 {
@@ -240,9 +197,6 @@ func (m *menu) moveDown() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *menu) draw(dt, elapsed float64) {
 	offsetX := 30.0
 	extraOffset := 0.0

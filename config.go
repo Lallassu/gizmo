@@ -1,9 +1,5 @@
-//=============================================================
-// config.go
-//-------------------------------------------------------------
 // Configuration for the game. Loaded both from config file
 // and static configuration.
-//=============================================================
 package main
 
 import (

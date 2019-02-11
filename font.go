@@ -1,29 +1,21 @@
-//=============================================================
-// font.go
-//-------------------------------------------------------------
-// Font mapping system.
-//=============================================================
 package main
 
 import (
 	"fmt"
+	"unicode"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"unicode"
 )
 
-//=============================================================
-//
-//=============================================================
+// font is a font mapping system
 type font struct {
 	chars   map[string]*pixel.Sprite
 	cHeight float64
 	cWidth  float64
 }
 
-//=============================================================
-// Init font system
-//=============================================================
+// create  Inits font system
 func (f *font) create() {
 	img, _, _, _ := loadTexture(fmt.Sprintf("%v%v", wAssetMixedPath, "font.png"))
 	pic := pixel.PictureDataFromImage(img)
@@ -53,9 +45,7 @@ func (f *font) create() {
 	}
 }
 
-//=============================================================
-// Draw text to canvas and return a canvas
-//=============================================================
+// write text to canvas and return a canvas
 func (f *font) write(text string) *pixelgl.Canvas {
 	canvas := pixelgl.NewCanvas(pixel.R(0, 0, float64(len(text))*f.cWidth, f.cHeight))
 	for i, c := range text {
@@ -66,9 +56,7 @@ func (f *font) write(text string) *pixelgl.Canvas {
 	return canvas
 }
 
-//=============================================================
 // Draw text to given canvas (pre-created canvas for shaders)
-//=============================================================
 func (f *font) writeToCanvas(text string, canvas *pixelgl.Canvas) {
 	canvas.SetBounds(pixel.R(0, 0, float64(len(text))*f.cWidth, f.cHeight))
 	for i, c := range text {

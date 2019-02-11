@@ -1,8 +1,3 @@
-//=============================================================
-// utils.go
-//-------------------------------------------------------------
-// Utility functions
-//=============================================================
 package main
 
 import (
@@ -17,10 +12,8 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-//=============================================================
 // Load texture file (could also be spritesheets) (png format)
 // Size is the largest of height/width used for 1D pixel arrays
-//=============================================================
 func loadTexture(file string) (img image.Image, width, height, size float64) {
 	width = 0.0
 	height = 0.0
@@ -54,9 +47,7 @@ func loadTexture(file string) (img image.Image, width, height, size float64) {
 	return
 }
 
-//=============================================================
 // Distance between two points in 2D space
-//=============================================================
 func distance(p1, p2 pixel.Vec) float64 {
 	return math.Sqrt(math.Pow(float64(p1.X-p2.X), 2) + math.Pow(float64(p1.Y-p2.Y), 2))
 }
@@ -71,12 +62,10 @@ func printMemoryUsage() {
 	Debug(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
 }
 
-//=============================================================
 // Without this window is black, bug after mojave update for
 // osx?
 // Must move window a bit in order to make it draw the first
 // time.
-//=============================================================
 func centerWindow(win *pixelgl.Window) {
 	x, y := pixelgl.PrimaryMonitor().Size()
 	width, height := win.Bounds().Size().XY()

@@ -1,8 +1,3 @@
-//=============================================================
-// camera.go
-//-------------------------------------------------------------
-// Controls the camera
-//=============================================================
 package main
 
 import (
@@ -11,6 +6,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
+// camera controls the camera
 type camera struct {
 	zoom       float64
 	pos        pixel.Vec

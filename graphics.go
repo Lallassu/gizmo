@@ -1,8 +1,3 @@
-//=============================================================
-// graphics.go
-//-------------------------------------------------------------
-// Graphics for items and mobs
-//=============================================================
 package main
 
 import (
@@ -12,6 +7,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+// graphics handles the graphics for entities in the game
 type graphics struct {
 	sheetFile   string
 	walkFrames  []int
@@ -42,9 +38,7 @@ type hitText struct {
 	ttl    float64
 }
 
-//=============================================================
 // Create graphics
-//=============================================================
 func (gfx *graphics) createGfx(x, y float64, static bool) {
 	if gfx.scalexy == 0 {
 		gfx.scalexy = 1.0
@@ -102,9 +96,7 @@ func (gfx *graphics) createGfx(x, y float64, static bool) {
 	}
 }
 
-//=============================================================
 // Build each frame
-//=============================================================
 func (gfx *graphics) buildFrames() {
 	v := 0
 	rc := uint32(0)
@@ -232,9 +224,6 @@ func (gfx *graphics) buildFrames() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (gfx *graphics) hitGfx(lx, ly int, gx, gy, vx, vy float64, power int, blood bool) {
 	if global.gRand.rand() < 1 {
 		global.gParticleEngine.effectBlood(gx, gy, vx, vy, 1)
@@ -275,9 +264,7 @@ func (gfx *graphics) hitGfx(lx, ly int, gx, gy, vx, vy float64, power int, blood
 	gfx.buildFrames()
 }
 
-//=============================================================
-// Evaporate
-//=============================================================
+// evaporate destroys an object into particles.
 func (gfx *graphics) evaporate(gx, gy float64) {
 	size := gfx.scalexy
 	if size < 0.5 {
@@ -315,9 +302,7 @@ func (gfx *graphics) evaporate(gx, gy float64) {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
+// explodeGfx explodes the object into particles.
 func (gfx *graphics) explodeGfx(gx, gy float64, blood bool) {
 	size := gfx.scalexy
 	if size < 0.5 {

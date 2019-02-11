@@ -1,8 +1,3 @@
-//=============================================================
-// lights.go
-//-------------------------------------------------------------
-// Handle lights and pooling of lights
-//=============================================================
 package main
 
 import (
@@ -14,9 +9,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-//=============================================================
-// Light structure
-//=============================================================
+// Light structure for a light source
 type light struct {
 	bounds               *Bounds
 	color                pixel.RGBA
@@ -39,10 +32,8 @@ type light struct {
 	blinkDt              float64
 }
 
-//=============================================================
 // Create a light
 // Life == -1, infinite life
-//=============================================================
 func (l *light) create(x, y, angle, spread, radius float64, color pixel.RGBA, dynamic bool, life float64) {
 	l.canvas = pixelgl.NewCanvas(pixel.R(0, 0, radius*2, radius*2))
 	l.canvas.SetComposeMethod(pixel.ComposeOver)
@@ -76,30 +67,22 @@ func (l *light) create(x, y, angle, spread, radius float64, color pixel.RGBA, dy
 	global.gWorld.AddObject(l.bounds)
 }
 
-//=============================================================
-// Hit
-//=============================================================
+// Hit a light soruce
 func (l *light) hit(x, y, vx, vy float64, power int) {
 
 }
 
-//=============================================================
 // Destroy light
-//=============================================================
 func (l *light) destroy() {
 	global.gWorld.qt.Remove(l.bounds)
 }
 
-//=============================================================
 // Get position
-//=============================================================
 func (l *light) getPosition() pixel.Vec {
 	return pixel.Vec{X: l.bounds.X, Y: l.bounds.Y}
 }
 
-//=============================================================
 // Draw
-//=============================================================
 func (l *light) draw(dt, elapsed float64) {
 	l.redrawDt += dt
 
@@ -146,9 +129,7 @@ func (l *light) draw(dt, elapsed float64) {
 	l.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(l.bounds.X, l.bounds.Y)))
 }
 
-//=============================================================
 // Fetch object bounds around light
-//=============================================================
 func (l *light) updateObjectBounds() {
 	// TBD: this might cause a lot of GC?
 	l.objectBounds = make([]*Bounds, 0)
@@ -167,9 +148,7 @@ func (l *light) updateObjectBounds() {
 	}
 }
 
-//=============================================================
 // Shine!
-//=============================================================
 func (l *light) shine() {
 	addTo := float64(1 / l.radius)
 

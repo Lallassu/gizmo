@@ -1,8 +1,3 @@
-//=============================================================
-// controller.go
-//-------------------------------------------------------------
-// Controllers (input) + AI
-//=============================================================
 package main
 
 import (
@@ -10,6 +5,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+// controller handle input from devices
 type controller struct {
 	quit         bool
 	entity       entity
@@ -21,9 +17,7 @@ type controller struct {
 	lightDt      float64
 }
 
-//=============================================================
 // Set which entity to control
-//=============================================================
 func (c *controller) setActiveEntity(e entity) {
 	switch item := e.(type) {
 	case *mob:
@@ -31,16 +25,12 @@ func (c *controller) setActiveEntity(e entity) {
 	}
 }
 
-//=============================================================
 // Initialize controls
-//=============================================================
 func (c *controller) create() {
 	c.quit = false
 }
 
-//=============================================================
 // Handle input for both mouse and keyboard
-//=============================================================
 func (c *controller) update(dt float64) {
 	if global.gWin.Pressed(pixelgl.KeyQ) {
 		c.quit = true

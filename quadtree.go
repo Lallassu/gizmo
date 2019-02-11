@@ -1,10 +1,6 @@
-//=============================================================
-// quadtree.go
-//-------------------------------------------------------------
 // Quadtree for holding entities
 // Can't remember where I got this from. But I modified it
 // somewhat...
-//=============================================================
 package main
 
 // Quadtree - The quadtree data structure

@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -113,10 +114,6 @@ func (i *item) action(m *mob) {
 func (i *item) setOwner(m *mob) {
 	switch i.iType {
 	case itemPowerupHealth:
-		// TBD: Powerup effect
-		// TBD: Text how much power?
-		// Remove object
-
 		i.evaporate(i.bounds.X, i.bounds.Y+i.animateOffset)
 		m.setLife(50) // TBD
 		m.graphics.hitTexts = append(m.graphics.hitTexts, &hitText{global.gFont.write(fmt.Sprintf("+%v", 50)), 3.0})

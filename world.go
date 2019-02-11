@@ -1,13 +1,3 @@
-//=============================================================
-// world.go
-//-------------------------------------------------------------
-// Keep control of map (all pixels)
-// Destuction of map
-// Additions to map
-// Generation of map
-// Map flood fill
-// Quadtree for entities
-//=============================================================
 package main
 
 import (
@@ -17,9 +7,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
-//=============================================================
 // World Structure
-//=============================================================
 type world struct {
 	width      int
 	height     int
@@ -32,15 +20,6 @@ type world struct {
 	doors      []pixel.Vec
 }
 
-//=============================================================
-//=============================================================
-// World Public Functions
-//=============================================================
-//=============================================================
-
-//=============================================================
-// Initialize world first time.
-//=============================================================
 func (w *world) Init() {
 	w.qt = &Quadtree{
 		Bounds:     Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)},
@@ -52,9 +31,7 @@ func (w *world) Init() {
 	w.doors = make([]pixel.Vec, 0)
 }
 
-//=============================================================
 // New Map
-//=============================================================
 func (w *world) NewMap(width, height, size float64) {
 	w.qt.Clear()
 
@@ -103,36 +80,17 @@ func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
 	return pixel.Vec{X: float64(posX), Y: float64(posY)}, true
 }
 
-//func loadPicture(path string) (pixel.Picture, error) {
-//	file, err := os.Open(path)
-//	if err != nil {
-//		return nil, err
-//	}
-//	defer file.Close()
-//	img, _, err := image.Decode(file)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return pixel.PictureDataFromImage(img), nil
-//}
-
-//=============================================================
 // Add object to world (QT)
-//=============================================================
 func (w *world) AddObject(obj *Bounds) {
 	w.qt.Insert(obj)
 }
 
-//=============================================================
 // Remove object from world (QT)
-//=============================================================
 func (w *world) RemoveObject(obj entity) {
 
 }
 
-//=============================================================
 // Check if pixel is a background
-//=============================================================
 func (w *world) IsBackground(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
@@ -146,9 +104,7 @@ func (w *world) IsBackground(posX, posY float64) bool {
 	return false
 }
 
-//=============================================================
 // Check if pixel is a shadow
-//=============================================================
 func (w *world) IsShadow(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
@@ -161,9 +117,7 @@ func (w *world) IsShadow(posX, posY float64) bool {
 	return false
 }
 
-//=============================================================
 // Check if pixel is regular
-//=============================================================
 func (w *world) IsRegular(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
@@ -176,9 +130,7 @@ func (w *world) IsRegular(posX, posY float64) bool {
 	return false
 }
 
-//=============================================================
 // Check if it's a wall
-//=============================================================
 func (w *world) IsWall(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
@@ -191,9 +143,7 @@ func (w *world) IsWall(posX, posY float64) bool {
 	return false
 }
 
-//=============================================================
 // Check if it's a ladder
-//=============================================================
 func (w *world) IsLadder(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
@@ -207,17 +157,13 @@ func (w *world) IsLadder(posX, posY float64) bool {
 
 }
 
-//=============================================================
 // Check if pixel exists
-//=============================================================
 func (w *world) PixelExists(x, y float64) bool {
 	return true
 }
 
-//=============================================================
 // Get color of the specified pixel
 // Return -1 if not exist
-//=============================================================
 func (w *world) PixelColor(x, y float64) int32 {
 	if x < 0 || y < 0 || x >= float64(w.width) || y >= float64(w.height) {
 		return -1
@@ -225,9 +171,7 @@ func (w *world) PixelColor(x, y float64) int32 {
 	return int32(w.pixels[uint32(int(x)*w.width+int(y))])
 }
 
-//=============================================================
 // Draw
-//=============================================================
 func (w *world) Draw(dt, elapsed float64) {
 	w.bgSprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(w.width)/2, float64(w.height)/2)))
 
@@ -241,9 +185,7 @@ func (w *world) Draw(dt, elapsed float64) {
 	}
 }
 
-//=============================================================
 // Add pixel with color (replace if already exists)
-//=============================================================
 func (w *world) AddPixel(x, y int, color uint32) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
@@ -252,9 +194,7 @@ func (w *world) AddPixel(x, y int, color uint32) {
 	}
 }
 
-//=============================================================
 // Set pixel without rebuilding chunk
-//=============================================================
 func (w *world) SetPixel(x, y int, color uint32) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
@@ -262,9 +202,7 @@ func (w *world) SetPixel(x, y int, color uint32) {
 	}
 }
 
-//=============================================================
 // Remove a pixel from the world map
-//=============================================================
 func (w *world) RemovePixel(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
@@ -314,10 +252,8 @@ func (w *world) RemovePixel(x, y int) {
 	}
 }
 
-//=============================================================
 // Explode in world
 // Also hits objects in the world.
-//=============================================================
 func (w *world) Explode(posX, posY float64, power int) {
 	//	global.gSounds.play("explosion")
 
@@ -385,22 +321,12 @@ func (w *world) Explode(posX, posY float64, power int) {
 	// }}
 }
 
-//=============================================================
-//=============================================================
-// World Internal Functions
-//=============================================================
-//=============================================================
-
-//=============================================================
 // Flood fill in map
-//=============================================================
 func (w *world) floodFill(x, y int) {
 
 }
 
-//=============================================================
 // Remove shadows from map on given position
-//=============================================================
 func (w *world) removeShadow(x, y int) {
 	pos := w.width*x + y
 	if pos < w.size && pos >= 0 {
@@ -414,9 +340,7 @@ func (w *world) removeShadow(x, y int) {
 	}
 }
 
-//=============================================================
 // Add shadows to map on given position
-//=============================================================
 func (w *world) addShadow(x, y int) {
 	pos := w.width*x + y
 	if pos < w.width*w.height && pos >= 0 {
@@ -430,9 +354,7 @@ func (w *world) addShadow(x, y int) {
 	}
 }
 
-//=============================================================
 // Mark chunk as dirty to rebuild it
-//=============================================================
 func (w *world) markChunkDirty(x, y int) {
 	// Get all chunks in this area.
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: float64(x), Y: float64(y), Width: 3, Height: 3}) {

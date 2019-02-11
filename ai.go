@@ -1,8 +1,3 @@
-//=============================================================
-// ai.go
-//-------------------------------------------------------------
-// Stear an entity of type mob
-//=============================================================
 package main
 
 import (
@@ -11,6 +6,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
+// ai used for mobs
 type ai struct {
 	entity     entity
 	dirX       float64

@@ -1,8 +1,3 @@
-//=============================================================
-// ammo.go
-//-------------------------------------------------------------
-// Ammunition
-//=============================================================
 package main
 
 import (
@@ -13,6 +8,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+// ammoEngine is the pool for ammunition
 type ammoEngine struct {
 	canvas  *pixelgl.Canvas
 	bullets []ammo
@@ -20,6 +16,7 @@ type ammoEngine struct {
 	batch   *pixel.Batch
 }
 
+// ammo is the specific ammunition
 type ammo struct {
 	x      float64
 	y      float64

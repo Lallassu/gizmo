@@ -2,15 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/faiface/pixel"
 	"image"
 	"os"
 	"regexp"
+
+	"github.com/faiface/pixel"
 )
 
-//=============================================================
 // Textures loaded from packed texture atlas and JSON descr.
-//=============================================================
 type textures struct {
 	batch   *pixel.Batch
 	image   *pixel.PictureData
@@ -18,18 +17,14 @@ type textures struct {
 	objects []*sprite
 }
 
-//=============================================================
 // Sprite contains an object where position is volatile
-//=============================================================
 type sprite struct {
 	name  string
 	pos   pixel.Vec
 	scale float64
 }
 
-//=============================================================
 // JSON parsing for texture packed information
-//=============================================================
 type frames struct {
 	Frames []files `json:"frames"`
 	Meta   meta    `json:"meta"`
@@ -61,9 +56,7 @@ type frame struct {
 	H float64 `json:"h"`
 }
 
-//=============================================================
 // Load and create textures
-//=============================================================
 func (t *textures) load(jsonfile string) {
 	t.sprites = make(map[string]*pixel.Sprite)
 
@@ -105,31 +98,23 @@ func (t *textures) load(jsonfile string) {
 	}
 }
 
-//=============================================================
 // Add new sprite object to draw
-//=============================================================
 func (t *textures) addObject(o *sprite) {
 	t.objects = append(t.objects, o)
 }
 
-//=============================================================
 // Remove object from drawing list
-//=============================================================
 func (t *textures) removeObject(o sprite) {
 	// TBD
 }
 
-//=============================================================
 // Get info for sprite
-//=============================================================
 func (t *textures) spriteInfo(name string) (int, int) {
 	f := t.sprites[name].Frame()
 	return int(f.Max.X - f.Min.X), int(f.Max.Y - f.Min.Y)
 }
 
-//=============================================================
 // Draw the batch based on the packed texture atlas
-//=============================================================
 func (t *textures) update(dt float64) {
 	t.batch.Clear()
 	for _, o := range t.objects {

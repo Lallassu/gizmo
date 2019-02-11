@@ -1,8 +1,3 @@
-//=============================================================
-// mob.go
-//-------------------------------------------------------------
-// Anything that can move/be destroyed etc.
-//=============================================================
 package main
 
 import (
@@ -26,9 +21,7 @@ type mob struct {
 	maxLife  float64
 }
 
-//=============================================================
 // Create mob
-//=============================================================
 func (m *mob) create(x, y float64) {
 	if m.ai != nil {
 		m.ai.create(m)
@@ -60,9 +53,6 @@ func (m *mob) create(x, y float64) {
 
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *mob) hit(posX, posY, vx, vy float64, power int) {
 	// Create some text above the mob.
 	m.graphics.hitTexts = append(m.graphics.hitTexts, &hitText{global.gFont.write(fmt.Sprintf("-%v", power*2)), 3.0})
@@ -111,9 +101,6 @@ func (m *mob) hit(posX, posY, vx, vy float64, power int) {
 	}
 }
 
-//=============================================================
-// Set Health
-//=============================================================
 func (m *mob) setLife(change float64) {
 	m.life += change
 	if m.life > m.maxLife {
@@ -126,9 +113,7 @@ func (m *mob) setLife(change float64) {
 	}
 }
 
-//=============================================================
 // Shoot if weapon attached
-//=============================================================
 func (m *mob) shoot() {
 	if m.carry != nil {
 		switch item := m.carry.(type) {
@@ -139,9 +124,6 @@ func (m *mob) shoot() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *mob) pickup() {
 	// Check if anything to pickup?
 	var obj objectInterface
@@ -167,9 +149,6 @@ func (m *mob) pickup() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *mob) action() {
 	for _, v := range global.gWorld.qt.RetrieveIntersections(m.bounds) {
 		switch i := v.entity.(type) {
@@ -192,9 +171,7 @@ func (m *mob) action() {
 	}
 }
 
-//=============================================================
 // Throw/drop object
-//=============================================================
 func (m *mob) throw() {
 	if m.carry != nil {
 		switch item := m.carry.(type) {
@@ -211,9 +188,7 @@ func (m *mob) throw() {
 	}
 }
 
-//=============================================================
 // Die
-//=============================================================
 func (m *mob) die() {
 	// Drop weapon
 	m.throw()
@@ -222,9 +197,6 @@ func (m *mob) die() {
 	global.gWorld.qt.Remove(m.bounds)
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *mob) move(x, y float64) {
 	m.phys.keyMove.X = x
 	m.phys.keyMove.Y = y
@@ -239,16 +211,10 @@ func (m *mob) move(x, y float64) {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *mob) getPosition() pixel.Vec {
 	return pixel.Vec{X: m.bounds.X, Y: m.bounds.Y}
 }
 
-//=============================================================
-//
-//=============================================================
 func (m *mob) draw(dt, elapsed float64) {
 	shooting := false
 	if m.currentAnim == animShoot {
