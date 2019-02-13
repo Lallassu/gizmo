@@ -107,7 +107,7 @@ func (u *ui) draw(dt float64) {
 	u.miniMapCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 	u.miniMapFrameCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
-	u.updateMiniMap()
+	//u.updateMiniMap()
 
 	u.updatePlayerLife()
 	u.lifeCanvas.Draw(u.canvas, pixel.IM.Scaled(pixel.ZV, 0.5).Moved(pixel.V(50, wViewMax/2+40)))
@@ -115,7 +115,7 @@ func (u *ui) draw(dt float64) {
 	bounds := u.miniMapFrameCanvas.Bounds()
 	u.miniMapFrameCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+bounds.Max.X/2, global.gCamera.pos.Y+bounds.Max.Y/2)))
 	bounds = u.miniMapCanvas.Bounds()
-	u.miniMapCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X, global.gCamera.pos.Y)))
+	//u.miniMapCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X, global.gCamera.pos.Y)))
 	//u.miniMapCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))
 
 	u.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))

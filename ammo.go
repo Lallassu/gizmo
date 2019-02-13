@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	_ "reflect"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"

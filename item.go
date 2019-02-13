@@ -1,8 +1,3 @@
-//=============================================================
-// item.go
-//-------------------------------------------------------------
-// Implements different types of items
-//=============================================================
 package main
 
 import (
@@ -11,17 +6,11 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-//=============================================================
-//
-//=============================================================
 type item struct {
 	object
 	iType objectType
 }
 
-//=============================================================
-//
-//=============================================================
 func (i *item) newItem(x, y float64, iType objectType) {
 	i.iType = iType
 	switch iType {
@@ -69,16 +58,12 @@ func (i *item) newItem(x, y float64, iType objectType) {
 	i.bounds.entity = entity(i)
 }
 
-//=============================================================
 // Get Type
-//=============================================================
 func (i *item) getType() objectType {
 	return i.iType
 }
 
-//=============================================================
 // Action (activate)
-//=============================================================
 func (i *item) action(m *mob) {
 	switch i.iType {
 	case itemPortal:
@@ -108,9 +93,7 @@ func (i *item) action(m *mob) {
 	}
 }
 
-//=============================================================
 // Attach
-//=============================================================
 func (i *item) setOwner(m *mob) {
 	switch i.iType {
 	case itemPowerupHealth:
@@ -123,24 +106,18 @@ func (i *item) setOwner(m *mob) {
 	i.object.setOwner(m)
 }
 
-//=============================================================
 // Custom draw function
-//=============================================================
 func (i *item) draw(dt, elapsed float64) {
 	// Set uniform used for shaders
 	i.object.draw(dt, elapsed)
 }
 
-//=============================================================
 // custom explode function called after object.explode
-//=============================================================
 func (i *item) explode() {
 	i.object.explode()
 }
 
-//=============================================================
 // custom hit function called after object.hit
-//=============================================================
 func (i *item) hit(x, y, vx, vy float64, power int) {
 	i.object.hit(x, y, vx, vy, power)
 }

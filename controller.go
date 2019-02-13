@@ -13,7 +13,6 @@ type controller struct {
 	moveRightKey pixelgl.Button
 	moveClimbKey pixelgl.Button
 	moveJumpKey  pixelgl.Button
-	menuMoveDt   float64
 	lightDt      float64
 }
 
@@ -38,21 +37,17 @@ func (c *controller) update(dt float64) {
 
 	// If main menu is visible, just stear the menu and not char.
 	if global.gActiveMenu != nil {
-		c.menuMoveDt += dt
-		if c.menuMoveDt > 0.1 {
-			if global.gWin.Pressed(pixelgl.KeyUp) {
-				global.gActiveMenu.moveUp()
-			}
-			if global.gWin.Pressed(pixelgl.KeyDown) {
-				global.gActiveMenu.moveDown()
-			}
-			if global.gWin.Pressed(pixelgl.KeyEnter) {
-				global.gActiveMenu.selectItem()
-			}
-			if global.gWin.Pressed(pixelgl.KeyEscape) {
-				global.gActiveMenu = nil
-			}
-			c.menuMoveDt = 0
+		if global.gWin.JustPressed(pixelgl.KeyUp) {
+			global.gActiveMenu.moveUp()
+		}
+		if global.gWin.JustPressed(pixelgl.KeyDown) {
+			global.gActiveMenu.moveDown()
+		}
+		if global.gWin.JustPressed(pixelgl.KeyEnter) {
+			global.gActiveMenu.selectItem()
+		}
+		if global.gWin.JustPressed(pixelgl.KeyEscape) {
+			global.gActiveMenu = nil
 		}
 		return
 	}

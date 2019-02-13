@@ -1,11 +1,11 @@
 General
 --------
-- Better UI movement.
 - Changes in options menu should take effect directly. (eg. fullscreen)
 - Smoother (de)acceleration for mobs?
 
 - Scale of everything should be affected by fullscreen/resolution
     -> Right now everything is scaled differently in fullscreen.
+    -> Shouldn't take ViewMax into account, should be based on screen W/H.
 
 - UI Positioning should work for different size of windows
     -> Not working for fullscreen right now.

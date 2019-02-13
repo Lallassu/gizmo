@@ -1,8 +1,3 @@
-//=============================================================
-// phys.go
-//-------------------------------------------------------------
-// Physics for MOBs (incl. player) and objects.
-//=============================================================
 package main
 
 import (
@@ -36,9 +31,6 @@ type phys struct {
 	updateObjectBoundsDt float64
 }
 
-//=============================================================
-//
-//=============================================================
 func (p *phys) createPhys(x, y, width, height float64) {
 	// Initiate bounds for qt
 	if p.scale == 0 {
@@ -68,9 +60,7 @@ func (p *phys) createPhys(x, y, width, height float64) {
 	}
 }
 
-//=============================================================
 // Fetch object bounds
-//=============================================================
 func (p *phys) updateObjectBounds() {
 	// TBD: this might cause a lot of GC?
 	p.objectBounds = make([]*Bounds, 0)
@@ -91,9 +81,6 @@ func (p *phys) updateObjectBounds() {
 	}
 }
 
-//=============================================================
-//
-//=============================================================
 func (p *phys) hitCeiling(x, y float64) bool {
 	for px := 0.0; px < p.bounds.Width; px += p.offset {
 		if global.gWorld.IsRegular(x+px, y+p.bounds.Height+1) {
@@ -103,9 +90,6 @@ func (p *phys) hitCeiling(x, y float64) bool {
 	return false
 }
 
-//=============================================================
-//
-//=============================================================
 func (p *phys) hitFloor(x, y float64) bool {
 	for px := 0.0; px < p.bounds.Width; px += 2 { // use instead of offset.
 		if global.gWorld.IsRegular(x+px, y+1) {
@@ -125,9 +109,6 @@ func (p *phys) hitFloor(x, y float64) bool {
 	return false
 }
 
-//=============================================================
-//
-//=============================================================
 func (p *phys) hitWallLeft(x, y float64) bool {
 	for py := p.bounds.Height / 2; py < p.bounds.Height; py += p.offset {
 		if global.gWorld.IsRegular(x-2, y+py) {
@@ -155,9 +136,6 @@ func (p *phys) hitWallLeft(x, y float64) bool {
 	return false
 }
 
-//=============================================================
-//
-//=============================================================
 func (p *phys) hitWallRight(x, y float64) bool {
 	for py := p.bounds.Height / 2; py < p.bounds.Height; py += p.offset {
 		if global.gWorld.IsRegular(x+p.bounds.Width+1, y+py) {
@@ -186,9 +164,7 @@ func (p *phys) hitWallRight(x, y float64) bool {
 	return false
 }
 
-//=============================================================
 // Check if on ladder
-//=============================================================
 func (p *phys) IsOnLadder() bool {
 	for px := p.bounds.Width / 3; px < p.bounds.Width-p.bounds.Width/3; px += p.offset {
 		for py := 0.0; py < p.bounds.Height; py += 2 {
@@ -200,8 +176,6 @@ func (p *phys) IsOnLadder() bool {
 	return false
 }
 
-//=============================================================
-//=============================================================
 func (p *phys) physics(dt float64) {
 	p.updateObjectBoundsDt += dt
 	if p.updateObjectBoundsDt > 1/2 {
@@ -289,9 +263,7 @@ func (p *phys) physics(dt float64) {
 	p.unStuck(dt)
 }
 
-//=============================================================
 // Unstuck the objet if stuck.
-//=============================================================
 func (p *phys) unStuck(dt float64) {
 	bottom := false
 	top := false
