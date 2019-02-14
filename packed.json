@@ -1,0 +1,100 @@
+{"frames": [
+
+{
+	"filename": "ak47_weapon.png",
+	"frame": {"x":0,"y":61,"w":100,"h":50},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":50},
+	"sourceSize": {"w":100,"h":50}
+},
+{
+	"filename": "crate_obj.png",
+	"frame": {"x":0,"y":0,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "enemy1.png",
+	"frame": {"x":0,"y":125,"w":324,"h":14},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":324,"h":14},
+	"sourceSize": {"w":324,"h":14}
+},
+{
+	"filename": "grenade_weapon.png",
+	"frame": {"x":70,"y":0,"w":50,"h":61},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":50,"h":61},
+	"sourceSize": {"w":50,"h":61}
+},
+{
+	"filename": "minigun_weapon.png",
+	"frame": {"x":100,"y":61,"w":100,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":64},
+	"sourceSize": {"w":100,"h":64}
+},
+{
+	"filename": "p90_weapon.png",
+	"frame": {"x":120,"y":0,"w":82,"h":50},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":82,"h":50},
+	"sourceSize": {"w":82,"h":50}
+},
+{
+	"filename": "pistol_weapon.png",
+	"frame": {"x":32,"y":0,"w":38,"h":34},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":38,"h":34},
+	"sourceSize": {"w":38,"h":34}
+},
+{
+	"filename": "player.png",
+	"frame": {"x":0,"y":139,"w":324,"h":14},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":324,"h":14},
+	"sourceSize": {"w":324,"h":14}
+},
+{
+	"filename": "rocketlauncher_weapon.png",
+	"frame": {"x":298,"y":0,"w":98,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":98,"h":40},
+	"sourceSize": {"w":98,"h":40}
+},
+{
+	"filename": "shotgun_weapon.png",
+	"frame": {"x":202,"y":0,"w":96,"h":34},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":34},
+	"sourceSize": {"w":96,"h":34}
+},
+{
+	"filename": "sniper_weapon.png",
+	"frame": {"x":200,"y":61,"w":102,"h":46},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":102,"h":46},
+	"sourceSize": {"w":102,"h":46}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "packed.png",
+	"format": "RGBA8888",
+	"size": {"w":396,"h":153},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:70840529ef23c1b10b399fff54fe7023:ec7f4ea6b56c5c82a3e2f4e778bf3813:de62c4130a72712ae995d05d7f4a14e5$"
+}
+}

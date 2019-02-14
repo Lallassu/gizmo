@@ -1,5 +1,14 @@
 General
 --------
+- lasers (lights with straight angle)
+
+- Map FG chunks draws strange?
+
+- List videomodes for the monitor in the menu.
+    -> monitor->VideoModes()
+
+- Add joystick support
+
 - Changes in options menu should take effect directly. (eg. fullscreen)
 - Smoother (de)acceleration for mobs?
 
@@ -31,6 +40,7 @@ General
     -> Object
     -> Moving certain path
 
+- Use shader for shadows instead of calculation of fg?
 
 - Doors should be connected pairs.
     -> Not random location when entering.
@@ -90,3 +100,5 @@ PRIO2
 - Explode of mobs
     -> Leave bloody parts (flood fill)
     -> "Hit" objects and destroy them partially + floodfill
+
+- error checking

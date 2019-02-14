@@ -28,7 +28,10 @@ func run() {
 		cfg.Monitor = pixelgl.PrimaryMonitor()
 	}
 	gWin, err := pixelgl.NewWindow(cfg)
+	Debug("W:", gWin.Bounds())
 	//gWin.SetBounds(pixel.R(0, 0, 800, 600))
+
+	gWin.SetCursorVisible(false)
 
 	if err != nil {
 		panic(err)

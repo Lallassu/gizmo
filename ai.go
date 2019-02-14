@@ -25,7 +25,11 @@ func (a *ai) create(e entity) {
 //updateObjectList updates the information where weapons/objects exists in the world.
 func (a *ai) updateObjectList() {
 	// Get all weapons within view range.
-	m := a.entity.(*mob)
+	m, ok := a.entity.(*mob)
+	if !ok {
+		return
+	}
+
 	a.objList = []pixel.Vec{}
 	for _, v := range global.gWorld.qt.RetrieveIntersections(&Bounds{X: m.bounds.X, Y: m.bounds.Y, Width: 300, Height: 300}) {
 		//if v.entity.getType() == entityObject {
@@ -59,7 +63,9 @@ func (a *ai) findWeapon(dt float64) {
 	}
 
 	if closest < 20 {
-		a.entity.(*mob).pickup()
+		if m, ok := a.entity.(*mob); ok {
+			m.pickup()
+		}
 		return
 	}
 
@@ -79,8 +85,11 @@ func (a *ai) findWeapon(dt float64) {
 }
 
 func (a *ai) update(dt, time float64) {
-	// TBD: assumes mob, handle with reflection
-	m := a.entity.(*mob)
+	var m *mob
+	var ok bool
+	if m, ok = a.entity.(*mob); !ok {
+		return
+	}
 
 	if m.carry == nil {
 		a.updateTime += dt

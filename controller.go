@@ -90,17 +90,23 @@ func (c *controller) update(dt float64) {
 
 	// Go into door
 	if global.gWin.Pressed(pixelgl.KeyA) {
-		c.entity.(*mob).action()
+		if m, ok := c.entity.(*mob); ok {
+			m.action()
+		}
 	}
 
 	// Test pickup
 	if global.gWin.Pressed(pixelgl.KeyB) {
-		c.entity.(*mob).pickup()
+		if m, ok := c.entity.(*mob); ok {
+			m.pickup()
+		}
 	}
 
 	// Throw object
 	if global.gWin.Pressed(pixelgl.KeyV) {
-		c.entity.(*mob).throw()
+		if m, ok := c.entity.(*mob); ok {
+			m.throw()
+		}
 	}
 
 	if global.gWin.Pressed(pixelgl.KeyS) {
@@ -122,10 +128,14 @@ func (c *controller) update(dt float64) {
 		move.Y = -dt
 	}
 
-	c.entity.(*mob).move(move.X, move.Y)
+	if m, ok := c.entity.(*mob); ok {
+		m.move(move.X, move.Y)
+	}
 
 	// Handle mouse
 	if global.gWin.Pressed(pixelgl.MouseButtonLeft) || global.gWin.Pressed(pixelgl.KeyLeftShift) {
-		c.entity.(*mob).shoot()
+		if m, ok := c.entity.(*mob); ok {
+			m.shoot()
+		}
 	}
 }

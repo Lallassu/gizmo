@@ -96,6 +96,9 @@ func (m *menu) createDisplay() {
 			} else {
 				global.gVariableConfig.Vsync = true
 			}
+
+			global.gWin.SetVSync(global.gVariableConfig.Vsync)
+
 			m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "V-sync", global.gVariableConfig.Vsync))
 			global.gVariableConfig.SaveConfiguration()
 		})
@@ -107,6 +110,16 @@ func (m *menu) createDisplay() {
 				global.gVariableConfig.Fullscreen = true
 			}
 			m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Fullscreen", global.gVariableConfig.Fullscreen))
+
+			// TBD: Toggle fullscreen
+			if global.gVariableConfig.Fullscreen {
+				global.gWin.SetMonitor(pixelgl.PrimaryMonitor())
+				//	global.gWin.SetBounds(global.gWin.Bounds())
+			} else {
+				global.gWin.SetMonitor(nil)
+				global.gWin.SetBounds(pixel.R(0, float64(global.gVariableConfig.WindowWidth), 0, float64(global.gVariableConfig.WindowHeight)))
+			}
+
 			global.gVariableConfig.SaveConfiguration()
 		})
 	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Undecorated Window", global.gVariableConfig.UndecoratedWindow),

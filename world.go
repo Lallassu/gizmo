@@ -173,14 +173,17 @@ func (w *world) PixelColor(x, y float64) int32 {
 
 // Draw
 func (w *world) Draw(dt, elapsed float64) {
-	w.bgSprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(float64(w.width)/2, float64(w.height)/2)))
+	r := w.bgSprite.Frame()
+	w.bgSprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(r.Max.X/2, r.Max.Y/2)))
 
 	// Draw objects in QT around player position only.
 	pos := pixel.Vec{X: 0, Y: 0}
 	if global.gCamera.follow != nil {
 		pos = global.gCamera.follow.getPosition()
 	}
-	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: pos.X - wViewMax/2, Y: pos.Y - wViewMax/2, Width: wViewMax, Height: wViewMax}) {
+	//for _, v := range w.qt.RetrieveIntersections(&Bounds{X: pos.X - wViewMax/2, Y: pos.Y - wViewMax/2, Width: wViewMax, Height: wViewMax}) {
+	winSize := global.gWin.Bounds()
+	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: pos.X - winSize.Max.X/2, Y: pos.Y - winSize.Max.Y/2, Width: winSize.Max.X, Height: winSize.Max.Y}) {
 		v.entity.draw(dt, elapsed)
 	}
 }
