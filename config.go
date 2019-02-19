@@ -17,8 +17,8 @@ import (
 //=============================================================
 // General constants
 const (
-	GameTitle   = "GoD - Game or Die"
-	GameVersion = "0.0"
+	GameTitle   = "Gizmo"
+	GameVersion = "0.1"
 )
 
 var gSoundFiles = []string{

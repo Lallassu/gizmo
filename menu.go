@@ -35,7 +35,7 @@ func (m *menu) create() {
 func (m *menu) createMain() {
 	m.logo = &menuItem{
 		canvas:   pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)),
-		name:     "GoD",
+		name:     "Gizmo",
 		selected: 2,
 		scale:    2.0,
 	}
@@ -96,7 +96,9 @@ func (m *menu) createDisplay() {
 		func() {
 			// Change to current video mode
 			mode := m.videoModes[m.currentVideoMode]
-			global.gWin.SetBounds(pixel.R(0, float64(mode.Width), 0, float64(mode.Height)))
+			global.gVariableConfig.WindowWidth = mode.Width
+			global.gVariableConfig.WindowHeight = mode.Height
+			global.gWin.SetBounds(pixel.R(0, 0, float64(mode.Width), float64(mode.Height)))
 			centerWindow(global.gWin)
 			global.gVariableConfig.SaveConfiguration()
 		})
@@ -106,9 +108,7 @@ func (m *menu) createDisplay() {
 			m.currentVideoMode = len(m.videoModes) - 1
 		}
 		mode := m.videoModes[m.currentVideoMode]
-		global.gVariableConfig.WindowWidth = mode.Width
-		global.gVariableConfig.WindowHeight = mode.Height
-		m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)))
+		m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", mode.Width, mode.Height)))
 	}
 	m.items[len(m.items)-1].nextItem = func() {
 		m.currentVideoMode++
@@ -116,9 +116,7 @@ func (m *menu) createDisplay() {
 			m.currentVideoMode = 0
 		}
 		mode := m.videoModes[m.currentVideoMode]
-		global.gVariableConfig.WindowWidth = mode.Width
-		global.gVariableConfig.WindowHeight = mode.Height
-		m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)))
+		m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", mode.Width, mode.Height)))
 	}
 	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "V-sync", global.gVariableConfig.Vsync),
 		func() {
@@ -266,20 +264,20 @@ func (m *menu) moveDown() {
 }
 
 func (m *menu) draw(dt, elapsed float64) {
-	// TBD: Set offset + scale based on current resolution
-	// mode := m.videoModes[m.currentVideoMode]
-	offsetX := 30.0
-	extraOffset := 0.0
 	if m.logo != nil {
 		m.logo.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 		global.gFont.writeToCanvas(m.logo.name, m.logo.canvas)
-		m.logo.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.logo.scale).Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offsetX, global.gCamera.pos.Y+wViewMax/20+200)))
-		extraOffset = 50
+		offsetX := (float64(global.gVariableConfig.WindowWidth) / global.gCamera.zoom) / 2 //- m.logo.canvas.Bounds().Max.X/2
+		offsetY := (float64(global.gVariableConfig.WindowHeight) / global.gCamera.zoom) - m.logo.canvas.Bounds().Max.Y
+		m.logo.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.logo.scale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
+		//	extraOffset = 50
 	}
 	for i := range m.items {
 		m.items[i].canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
-		offsetY := 30 * m.items[i].scale
 		global.gFont.writeToCanvas(m.items[i].name, m.items[i].canvas)
-		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.items[i].scale).Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0-offsetX, global.gCamera.pos.Y+wViewMax/2-float64(i)*offsetY-extraOffset)))
+		//itemScale := m.items[i].scale
+		offsetX := (float64(global.gVariableConfig.WindowWidth) / global.gCamera.zoom) / 2 //- m.logo.canvas.Bounds().Max.X/2
+		offsetY := (float64(global.gVariableConfig.WindowHeight) / 1.5 / global.gCamera.zoom) - m.items[i].canvas.Bounds().Max.Y*float64(i)
+		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.items[i].scale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
 	}
 }
