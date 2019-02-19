@@ -8,12 +8,16 @@ import (
 )
 
 type menu struct {
-	items []*menuItem
-	logo  *menuItem
+	items            []*menuItem
+	logo             *menuItem
+	videoModes       []pixelgl.VideoMode
+	currentVideoMode int
 }
 
 type menuItem struct {
 	action   func()
+	nextItem func()
+	prevItem func()
 	name     string
 	canvas   *pixelgl.Canvas
 	scale    float64
@@ -22,6 +26,10 @@ type menuItem struct {
 
 func (m *menu) create() {
 	m.items = make([]*menuItem, 0)
+	m.videoModes = make([]pixelgl.VideoMode, 0)
+	for _, mode := range pixelgl.PrimaryMonitor().VideoModes() {
+		m.videoModes = append(m.videoModes, mode)
+	}
 }
 
 func (m *menu) createMain() {
@@ -86,9 +94,32 @@ func (m *menu) createDisplay() {
 	m.create()
 	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)),
 		func() {
-			// TBD: List of resolutions to toggle between
+			// Change to current video mode
+			mode := m.videoModes[m.currentVideoMode]
+			global.gWin.SetBounds(pixel.R(0, float64(mode.Width), 0, float64(mode.Height)))
+			centerWindow(global.gWin)
 			global.gVariableConfig.SaveConfiguration()
 		})
+	m.items[len(m.items)-1].prevItem = func() {
+		m.currentVideoMode--
+		if m.currentVideoMode < 0 {
+			m.currentVideoMode = len(m.videoModes) - 1
+		}
+		mode := m.videoModes[m.currentVideoMode]
+		global.gVariableConfig.WindowWidth = mode.Width
+		global.gVariableConfig.WindowHeight = mode.Height
+		m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)))
+	}
+	m.items[len(m.items)-1].nextItem = func() {
+		m.currentVideoMode++
+		if m.currentVideoMode >= len(m.videoModes) {
+			m.currentVideoMode = 0
+		}
+		mode := m.videoModes[m.currentVideoMode]
+		global.gVariableConfig.WindowWidth = mode.Width
+		global.gVariableConfig.WindowHeight = mode.Height
+		m.updateSelectedItemText(fmt.Sprintf("%20v: %-10v", "Resolution", fmt.Sprintf("%v x %v", global.gVariableConfig.WindowWidth, global.gVariableConfig.WindowHeight)))
+	}
 	m.addItem(0.5, fmt.Sprintf("%20v: %-10v", "V-sync", global.gVariableConfig.Vsync),
 		func() {
 			if global.gVariableConfig.Vsync {
@@ -158,11 +189,11 @@ func (m *menu) createGame() {
 	m.items[0].selected = 1
 }
 
-func (m *menu) addItem(scale float64, str string, f func()) {
+func (m *menu) addItem(scale float64, str string, fAction func()) {
 	item := &menuItem{
 		canvas:   pixelgl.NewCanvas(pixel.R(0, 0, 1, 1)),
 		name:     str,
-		action:   f,
+		action:   fAction,
 		selected: 0,
 		scale:    scale,
 	}
@@ -171,6 +202,30 @@ func (m *menu) addItem(scale float64, str string, f func()) {
 	item.canvas.SetFragmentShader(fragmentShaderMenuItem)
 
 	m.items = append(m.items, item)
+}
+
+// nextItem used for a specific setting such as resolution
+func (m *menu) nextItem() {
+	for i, item := range m.items {
+		if item.selected == 1 {
+			if m.items[i].nextItem != nil {
+				m.items[i].nextItem()
+			}
+			return
+		}
+	}
+}
+
+// prevItem used for a specific setting such as resolution
+func (m *menu) prevItem() {
+	for i, item := range m.items {
+		if item.selected == 1 {
+			if m.items[i].prevItem != nil {
+				m.items[i].prevItem()
+			}
+			return
+		}
+	}
 }
 
 func (m *menu) selectItem() {
@@ -211,6 +266,8 @@ func (m *menu) moveDown() {
 }
 
 func (m *menu) draw(dt, elapsed float64) {
+	// TBD: Set offset + scale based on current resolution
+	// mode := m.videoModes[m.currentVideoMode]
 	offsetX := 30.0
 	extraOffset := 0.0
 	if m.logo != nil {

@@ -46,6 +46,12 @@ func (c *controller) update(dt float64) {
 		if global.gWin.JustPressed(pixelgl.KeyEnter) {
 			global.gActiveMenu.selectItem()
 		}
+		if global.gWin.JustPressed(pixelgl.KeyLeft) {
+			global.gActiveMenu.prevItem()
+		}
+		if global.gWin.JustPressed(pixelgl.KeyRight) {
+			global.gActiveMenu.nextItem()
+		}
 		if global.gWin.JustPressed(pixelgl.KeyEscape) {
 			global.gActiveMenu = nil
 		}

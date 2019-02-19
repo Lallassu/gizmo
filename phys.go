@@ -72,8 +72,11 @@ func (p *phys) updateObjectBounds() {
 			continue
 		case *weapon:
 			continue
-			//case *mob:
-			//	continue
+		case *item:
+			// Skip doors, no need to collide with them.
+			if b.entity.(*item).name == "Door" {
+				continue
+			}
 		}
 		if b != p.bounds {
 			p.objectBounds = append(p.objectBounds, b)
@@ -187,7 +190,17 @@ func (p *phys) physics(dt float64) {
 		p.velo.X = dt * p.speed * p.dir
 	} else {
 		if p.hitFloor(p.bounds.X, p.bounds.Y-1) {
-			p.velo.X = 0
+			p.velo.X = math.Abs(p.velo.X)
+			if p.velo.X > 0 {
+				p.velo.X -= (p.speed / 10) * dt
+				if p.velo.X < 0 {
+					p.velo.X = 0
+				} else {
+					p.velo.X *= p.dir
+				}
+			} else {
+				p.velo.X = 0
+			}
 			p.moving = false
 		} else {
 			if p.throwable {

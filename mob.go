@@ -228,11 +228,6 @@ func (m *mob) draw(dt, elapsed float64) {
 		}
 	}
 
-	if m.velo.Y < -6 {
-		// TBD: Fall to death, not explode
-		// Or power?
-	}
-
 	// Update physics & AI
 	m.physics(dt)
 

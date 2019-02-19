@@ -1,16 +1,15 @@
 General
 --------
+- Use tilemap maps instead.
+    -> use 32x32 pixels or something and draw each 
+       as that size in the game.
 - lasers (lights with straight angle)
 
 - Map FG chunks draws strange?
 
-- List videomodes for the monitor in the menu.
-    -> monitor->VideoModes()
-
 - Add joystick support
 
 - Changes in options menu should take effect directly. (eg. fullscreen)
-- Smoother (de)acceleration for mobs?
 
 - Scale of everything should be affected by fullscreen/resolution
     -> Right now everything is scaled differently in fullscreen.
