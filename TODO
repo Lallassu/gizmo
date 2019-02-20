@@ -4,10 +4,12 @@ General
     -> use 32x32 pixels or something and draw each 
        as that size in the game.
 
+- Scale of text menu based on screen resolution
+
 - Scale of everything should be affected by fullscreen/resolution
     -> Right now everything is scaled differently in fullscreen.
     -> Shouldn't take ViewMax into account, should be based on screen W/H.
-    
+
 - lasers (lights with straight angle)
 
 - Map FG chunks draws strange?

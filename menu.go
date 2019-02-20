@@ -146,7 +146,7 @@ func (m *menu) createDisplay() {
 				//	global.gWin.SetBounds(global.gWin.Bounds())
 			} else {
 				global.gWin.SetMonitor(nil)
-				global.gWin.SetBounds(pixel.R(0, float64(global.gVariableConfig.WindowWidth), 0, float64(global.gVariableConfig.WindowHeight)))
+				global.gWin.SetBounds(pixel.R(0, 0, float64(global.gVariableConfig.WindowWidth), float64(global.gVariableConfig.WindowHeight)))
 			}
 
 			global.gVariableConfig.SaveConfiguration()
@@ -277,7 +277,7 @@ func (m *menu) draw(dt, elapsed float64) {
 		global.gFont.writeToCanvas(m.items[i].name, m.items[i].canvas)
 		//itemScale := m.items[i].scale
 		offsetX := (float64(global.gVariableConfig.WindowWidth) / global.gCamera.zoom) / 2 //- m.logo.canvas.Bounds().Max.X/2
-		offsetY := (float64(global.gVariableConfig.WindowHeight) / 1.5 / global.gCamera.zoom) - m.items[i].canvas.Bounds().Max.Y*float64(i)
+		offsetY := (float64(global.gVariableConfig.WindowHeight) / 1.5 / global.gCamera.zoom) - m.items[i].canvas.Bounds().Max.Y*float64(i)*m.items[i].scale
 		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.items[i].scale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
 	}
 }
