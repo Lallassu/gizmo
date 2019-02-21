@@ -46,6 +46,8 @@ func (c *camera) shake(pos pixel.Vec, power int) {
 }
 
 func (c *camera) update(dt float64) {
+	c.zoom = (float64(global.gVariableConfig.WindowWidth) / float64(global.gVariableConfig.WindowHeight))
+	Debug("ZOOM", c.zoom)
 	pos := c.pos
 	if c.follow != nil {
 		pos = c.follow.getPosition()

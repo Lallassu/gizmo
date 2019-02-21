@@ -22,7 +22,6 @@ type ui struct {
 }
 
 func (u *ui) create() {
-
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
 	u.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
@@ -95,29 +94,35 @@ func (u *ui) draw(dt float64) {
 		u.deathScreenTimer += dt
 		u.setMiddleText(wDeathScreenText)
 
-		red := u.deathScreenTimer / 10
+		red := u.deathScreenTimer / 5
 		if red > 0.5 {
 			red = 0.5
 		}
-		color = pixel.RGBA{R: red, G: 0, B: 0, A: u.deathScreenTimer / 10}
+		color = pixel.RGBA{R: red, G: 0, B: 0, A: u.deathScreenTimer / 5}
+		u.canvas.Clear(color)
+		u.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+u.canvas.Bounds().Max.X/2, global.gCamera.pos.Y+u.canvas.Bounds().Max.Y/2)))
 	} else {
 		u.deathScreenTimer = 0
 	}
-	u.canvas.Clear(color)
+	u.updatePlayerLife()
+
 	u.miniMapCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 	u.miniMapFrameCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
 	//u.updateMiniMap()
 
-	u.updatePlayerLife()
-	u.lifeCanvas.Draw(u.canvas, pixel.IM.Scaled(pixel.ZV, 0.5).Moved(pixel.V(50, wViewMax/2+40)))
+	//offsetX := (float64(global.gVariableConfig.WindowWidth) / global.gCamera.zoom) - u.lifeCanvas.Bounds().Max.X
+	offsetX := (u.lifeCanvas.Bounds().Max.X / global.gCamera.zoom)
+	offsetY := (float64(global.gVariableConfig.WindowHeight) / global.gCamera.zoom) - u.lifeCanvas.Bounds().Max.Y
+	lifeScale := float64(global.gVariableConfig.WindowWidth) / float64(global.gVariableConfig.WindowHeight) / 5
+	u.lifeCanvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, lifeScale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
 
-	bounds := u.miniMapFrameCanvas.Bounds()
-	u.miniMapFrameCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+bounds.Max.X/2, global.gCamera.pos.Y+bounds.Max.Y/2)))
-	bounds = u.miniMapCanvas.Bounds()
+	//bounds := u.miniMapFrameCanvas.Bounds()
+	//u.miniMapFrameCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+bounds.Max.X/2, global.gCamera.pos.Y+bounds.Max.Y/2)))
+	//miniMapScale := float64(global.gVariableConfig.WindowWidth) / float64(global.gVariableConfig.WindowHeight) / 5
+	//u.miniMapFrameCanvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, miniMapScale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
+	//bounds = u.miniMapCanvas.Bounds()
 	//u.miniMapCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X, global.gCamera.pos.Y)))
 	//u.miniMapCanvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))
-
-	u.canvas.Draw(global.gWin, pixel.IM.Moved(pixel.V(global.gCamera.pos.X+wViewMax/2.0, global.gCamera.pos.Y+wViewMax/2.0)))
 
 }

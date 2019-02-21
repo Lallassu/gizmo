@@ -269,15 +269,15 @@ func (m *menu) draw(dt, elapsed float64) {
 		global.gFont.writeToCanvas(m.logo.name, m.logo.canvas)
 		offsetX := (float64(global.gVariableConfig.WindowWidth) / global.gCamera.zoom) / 2 //- m.logo.canvas.Bounds().Max.X/2
 		offsetY := (float64(global.gVariableConfig.WindowHeight) / global.gCamera.zoom) - m.logo.canvas.Bounds().Max.Y
-		m.logo.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.logo.scale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
-		//	extraOffset = 50
+		logoScale := float64(global.gVariableConfig.WindowWidth) / float64(global.gVariableConfig.WindowHeight)
+		m.logo.canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, logoScale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
 	}
 	for i := range m.items {
 		m.items[i].canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 		global.gFont.writeToCanvas(m.items[i].name, m.items[i].canvas)
-		//itemScale := m.items[i].scale
+		itemScale := (float64(global.gVariableConfig.WindowWidth) / float64(global.gVariableConfig.WindowHeight)) / 3
 		offsetX := (float64(global.gVariableConfig.WindowWidth) / global.gCamera.zoom) / 2 //- m.logo.canvas.Bounds().Max.X/2
-		offsetY := (float64(global.gVariableConfig.WindowHeight) / 1.5 / global.gCamera.zoom) - m.items[i].canvas.Bounds().Max.Y*float64(i)*m.items[i].scale
-		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, m.items[i].scale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
+		offsetY := (float64(global.gVariableConfig.WindowHeight) / 1.6 / global.gCamera.zoom) - m.items[i].canvas.Bounds().Max.Y*float64(i)*itemScale
+		m.items[i].canvas.Draw(global.gWin, pixel.IM.Scaled(pixel.ZV, itemScale).Moved(pixel.V(global.gCamera.pos.X+offsetX, global.gCamera.pos.Y+offsetY)))
 	}
 }

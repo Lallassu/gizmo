@@ -4,8 +4,10 @@ General
     -> use 32x32 pixels or something and draw each 
        as that size in the game.
 
-- Scale of text menu based on screen resolution
-
+- New Game must initialize everything correctly (now player is not hurt)
+- Remove minimap?
+- Position life correctly
+    
 - Scale of everything should be affected by fullscreen/resolution
     -> Right now everything is scaled differently in fullscreen.
     -> Shouldn't take ViewMax into account, should be based on screen W/H.
@@ -16,11 +18,8 @@ General
 
 - Add joystick support
 
-- Changes in options menu should take effect directly. (eg. fullscreen)
-
-
-- UI Positioning should work for different size of windows
-    -> Not working for fullscreen right now.
+- Fix keybindings in options menu
+- Fix vSync in options menu
 
 - Configuration support
     - Add functionality to menu
