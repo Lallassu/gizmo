@@ -14,6 +14,8 @@ General
 
 - lasers (lights with straight angle)
 
+- Lights are not finding correct path, just checks bounds. Should check pixelwise if possible.
+
 - Map FG chunks draws strange?
 
 - Add joystick support
@@ -65,7 +67,6 @@ General
     -> May be attachable
     -> Events
     -> Explode -> Drop item
-
 
 - Performance issues?
     -> AI loads high?
