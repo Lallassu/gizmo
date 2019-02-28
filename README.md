@@ -9,3 +9,5 @@ Developed using faiface/pixel 2D library (https://github.com/faiface/pixel).
 ## Videos
 [![](https://raw.github.com/lallassu/gizmo/master/videopreview.png)](https://youtu.be/6zcQvsf4R4Q)
 
+## License
+MIT
