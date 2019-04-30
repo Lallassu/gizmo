@@ -52,7 +52,7 @@ const (
 	wLadder32            = 0xFFFFFFAF
 	wShadow8             = 0xBF
 	wShadow32            = 0xFFFFFFBF
-	wViewMax             = 400 // 450
+	wViewMax             = 4000 // 450
 	wParticleDefaultLife = 5
 	wGravity             = -9.82
 	wAmmoMax             = 1000
@@ -87,7 +87,7 @@ type Global struct {
 	gPlayer         *mob
 	gSounds         *sound
 	gUI             *ui
-	gMap            *gameMap
+	gMap            *Map
 	gMapColor       *mapColor
 	gFont           *font
 	gMainMenu       *menu
@@ -106,14 +106,14 @@ var global = &Global{
 	gCamera:         &camera{},
 	gController:     &controller{},
 	gParticleEngine: &particleEngine{},
-	gClearColor:     pixel.RGBA{R: 0, G: 0, B: 0, A: 1.0},
+	gClearColor:     pixel.RGBA{R: 0.2, G: 0.15, B: 0, A: 1.0},
 	gWin:            &pixelgl.Window{},
 	gAmmoEngine:     &ammoEngine{},
 	gTextures:       &textures{},
 	gRand:           &fRand{},
 	gSounds:         &sound{},
 	gUI:             &ui{},
-	gMap:            &gameMap{},
+	gMap:            &Map{},
 	gMapColor:       &mapColor{},
 	gFont:           &font{},
 	gMainMenu:       &menu{},

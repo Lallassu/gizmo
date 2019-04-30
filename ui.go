@@ -25,10 +25,10 @@ func (u *ui) create() {
 	u.canvas = pixelgl.NewCanvas(pixel.R(0, 0, float64(wViewMax), float64(wViewMax)))
 	u.canvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
-	u.miniMapCanvas = pixelgl.NewCanvas(pixel.R(0, 0, 100, 100))
-	u.miniMapCanvas.SetUniform("uPos", &u.uPos)
-	u.miniMapCanvas.SetUniform("uTime", &global.uTime)
-	u.miniMapCanvas.SetFragmentShader(fragmentShaderMinimap)
+	//	u.miniMapCanvas = pixelgl.NewCanvas(pixel.R(0, 0, 100, 100))
+	//	u.miniMapCanvas.SetUniform("uPos", &u.uPos)
+	//	u.miniMapCanvas.SetUniform("uTime", &global.uTime)
+	//	u.miniMapCanvas.SetFragmentShader(fragmentShaderMinimap)
 
 	img, _, _, _ := loadTexture(fmt.Sprintf("%v%v", wAssetObjectsPath, "minimap.png"))
 	pic := pixel.PictureDataFromImage(img)
@@ -39,34 +39,34 @@ func (u *ui) create() {
 }
 
 // Mini map
-func (u *ui) updateMiniMap() {
-	u.miniMapScale = 0.25 / (float64(global.gWorld.width) / 1024)
-	pos := global.gPlayer.getPosition()
-	//canvas := pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
-	//canvas.Clear(pixel.RGBA{1.0, 0, 0, 0.5})
-
-	offsetX := float64(global.gWorld.width/2) * u.miniMapScale
-	offsetY := float64(global.gWorld.height/2) * u.miniMapScale
-	//offset_x2 := offset_x //- float64(global.gWorld.width/2)*u.miniMapScale
-	//offset_y2 := offset_y //- float64(global.gWorld.height/2)*u.miniMapScale
-
-	u.uPos = mgl32.Vec2{float32(offsetX / 2), float32(offsetY / 2)}
-
-	bounds := u.miniMapFrameCanvas.Bounds()
-	//u.miniMapSprite.Draw(u.miniMapFrameCanvas, pixel.IM.Moved(pixel.V(offset_x2, offset_y2)).ScaledXY(pixel.V(0.8, 0.8), pixel.V(0.8, 0.8)))
-	u.miniMapSprite.Draw(u.miniMapFrameCanvas, pixel.IM.Moved(pixel.V(bounds.Max.X/2, bounds.Max.Y/2)).ScaledXY(pixel.V(0.6, 0.6), pixel.V(0.6, 0.6)))
-
-	//global.gWorld.bgSprite.Draw(u.miniMapCanvas, pixel.IM.ScaledXY(pixel.V(u.miniMapScale, u.miniMapScale), pixel.V(u.miniMapScale/2, u.miniMapScale/2)).Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
-	bounds = global.gWorld.bgSprite.Frame()
-	global.gWorld.bgSprite.Draw(u.miniMapCanvas,
-		pixel.IM.ScaledXY(
-			pixel.V(u.miniMapScale, u.miniMapScale),
-			pixel.V(u.miniMapScale/2, u.miniMapScale/2),
-		).Moved(
-			pixel.V((bounds.Max.X*u.miniMapScale)/2+pos.X*u.miniMapScale, (bounds.Max.Y*u.miniMapScale)/2+pos.Y*u.miniMapScale)))
-	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
-	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(offset_x, offset_y)))
-}
+//func (u *ui) updateMiniMap() {
+//	u.miniMapScale = 0.25 / (float64(global.gWorld.width) / 1024)
+//	pos := global.gPlayer.getPosition()
+//	//canvas := pixelgl.NewCanvas(pixel.R(0, 0, 1, 1))
+//	//canvas.Clear(pixel.RGBA{1.0, 0, 0, 0.5})
+//
+//	offsetX := float64(global.gWorld.width/2) * u.miniMapScale
+//	offsetY := float64(global.gWorld.height/2) * u.miniMapScale
+//	//offset_x2 := offset_x //- float64(global.gWorld.width/2)*u.miniMapScale
+//	//offset_y2 := offset_y //- float64(global.gWorld.height/2)*u.miniMapScale
+//
+//	u.uPos = mgl32.Vec2{float32(offsetX / 2), float32(offsetY / 2)}
+//
+//	bounds := u.miniMapFrameCanvas.Bounds()
+//	//u.miniMapSprite.Draw(u.miniMapFrameCanvas, pixel.IM.Moved(pixel.V(offset_x2, offset_y2)).ScaledXY(pixel.V(0.8, 0.8), pixel.V(0.8, 0.8)))
+//	u.miniMapSprite.Draw(u.miniMapFrameCanvas, pixel.IM.Moved(pixel.V(bounds.Max.X/2, bounds.Max.Y/2)).ScaledXY(pixel.V(0.6, 0.6), pixel.V(0.6, 0.6)))
+//
+//	//global.gWorld.bgSprite.Draw(u.miniMapCanvas, pixel.IM.ScaledXY(pixel.V(u.miniMapScale, u.miniMapScale), pixel.V(u.miniMapScale/2, u.miniMapScale/2)).Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
+//	bounds = global.gWorld.bgSprite.Frame()
+//	global.gWorld.bgSprite.Draw(u.miniMapCanvas,
+//		pixel.IM.ScaledXY(
+//			pixel.V(u.miniMapScale, u.miniMapScale),
+//			pixel.V(u.miniMapScale/2, u.miniMapScale/2),
+//		).Moved(
+//			pixel.V((bounds.Max.X*u.miniMapScale)/2+pos.X*u.miniMapScale, (bounds.Max.Y*u.miniMapScale)/2+pos.Y*u.miniMapScale)))
+//	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(u.miniMapScale*pos.X+offset_x-float64(global.gWorld.width/2)*u.miniMapScale, u.miniMapScale*pos.Y+offset_y-float64(global.gWorld.height/2)*u.miniMapScale)))
+//	//canvas.Draw(u.canvas, pixel.IM.Moved(pixel.V(offset_x, offset_y)))
+//}
 
 func (u *ui) setMiddleText(text string) {
 	//u.middleTextStr = text
@@ -106,8 +106,8 @@ func (u *ui) draw(dt float64) {
 	}
 	u.updatePlayerLife()
 
-	u.miniMapCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
-	u.miniMapFrameCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
+	// u.miniMapCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
+	// u.miniMapFrameCanvas.Clear(pixel.RGBA{R: 0, G: 0, B: 0, A: 0})
 
 	//u.updateMiniMap()
 

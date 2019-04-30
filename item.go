@@ -81,7 +81,7 @@ func (i *item) action(m *mob) {
 		if dir != 0 {
 			// 2. If so, check if there is a position on the other side where the mob fits.
 			for x := 50.0; x < 150; x++ {
-				if global.gWorld.IsBackground(i.bounds.X+(dir*x), i.bounds.Y+i.bounds.Height/2) {
+				if global.gWorld.IsRegular(i.bounds.X+(dir*x), i.bounds.Y+i.bounds.Height/2) {
 					// 3. Move player.
 					m.bounds.X = i.bounds.X + (dir * (x + 10))
 					// 4. Destroy portal (explode)

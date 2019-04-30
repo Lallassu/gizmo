@@ -75,7 +75,8 @@ func setup() {
 	global.gController.setActiveEntity(global.gPlayer)
 	global.gCamera.setFollow(global.gPlayer)
 	global.gTextures.load("packed.json")
-	global.gMap.newMap(1)
+	global.gMap.newMapFromImg()
+	//global.gMap.newMap(1)
 
 	//global.gWin.Canvas().SetUniform("utime", &global.utime)
 	global.gWin.Canvas().SetFragmentShader(fragmentShaderFullScreen)
@@ -105,12 +106,16 @@ func gameLoop() {
 
 				global.gWin.Clear(global.gClearColor)
 
+				global.gMap.updateBG(wMaxInvFPS)
+
 				global.gController.update(wMaxInvFPS)
 				global.gWorld.Draw(wMaxInvFPS, elapsed)
 				global.gTextures.update(wMaxInvFPS)
 
 				global.gParticleEngine.update(wMaxInvFPS)
 				global.gAmmoEngine.update(wMaxInvFPS)
+
+				global.gMap.updateFG(wMaxInvFPS)
 
 				global.gCamera.update(wMaxInvFPS)
 

@@ -1,8 +1,33 @@
 General
 --------
-- Use tilemap maps instead.
-    -> use 32x32 pixels or something and draw each 
-       as that size in the game.
+- Använd inte BG/FG Chunk.
+- Använd uint64 med alpha för pixlar.
+- Set 1 LSB to 1 if pixel is used.
+- Fixa dynamiskt antal chunks så det skapas allt eftersom man addar pixels.
+
+- MAP:
+    - read bg
+    - read layers
+    - parrallax layers
+- World:
+    - Not shadows
+    - Only destructable or not + ladder 
+    - Shoot stuff but can still walk through them.
+        - Buildings
+        - Items etc.
+
+- Remove FG/BG pixels. Only use ONE type.
+- Remove PCG
+- Remove Map Coloring
+- Remove Map Generator
+- Remove Packed*
+
+- Use regular images for maps
+    - bg, fg, actual map
+- Use Tiled to create positions in map for items.
+    - mark parts that should be marked as none-destructable
+
+- Graphics for players, enemies, weapons, crates, etc.
 
 - New Game must initialize everything correctly (now player is not hurt)
 - Remove minimap?
@@ -12,11 +37,8 @@ General
     -> Right now everything is scaled differently in fullscreen.
     -> Shouldn't take ViewMax into account, should be based on screen W/H.
 
-- lasers (lights with straight angle)
-
 - Lights are not finding correct path, just checks bounds. Should check pixelwise if possible.
 
-- Map FG chunks draws strange?
 
 - Add joystick support
 
@@ -31,17 +53,6 @@ General
 
 - Handle respawn when dead.
     - Reset of player
-
-- Shader for minimap
-    -> Own canvas for map-shader.
-        -> Middle of the frame canvas.
-    -> Set map correct position compared to player.
-    -> Add enemies to minimap?
-- Key to zoom in minimap instantly.
-
-- Elevators
-    -> Object
-    -> Moving certain path
 
 - Use shader for shadows instead of calculation of fg?
 

@@ -29,7 +29,7 @@ func (w *weapon) newWeapon(x, y float64, wType objectType) {
 
 	switch wType {
 	case weaponAk47:
-		w.ammoCount = 50
+		w.ammoCount = 5000
 		ammoBarType = "ammobar.png"
 		w.sheetFile = fmt.Sprintf("%v%v", wAssetObjectsPath, "ak47_weapon.png")
 		w.name = "ak47"

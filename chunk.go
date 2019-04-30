@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
+	_ "github.com/faiface/pixel/pixelgl"
 )
 
 // chunk handles triangle data and batch drawing
@@ -11,7 +11,6 @@ type chunk struct {
 	batch     *pixel.Batch
 	triangles *pixel.TrianglesData
 	bounds    *Bounds
-	cType     chunkType
 	sprite    *pixel.Sprite
 }
 
@@ -39,107 +38,102 @@ func (c *chunk) create(x, y float64, pixels int) {
 
 // Draw the chunk
 func (c *chunk) draw(dt, elapsed float64) {
-	if c.cType == fgChunk {
-		if c.dirty {
-			c.build()
-		}
-		c.batch.Draw(global.gWin)
-	} else {
-		c.sprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(c.bounds.X+c.bounds.Width/2, c.bounds.Y+c.bounds.Height/2)))
+	if c.dirty {
+		c.build()
 	}
+	c.batch.Draw(global.gWin)
 }
 
 // Rebuild/Build the chunk.
 func (c *chunk) build() {
 	//	start := time.Now()
 	i := 0
-	rc := uint32(0)
-	gc := uint32(0)
-	bc := uint32(0)
-	p2 := uint32(0)
-	r1 := uint32(0)
-	g1 := uint32(0)
-	b1 := uint32(0)
+	//rc := uint32(0)
+	//gc := uint32(0)
+	//bc := uint32(0)
+	//p2 := uint32(0)
+	//r1 := uint32(0)
+	//g1 := uint32(0)
+	//b1 := uint32(0)
 	draw := 0
 	sameX := 1.0
 	sameY := 1.0
-	pos := 0
+	//pos := 0
 	px := 0.0
 	py := 0.0
-	xpos := 0.0
+	//xpos := 0.0
 
 	for x := 0.0; x < c.bounds.Width; x++ {
 		for y := 0.0; y < c.bounds.Height; y++ {
-			p := global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))]
-			// Skip visisted or empty
-			if p == 0 || p&0xFF>>7 == 0 {
+			pp := int(float64(global.gWorld.width)*(x+c.bounds.X) + (y + c.bounds.Y))
+			if pp >= len(global.gWorld.pixels) {
 				continue
 			}
-			if p&0xFF != wBackground8 && c.cType == bgChunk {
+			p := global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))]
+			// Skip visisted or empty
+			if p == 0 {
 				continue
 			}
 
-			if p&0xFF == wBackground8 && c.cType == fgChunk {
-				continue
-			}
-			rc = p >> 24 & 0xFF
-			gc = p >> 16 & 0xFF
-			bc = p >> 8 & 0xFF
+			// if p&0xFF>>7 == 0 {
+			// 	continue
+			// }
+
+			// rc = p >> 24 & 0xFF
+			// gc = p >> 16 & 0xFF
+			// bc = p >> 8 & 0xFF
 			sameX = 1.0
 			sameY = 1.0
 
-			// Greedy algorithm to check for range of colors.
-			// Use first bit in alpha to check for if it has been visited or not.
-			// It's not being used anyway. Or at least for now :)
+			// // Greedy algorithm to check for range of colors.
+			// // Use first bit in alpha to check for if it has been visited or not.
+			// // It's not being used anyway. Or at least for now :)
 
-			// First check how far we can go with the same pixel color
-			// For each X, walk as long as possible towards Y
-			for l := x + 1; l < c.bounds.Width; l++ {
-				// Check color
-				xpos = float64(global.gWorld.width) * (l + c.bounds.X)
-				pos = int(xpos + (y + c.bounds.Y))
-				p2 = global.gWorld.pixels[pos]
-				if p2 == 0 {
-					break
-				}
-				r1 = p2 >> 24 & 0xFF
-				g1 = p2 >> 16 & 0xFF
-				b1 = p2 >> 8 & 0xFF
+			// // First check how far we can go with the same pixel color
+			// // For each X, walk as long as possible towards Y
+			// for l := x + 1; l < c.bounds.Width; l++ {
+			// 	// Check color
+			// 	xpos = float64(global.gWorld.width) * (l + c.bounds.X)
+			// 	pos = int(xpos + (y + c.bounds.Y))
+			// 	if pos >= len(global.gWorld.pixels) {
+			// 		continue
+			// 	}
+			// 	p2 = global.gWorld.pixels[pos]
+			// 	if p2 == 0 {
+			// 		break
+			// 	}
+			// 	r1 = p2 >> 24 & 0xFF
+			// 	g1 = p2 >> 16 & 0xFF
+			// 	b1 = p2 >> 8 & 0xFF
 
-				if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
-					if p2&0xFF != wBackground8 && c.cType == bgChunk {
-						break
-					}
-					// Same color and not yet visited!
-					global.gWorld.pixels[pos] &= 0xFFFFFF7F
-					sameX++
-					newY := 1.0
-					for k := y; k < c.bounds.Height; k++ {
-						pos = int(xpos + (k + c.bounds.Y))
-						p2 = global.gWorld.pixels[pos]
-						r1 = p2 >> 24 & 0xFF
-						g1 = p2 >> 16 & 0xFF
-						b1 = p2 >> 8 & 0xFF
+			// 	if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
+			// 		// Same color and not yet visited!
+			// 		global.gWorld.pixels[pos] &= 0xFFFFFF7F
+			// 		sameX++
+			// 		newY := 1.0
+			// 		for k := y; k < c.bounds.Height; k++ {
+			// 			pos = int(xpos + (k + c.bounds.Y))
+			// 			p2 = global.gWorld.pixels[pos]
+			// 			r1 = p2 >> 24 & 0xFF
+			// 			g1 = p2 >> 16 & 0xFF
+			// 			b1 = p2 >> 8 & 0xFF
 
-						if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
-							if p2&0xFF != wBackground8 && c.cType == bgChunk {
-								break
-							}
-							global.gWorld.pixels[pos] &= 0xFFFFFF7F
-							newY++
-						} else {
-							break
-						}
-					}
-					if newY < sameY {
-						break
-					} else {
-						sameY = newY
-					}
-				} else {
-					break
-				}
-			}
+			// 			if r1 == rc && g1 == gc && b1 == bc && ((p2&0xFF)>>7) == 1 {
+			// 				global.gWorld.pixels[pos] &= 0xFFFFFF7F
+			// 				newY++
+			// 			} else {
+			// 				break
+			// 			}
+			// 		}
+			// 		if newY < sameY {
+			// 			break
+			// 		} else {
+			// 			sameY = newY
+			// 		}
+			// 	} else {
+			// 		break
+			// 	}
+			// }
 
 			px = x + c.bounds.X
 			py = y + c.bounds.Y
@@ -176,7 +170,11 @@ func (c *chunk) build() {
 	// Reset the greedy bit
 	for x := 0.0; x < c.bounds.Width; x++ {
 		for y := 0.0; y < c.bounds.Height; y++ {
-			global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))] |= 0x00000080
+			pp := int(float64(global.gWorld.width)*(x+c.bounds.X) + (y + c.bounds.Y))
+			if pp >= len(global.gWorld.pixels) {
+				continue
+			}
+			//	global.gWorld.pixels[int(float64(global.gWorld.width)*(x+c.bounds.X)+(y+c.bounds.Y))] |= 0x00000080
 		}
 	}
 	//	elapsed := time.Since(start)
@@ -186,11 +184,4 @@ func (c *chunk) build() {
 	c.dirty = false
 
 	// If background we build our sprite
-	if c.cType == bgChunk {
-		canvas := pixelgl.NewCanvas(pixel.R(0, 0, float64(global.gWorld.width), float64(global.gWorld.height)))
-		c.batch.Draw(canvas)
-		c.sprite = pixel.NewSprite(canvas, pixel.R(c.bounds.X, c.bounds.Y, c.bounds.X+c.bounds.Width, c.bounds.Y+c.bounds.Height))
-		c.triangles.SetLen(0)
-		c.batch = nil
-	}
 }

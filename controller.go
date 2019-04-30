@@ -73,6 +73,10 @@ func (c *controller) update(dt float64) {
 		global.gWorld.gravity -= 0.1
 	}
 
+	if global.gWin.Pressed(pixelgl.KeyK) {
+		global.gWorld.buildAllChunks()
+	}
+
 	// Controllers for entity
 	if c.entity == nil {
 		return

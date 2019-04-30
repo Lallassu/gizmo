@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	"math/rand"
 
 	"github.com/faiface/pixel"
 )
@@ -16,7 +15,6 @@ type world struct {
 	pixels     []uint32
 	currentMap mapType
 	gravity    float64
-	bgSprite   *pixel.Sprite
 	doors      []pixel.Vec
 }
 
@@ -43,7 +41,7 @@ func (w *world) NewMap(width, height, size float64) {
 	// FG Chunks
 	for x := 0; x < w.width; x += wPixelsPerChunk {
 		for y := 0; y < w.height; y += wPixelsPerChunk {
-			c := &chunk{cType: fgChunk}
+			c := &chunk{}
 			c.create(float64(x), float64(y), wPixelsPerChunk)
 			w.qt.Insert(c.bounds)
 		}
@@ -55,30 +53,21 @@ func (w *world) buildAllChunks() {
 	for _, v := range w.qt.RetrieveIntersections(&Bounds{X: 0, Y: 0, Width: float64(w.width), Height: float64(w.height)}) {
 		v.entity.draw(-1, 0)
 	}
-
-	// One sprite for whole bg
-	c := &chunk{cType: bgChunk}
-	c.create(float64(0), float64(0), w.width)
-	c.build()
-	w.bgSprite = c.sprite
 }
 
-func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
-	posX := rand.Intn(w.width - 1)
-	posY := rand.Intn(w.height - 1)
-	for x := posX - size/2; x < posX+size/2; x++ {
-		for y := posY - size/2; y < posY+size/2; y++ {
-			pos := x*w.width + y
-			if pos < len(w.pixels) && pos >= 0 {
-				p := w.pixels[pos]
-				if p&0xFF != wBackground8 {
-					return pixel.Vec{}, false
-				}
-			}
-		}
-	}
-	return pixel.Vec{X: float64(posX), Y: float64(posY)}, true
-}
+//func (w *world) fitInWorld(size int) (pixel.Vec, bool) {
+//	posX := rand.Intn(w.width - 1)
+//	posY := rand.Intn(w.height - 1)
+//	for x := posX - size/2; x < posX+size/2; x++ {
+//		for y := posY - size/2; y < posY+size/2; y++ {
+//			pos := x*w.width + y
+//			if pos < len(w.pixels) && pos >= 0 {
+//				p := w.pixels[pos]
+//			}
+//		}
+//	}
+//	return pixel.Vec{X: float64(posX), Y: float64(posY)}, true
+//}
 
 // Add object to world (QT)
 func (w *world) AddObject(obj *Bounds) {
@@ -90,39 +79,12 @@ func (w *world) RemoveObject(obj entity) {
 
 }
 
-// Check if pixel is a background
-func (w *world) IsBackground(posX, posY float64) bool {
-	x := int(posX)
-	y := int(posY)
-	pos := w.width*x + y
-	if pos < w.size && pos >= 0 {
-		if w.pixels[pos]&0xFF == wBackground8 ||
-			w.pixels[pos]&0xFF == wBackgroundNew8 {
-			return true
-		}
-	}
-	return false
-}
-
-// Check if pixel is a shadow
-func (w *world) IsShadow(posX, posY float64) bool {
-	x := int(posX)
-	y := int(posY)
-	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
-		if w.pixels[pos]&0xFF == wShadow8 {
-			return true
-		}
-	}
-	return false
-}
-
 // Check if pixel is regular
 func (w *world) IsRegular(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == 0xFF {
 			return true
 		}
@@ -135,8 +97,9 @@ func (w *world) IsWall(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
-		if w.pixels[pos] != 0 && w.pixels[pos]&0xFF != wBackgroundNew8 && w.pixels[pos]&0xFF != wBackground8 && w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != wLadder8 {
+	if pos < w.size && pos >= 0 {
+		//if w.pixels[pos] != 0 && w.pixels[pos]&0xFF != wBackgroundNew8 && w.pixels[pos]&0xFF != wBackground8 && w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != wLadder8 {
+		if w.pixels[pos] != 0 {
 			return true
 		}
 	}
@@ -148,7 +111,7 @@ func (w *world) IsLadder(posX, posY float64) bool {
 	x := int(posX)
 	y := int(posY)
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == wLadder8 {
 			return true
 		}
@@ -173,8 +136,6 @@ func (w *world) PixelColor(x, y float64) int32 {
 
 // Draw
 func (w *world) Draw(dt, elapsed float64) {
-	r := w.bgSprite.Frame()
-	w.bgSprite.Draw(global.gWin, pixel.IM.Moved(pixel.V(r.Max.X/2, r.Max.Y/2)))
 
 	// Draw objects in QT around player position only.
 	pos := pixel.Vec{X: 0, Y: 0}
@@ -191,7 +152,7 @@ func (w *world) Draw(dt, elapsed float64) {
 // Add pixel with color (replace if already exists)
 func (w *world) AddPixel(x, y int, color uint32) {
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		w.pixels[pos] = color
 		w.markChunkDirty(x, y)
 	}
@@ -200,7 +161,7 @@ func (w *world) AddPixel(x, y int, color uint32) {
 // Set pixel without rebuilding chunk
 func (w *world) SetPixel(x, y int, color uint32) {
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		w.pixels[pos] = color
 	}
 }
@@ -208,22 +169,22 @@ func (w *world) SetPixel(x, y int, color uint32) {
 // Remove a pixel from the world map
 func (w *world) RemovePixel(x, y int) {
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
-		if w.pixels[pos]&0xFF == wStaticColor8 ||
-			w.pixels[pos]&0xFF == wBackground8 ||
-			w.pixels[pos]&0xFF == wBackgroundNew8 ||
-			w.pixels[pos]&0xFF == wLadder8 ||
-			w.pixels[pos]&0xFF == wShadow8 {
-			return
-		}
+	if pos < w.size && pos >= 0 {
+		// if w.pixels[pos]&0xFF == wStaticColor8 ||
+		// 	w.pixels[pos]&0xFF == wBackground8 ||
+		// 	w.pixels[pos]&0xFF == wBackgroundNew8 ||
+		// 	w.pixels[pos]&0xFF == wLadder8 ||
+		// 	w.pixels[pos]&0xFF == wShadow8 {
+		// 	return
+		// }
 
 		// Remove shadow
-		for i := 0; i < wShadowLength; i++ {
-			pos2 := (x+i)*w.width + y - i
-			if pos2 < w.width*w.height && pos2 >= 0 {
-				w.removeShadow(x+i, y-i)
-			}
-		}
+		// for i := 0; i < wShadowLength; i++ {
+		// 	pos2 := (x+i)*w.width + y - i
+		// 	if pos2 < w.size && pos2 >= 0 {
+		// 		w.removeShadow(x+i, y-i)
+		// 	}
+		// }
 
 		// Particle
 		if w.IsRegular(float64(x), float64(y)) {
@@ -246,11 +207,12 @@ func (w *world) RemovePixel(x, y int) {
 		}
 
 		// Set bg pixel.
-		if w.pixels[pos] != 0 {
-			v := global.gMapColor.backgroundSoft
-			v &= wBackgroundNew32
-			w.pixels[pos] = v
-		}
+		// if w.pixels[pos] != 0 {
+		// 	v := global.gMapColor.backgroundSoft
+		// 	v &= wBackgroundNew32
+		// 	w.pixels[pos] = v
+		// }
+		w.pixels[pos] = 0
 		w.markChunkDirty(x, y)
 	}
 }
@@ -264,7 +226,7 @@ func (w *world) Explode(posX, posY float64, power int) {
 	x := int(posX)
 	y := int(posY)
 	pow := power * power
-	ff := make([]pixel.Vec, 50)
+	//ff := make([]pixel.Vec, 50)
 	for rx := x - power; rx <= x+power; rx++ {
 		vx := (rx - x) * (rx - x)
 		for ry := y - power; ry <= y+power; ry++ {
@@ -278,9 +240,9 @@ func (w *world) Explode(posX, posY float64, power int) {
 				//for _, v := range w.qt.RetrieveIntersections(&Bounds{X: float64(rx), Y: float64(ry), Width: 1, Height: 1}) {
 				//	v.entity.hit(x_, y_)
 				//}
-			} else {
-				ff = append(ff, pixel.Vec{X: float64(rx), Y: float64(ry)})
-			}
+			} // else {
+			// 	ff = append(ff, pixel.Vec{X: float64(rx), Y: float64(ry)})
+			// }
 		}
 	}
 
@@ -290,24 +252,24 @@ func (w *world) Explode(posX, posY float64, power int) {
 	}
 
 	// Add shadows
-	for n := 0; n < len(ff); n++ {
-		ffx := int(ff[n].X)
-		ffy := int(ff[n].Y)
-		pp := ffx*w.width + ffy
-		if pp >= 0 && pp < w.width*w.height {
-			if w.pixels[pp]&0xFF == 0xFF {
-				for i := 0; i < wShadowLength; i++ {
-					pos2 := (ffx+i)*w.width + ffy - i
-					if pos2 < w.width*w.height && pos2 >= 0 {
-						if w.pixels[pos2]&0xFF == wBackground8 ||
-							w.pixels[pos2]&0xFF == wBackgroundNew8 {
-							w.addShadow(ffx+i, ffy-i)
-						}
-					}
-				}
-			}
-		}
-	}
+	// for n := 0; n < len(ff); n++ {
+	// 	ffx := int(ff[n].X)
+	// 	ffy := int(ff[n].Y)
+	// 	pp := ffx*w.width + ffy
+	// 	if pp >= 0 && pp < w.size {
+	// 		if w.pixels[pp]&0xFF == 0xFF {
+	// 			for i := 0; i < wShadowLength; i++ {
+	// 				pos2 := (ffx+i)*w.width + ffy - i
+	// 				if pos2 < w.size && pos2 >= 0 {
+	// 					if w.pixels[pos2]&0xFF == wBackground8 ||
+	// 						w.pixels[pos2]&0xFF == wBackgroundNew8 {
+	// 						w.addShadow(ffx+i, ffy-i)
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 	l := light{}
 	if power > 10 {
 		l.create(posX, posY, 300, 360, float64(2*power), pixel.RGBA{R: 0.8, G: 0.3, B: 0, A: 0.1}, true, 0.1)
@@ -331,6 +293,7 @@ func (w *world) floodFill(x, y int) {
 
 // Remove shadows from map on given position
 func (w *world) removeShadow(x, y int) {
+	return
 	pos := w.width*x + y
 	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF == wShadow8 {
@@ -345,8 +308,9 @@ func (w *world) removeShadow(x, y int) {
 
 // Add shadows to map on given position
 func (w *world) addShadow(x, y int) {
+	return
 	pos := w.width*x + y
-	if pos < w.width*w.height && pos >= 0 {
+	if pos < w.size && pos >= 0 {
 		if w.pixels[pos]&0xFF != wShadow8 && w.pixels[pos]&0xFF != 0xFF {
 			r := uint32(math.Ceil(float64(w.pixels[pos]>>24&0xFF) / wShadowDepth))
 			g := uint32(math.Ceil(float64(w.pixels[pos]>>16&0xFF) / wShadowDepth))
