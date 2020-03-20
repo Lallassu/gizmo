@@ -63,7 +63,7 @@ func setup() {
 	global.gUI.create()
 	global.gMapColor.create()
 	global.gRand.create(100000)
-	global.gSounds.create()
+	//global.gSounds.create()
 	global.gCamera.create()
 	global.gController.create()
 	global.gWorld.Init()
