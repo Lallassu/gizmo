@@ -20,6 +20,8 @@ The main menu is not ready yet, you can use `ESC` to start the game & arrows for
 - s -> zoom out 
 - w -> zoom in
 - Left Shift -> shoot
+- arrow + v -> throw box while holding
+- a -> transition while holding power ring 
 
 ## Screenshots
 ![](https://raw.github.com/lallassu/gizmo/master/preview.png)
