@@ -13,13 +13,13 @@ go run .
 
 ## Game controls 
 
-The main menu is not ready yet, you can use `ESC` to start the game. 
+The main menu is not ready yet, you can use `ESC` to start the game & arrows for navigation.
 - b -> pick weapon
-- v -> drop weapon 
-- arrows for navigation
+- v -> drop weapon
 - q -> quit
 - s -> zoom out 
 - w -> zoom in
+- Left Shift -> shoot
 
 ## Screenshots
 ![](https://raw.github.com/lallassu/gizmo/master/preview.png)
